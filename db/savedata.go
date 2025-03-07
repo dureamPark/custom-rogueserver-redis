@@ -23,6 +23,8 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"os"
+	"log"
+	"fmt"
 
 	"github.com/klauspost/compress/zstd"
 	"github.com/pagefaultgames/rogueserver/defs"
@@ -60,14 +62,18 @@ func ReadSeedCompleted(uuid []byte, seed string) (bool, error) {
 }
 
 func ReadSystemSaveData(uuid []byte) (defs.SystemSaveData, error) {
+	log.Println("ReadSystemSaveData ", uuid);
 	var system defs.SystemSaveData
 
 	var data []byte
 	err := handle.QueryRow("SELECT data FROM systemSaveData WHERE uuid = ?", uuid).Scan(&data)
 	if err != nil {
+		log.Println("Not Find Data");
 		return system, err
 	}
 
+
+	log.Println(data);
 	zr, err := zstd.NewReader(bytes.NewReader(data))
 	if err != nil {
 		return system, err
@@ -84,6 +90,8 @@ func ReadSystemSaveData(uuid []byte) (defs.SystemSaveData, error) {
 }
 
 func StoreSystemSaveData(uuid []byte, data defs.SystemSaveData) error {
+	log.Println("StoreSystemSaveData ", uuid, data);
+
 	buf := new(bytes.Buffer)
 
 	zw, err := zstd.NewWriter(buf)
@@ -91,12 +99,28 @@ func StoreSystemSaveData(uuid []byte, data defs.SystemSaveData) error {
 		return err
 	}
 
-	defer zw.Close()
+	//defer zw.Close()
 
 	err = gob.NewEncoder(zw).Encode(data)
 	if err != nil {
+		log.Println("Encoding Error:", err)
 		return err
 	}
+
+	zw.Flush()
+	log.Println("✅ Data flushed to buffer!")
+
+	err = zw.Close()
+	if err != nil {
+	    log.Println("❌ Failed to close ZSTD writer:", err)
+	} else {
+	    log.Println("✅ ZSTD writer closed successfully")
+	}
+
+
+	log.Println("Compressed Data Length:", len(buf.Bytes()))
+	log.Println("Compressed Data Content:", buf.Bytes())
+	fmt.Println("Origin Data:", data);
 
 	_, err = handle.Exec("REPLACE INTO systemSaveData (uuid, data, timestamp) VALUES (?, ?, UTC_TIMESTAMP())", uuid, buf.Bytes())
 	if err != nil {
@@ -147,6 +171,7 @@ func DeleteSystemSaveData(uuid []byte) error {
 }
 
 func ReadSessionSaveData(uuid []byte, slot int) (defs.SessionSaveData, error) {
+	log.Println("ReadSessionSaveData", uuid, slot);
 	var session defs.SessionSaveData
 
 	var data []byte
@@ -181,6 +206,7 @@ func GetLatestSessionSaveDataSlot(uuid []byte) (int, error) {
 }
 
 func StoreSessionSaveData(uuid []byte, data defs.SessionSaveData, slot int) error {
+	log.Println("StoreSessionSaveData", uuid, data, slot);
 	buf := new(bytes.Buffer)
 
 	zw, err := zstd.NewWriter(buf)
@@ -188,12 +214,14 @@ func StoreSessionSaveData(uuid []byte, data defs.SessionSaveData, slot int) erro
 		return err
 	}
 
-	defer zw.Close()
+	//defer zw.Close()
 
 	err = gob.NewEncoder(zw).Encode(data)
 	if err != nil {
 		return err
 	}
+
+	zw.Close();
 
 	_, err = handle.Exec("REPLACE INTO sessionSaveData (uuid, slot, data, timestamp) VALUES (?, ?, ?, UTC_TIMESTAMP())", uuid, slot, buf.Bytes())
 	if err != nil {

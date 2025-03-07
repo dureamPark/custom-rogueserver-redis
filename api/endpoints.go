@@ -355,6 +355,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	log.Println("handleUpdateAll  ", uuid, data.SessionSlotId);
 	existingSave, err := savedata.GetSession(uuid, data.SessionSlotId)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		httpError(w, r, fmt.Errorf("failed to retrieve session save data: %s", err), http.StatusInternalServerError)
@@ -366,14 +367,17 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	log.Println("Update ", uuid, data.SessionSlotId, data.Session);
 	err = savedata.Update(uuid, data.SessionSlotId, data.Session)
 	if err != nil {
+		log.Print(err);
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
 	err = savedata.Update(uuid, 0, data.System)
 	if err != nil {
+		log.Print(err);
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
 	}

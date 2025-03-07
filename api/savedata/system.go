@@ -20,6 +20,7 @@ package savedata
 import (
 	"fmt"
 	"os"
+	"log"
 
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
@@ -32,6 +33,7 @@ func GetSystem(uuid []byte) (defs.SystemSaveData, error) {
 	if os.Getenv("S3_SYSTEM_BUCKET_NAME") != "" { // use S3
 		system, err = db.GetSystemSaveFromS3(uuid)
 	} else { // use database
+		log.Println("use database GetSystem");
 		system, err = db.ReadSystemSaveData(uuid)
 	}
 	if err != nil {
