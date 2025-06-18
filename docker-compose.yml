@@ -18,6 +18,14 @@ services:
       - internal
     ports:
       - "8001:8001"
+    deploy:
+      resources:
+        limits:
+          cpus: '2.5'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
 
   db:
     image: mariadb:11
@@ -35,12 +43,38 @@ services:
       MYSQL_USER: pokerogue
       MYSQL_PASSWORD: pokerogue
     volumes:
-      - database:/var/lib/mysql
+      - /mnt/ssd/database:/var/lib/mysql
       - ./mariadb.cnf:/etc/mysql/conf.d/mariadb.cnf  # 설정 파일 로드
+      - ./init-permissions.sql:/docker-entrypoint-initdb.d/init-permissions.sql
     networks:
       - internal
     ports:
       - "3306:3306"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 5G
+        reservations:
+          cpus: '0.3'
+          memory: 3G
+
+
+  # Watchtower is a service that will automatically update your running containers
+  # when a new image is available. This is useful for keeping your server up-to-date.
+  # see https://containrrr.dev/watchtower/ for more information.
+  #watchtower:
+  #  image: containrrr/watchtower
+  #  container_name: watchtower
+  #  restart: always
+  #  security_opt:
+  #    - no-new-privileges:true
+  #  environment:
+  #    WATCHTOWER_CLEANUP: "true"
+  #    WATCHTOWER_SCHEDULE: "@midnight"
+  #  volumes:
+  #    - /etc/localtime:/etc/localtime:ro
+  #    - /var/run/docker.sock:/var/run/docker.sock
 
   mysqld_exporter:
     image: prom/mysqld-exporter:latest
@@ -51,61 +85,54 @@ services:
     command:
       - "--mysqld.username=pokerogue:pokerogue"
       - "--mysqld.address=db:3306"
-      - "--collect.slave_status"
+        #- "--collect.slave_status"
+    environment:
+      - DATA_SOURCE_NAME=pokerogue:pokerogue@(db:3306)/
     depends_on:
       - db
     networks:
       - internal
+      - monitoring_network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 0.3G
+        reservations:
+          cpus: '0.2'
+          memory: 0.2G
 
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    restart: always
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.0
+    container_name: cadvisor
+    privileged: true # Docker 소켓 및 시스템 정보 접근을 위해 필요
+    volumes:
+      - /:/rootfs:ro # 호스트 파일 시스템 읽기 전용 마운트
+      - /var/run:/var/run:rw # Docker 데몬 소켓 접근
+      - /sys:/sys:ro # 시스템 정보 접근
+      - /var/lib/docker:/var/lib/docker:ro # Docker 데이터 디렉토리 읽기 전용
     ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    depends_on:
-      - mysqld_exporter
+      - "8080:8080" # VM3의 Prometheus가 이 포트로 cAdvisor 메트릭을 스크랩
     networks:
-      - internal
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
+      - monitoring_network
     restart: always
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana_data:/var/lib/grafana
-    depends_on:
-      - prometheus
-    networks:
-      - internal
-
-
-
-  # Watchtower is a service that will automatically update your running containers
-  # when a new image is available. This is useful for keeping your server up-to-date.
-  # see https://containrrr.dev/watchtower/ for more information.
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    restart: always
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      WATCHTOWER_CLEANUP: "true"
-      WATCHTOWER_SCHEDULE: "@midnight"
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 0.2G
+        reservations:
+          cpus: '0.1'
+          memory: 0.1G
 
 volumes:
-  database:
   mariadb_data:
-  grafana_data:
 
 networks:
   internal:
+   
+  # 모니터링 Exporter와 Prometheus간의 통신용 네트워크
+  # Prometheus가 
+  monitoring_network:
+    driver: bridge 
 
