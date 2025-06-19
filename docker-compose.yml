@@ -10,9 +10,14 @@ services:
       dbname: pokeroguedb
       gameurl: http://localhost:8000
       callbackurl: http://localhost:8001
+      REDIS_ADDR: redis:6379
+      REDIS_PASS: ""
+      REDIS_DB:   "0"
 
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - internal
@@ -25,6 +30,25 @@ services:
           memory: 4G
         reservations:
           cpus: '1.0'
+          memory: 2G
+
+  redis:
+    image: redis:7
+    container_name: pokerogue-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 4G
+        reservations:
+          cpus: '0.3'
           memory: 2G
 
   db:
@@ -127,6 +151,7 @@ services:
 
 volumes:
   mariadb_data:
+  redis-data:
 
 networks:
   internal:
