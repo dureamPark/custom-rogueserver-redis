@@ -19,11 +19,16 @@ package db
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"log"
 	"slices"
+	"time"
 
+	redis "github.com/go-redis/redis/v9"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/defs"
 )
 
@@ -37,18 +42,59 @@ func AddAccountRecord(uuid []byte, username string, key, salt []byte) error {
 }
 
 func AddAccountSession(username string, token []byte) error {
-	_, err := handle.Exec("INSERT INTO sessions (uuid, token, expire) SELECT a.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEK) FROM accounts a WHERE a.username = ?", token, username)
-	if err != nil {
+	cacheKey := fmt.Sprintf("session:token:%s", username)
+	s, err := cache.Rdb.Get(cache.Ctx, cacheKey).Result()
+	if err == nil {
+		log.Printf("[CACHE HIT] key=%s", cacheKey)
+	} else if err == redis.Nil {
+		log.Printf("[CACHE MISS] key=%s", cacheKey)
+	} else {
+		log.Printf("[CACHE ERROR] key=%s err=%v", cacheKey, err)
+	}
+	// 1) 캐시 조회
+	if err == nil {
+		// hit: base64 → []byte 변환 후 token 슬라이스에 덮어쓰기
+		if decoded, err := base64.StdEncoding.DecodeString(s); err == nil && len(decoded) == len(token) {
+			copy(token, decoded)
+			return nil
+		}
+		// 디코드 실패하면 그냥 아래 DB 로직으로 넘어감
+	} else if !errors.Is(err, redis.Nil) {
+		// redis.Nil 이외의 실제 오류
+		return fmt.Errorf("redis GET error: %w", err)
+	}
+
+	// 2) DB 삽입: sessions 테이블
+	if _, err := handle.Exec("INSERT INTO sessions (uuid, token, expire) SELECT a.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEK) FROM accounts a WHERE a.username = ?", token, username); err != nil {
+		return err
+	}
+	// 3) DB 업데이트: lastLoggedIn
+	if _, err := handle.Exec("UPDATE accounts SET lastLoggedIn = UTC_TIMESTAMP() WHERE username = ?", username); err != nil {
 		return err
 	}
 
-	_, err = handle.Exec("UPDATE accounts SET lastLoggedIn = UTC_TIMESTAMP() WHERE username = ?", username)
-	if err != nil {
-		return err
+	// 4) 캐시에 저장 (base64, TTL=1주일)
+	encoded := base64.StdEncoding.EncodeToString(token)
+	if err := cache.Rdb.Set(cache.Ctx, cacheKey, encoded, 7*24*time.Hour).Err(); err != nil {
+		return fmt.Errorf("redis SET error: %w", err)
 	}
 
 	return nil
 }
+
+// func AddAccountSession(username string, token []byte) error {
+// 	_, err := handle.Exec("INSERT INTO sessions (uuid, token, expire) SELECT a.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEK) FROM accounts a WHERE a.username = ?", token, username)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	_, err = handle.Exec("UPDATE accounts SET lastLoggedIn = UTC_TIMESTAMP() WHERE username = ?", username)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }
 
 func AddDiscordIdByUsername(discordId string, username string) error {
 	_, err := handle.Exec("UPDATE accounts SET discordId = ? WHERE username = ?", discordId, username)
@@ -199,11 +245,11 @@ func FetchLastLoggedInDateByUsername(username string) (string, error) {
 }
 
 type AdminSearchResponse struct {
-	Username        string `json:"username"`
-	DiscordId       string `json:"discordId"`
-	GoogleId        string `json:"googleId"`
-	LastActivity	string `json:"lastLoggedIn"` // TODO: this is currently lastLoggedIn to match server PR #54 with pokerogue PR #4198. We're hotfixing the server with this PR to return lastActivity, but we're not hotfixing the client, so are leaving this as lastLoggedIn so that it still talks to the client properly
-	Registered		string `json:"registered"`
+	Username     string `json:"username"`
+	DiscordId    string `json:"discordId"`
+	GoogleId     string `json:"googleId"`
+	LastActivity string `json:"lastLoggedIn"` // TODO: this is currently lastLoggedIn to match server PR #54 with pokerogue PR #4198. We're hotfixing the server with this PR to return lastActivity, but we're not hotfixing the client, so are leaving this as lastLoggedIn so that it still talks to the client properly
+	Registered   string `json:"registered"`
 }
 
 func FetchAdminDetailsByUsername(dbUsername string) (AdminSearchResponse, error) {
@@ -216,11 +262,11 @@ func FetchAdminDetailsByUsername(dbUsername string) (AdminSearchResponse, error)
 	}
 
 	adminResponse = AdminSearchResponse{
-		Username:        username.String,
-		DiscordId:       discordId.String,
-		GoogleId:        googleId.String,
-		LastActivity:    lastActivity.String,
-		Registered:		 registered.String,
+		Username:     username.String,
+		DiscordId:    discordId.String,
+		GoogleId:     googleId.String,
+		LastActivity: lastActivity.String,
+		Registered:   registered.String,
 	}
 
 	return adminResponse, nil
