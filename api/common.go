@@ -41,27 +41,27 @@ func Init(mux *http.ServeMux) error {
 	}
 
 	// account
-	mux.HandleFunc("GET /account/info", handleAccountInfo)
-	mux.HandleFunc("POST /account/register", handleAccountRegister)
-	mux.HandleFunc("POST /account/login", handleAccountLogin)
-	mux.HandleFunc("POST /account/changepw", handleAccountChangePW)
-	mux.HandleFunc("GET /account/logout", handleAccountLogout)
+	mux.HandleFunc("GET /account/info", handleAccountInfo)//user info -> login 때문에 필요.
+	mux.HandleFunc("POST /account/register", handleAccountRegister)//register 제외. 실험 환경과 연관 없음.
+	mux.HandleFunc("POST /account/login", handleAccountLogin)//login 때문에 필요.
+	mux.HandleFunc("POST /account/changepw", handleAccountChangePW)//changePW 제외. 실험 환경과 연관 없음.
+	mux.HandleFunc("GET /account/logout", handleAccountLogout)//logout 때문에 필요.
 
 	// game
-	mux.HandleFunc("GET /game/titlestats", handleGameTitleStats)
-	mux.HandleFunc("GET /game/classicsessioncount", handleGameClassicSessionCount)
+	mux.HandleFunc("GET /game/titlestats", handleGameTitleStats)//game loop 때문에 필요.
+	mux.HandleFunc("GET /game/classicsessioncount", handleGameClassicSessionCount)//game loop 때문에 필요.
 
 	// savedata
-	mux.HandleFunc("/savedata/session/{action}", handleSession)
-	mux.HandleFunc("/savedata/system/{action}", handleSystem)
+	mux.HandleFunc("/savedata/session/{action}", handleSession)//game loop 때문에 필요.
+	mux.HandleFunc("/savedata/system/{action}", handleSystem)//game loop 때문에 필요.
 
 	// new session
-	mux.HandleFunc("POST /savedata/updateall", handleUpdateAll)
+	mux.HandleFunc("POST /savedata/updateall", handleUpdateAll)//game loop 때문에 필요.
 
 	// daily
-	mux.HandleFunc("GET /daily/seed", handleDailySeed)
-	mux.HandleFunc("GET /daily/rankings", handleDailyRankings)
-	mux.HandleFunc("GET /daily/rankingpagecount", handleDailyRankingPageCount)
+	mux.HandleFunc("GET /daily/seed", handleDailySeed)//Jmeter 실험에서 game loop에 없음. 제외.
+	mux.HandleFunc("GET /daily/rankings", handleDailyRankings)//daily run은 Jmeter 실험에서 제외.
+	mux.HandleFunc("GET /daily/rankingpagecount", handleDailyRankingPageCount)//daily run은 Jmeter 실험에서 제외.
 
 	// auth
 	mux.HandleFunc("/auth/{provider}/callback", handleProviderCallback)

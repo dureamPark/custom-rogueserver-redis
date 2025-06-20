@@ -388,6 +388,7 @@ func UpdateActiveSession(uuid []byte, clientSessionId string) error {
 
 func FetchUUIDFromToken(token []byte) ([]byte, error) {
 	var uuid []byte
+	//user info DB에서 조회. 따라서 cache setting 필요.
 	err := handle.QueryRow("SELECT uuid FROM sessions WHERE token = ?", token).Scan(&uuid)
 	if err != nil {
 		return nil, err

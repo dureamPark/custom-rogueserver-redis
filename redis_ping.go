@@ -1,5 +1,8 @@
+//go:build ignore
+// +build ignore
+
 // redis_ping.go
-/*package main
+package main
 
 import (
 	"context"
@@ -52,4 +55,3 @@ func main() {
 		fmt.Printf("⚠️  값 불일치! 기대: %s, 실제: %s\n", val, got)
 	}
 }
-*/

@@ -1,5 +1,6 @@
 services:
   server:
+    build: .
     image: rogueserver:latest
     restart: unless-stopped
     environment:
@@ -36,6 +37,11 @@ services:
     image: redis:7
     container_name: pokerogue-redis
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
     volumes:
       - redis-data:/data
     ports:

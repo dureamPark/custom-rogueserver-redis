@@ -1,0 +1,16806 @@
+cscope 15 /home/user/duream/custom-rogueserver-redis               0000083235
+	@api/account/changepw.go
+
+18 
+·ckage
+ 
+accouÁ
+
+
+20 
+impÜt
+ (
+
+27 
+func
+ 
+	$ChªgePW
+(
+uuid
+ []
+by‹
+, 
+·sswÜd
+ 
+¡ršg
+è
+”rÜ
+ {
+
+28 
+	`Ën
+(
+·sswÜd
+) < 6 {
+
+29  
+fmt
+.
+	`E¼Üf
+("invalid…assword")
+
+32 
+§É
+ :ğ
+	`make
+([]
+by‹
+, 
+ArgÚS®tSize
+)
+
+33 
+_
+, 
+”r
+ :ğ
+¿nd
+.
+	`R—d
+(
+§É
+)
+
+34 
+”r
+ !ğ
+n
+ {
+
+35  
+fmt
+.
+	`E¼Üf
+("çedØg’”©§É: %s", 
+”r
+)
+
+38 
+”r
+ = 
+db
+.
+	`Upd©eAccouÁPasswÜd
+(
+uuid
+, 
+	`d”iveArgÚ2IDKey
+([]
+	`by‹
+(
+·sswÜd
+), 
+§É
+), salt)
+
+39 
+”r
+ !ğ
+n
+ {
+
+40  
+fmt
+.
+	`E¼Üf
+("çedØadd‡ccouÁ„ecÜd: %s", 
+”r
+)
+
+43  
+n
+
+
+44 
+	}
+}
+
+	@api/account/common.go
+
+18 
+·ckage
+ 
+accouÁ
+
+
+20 
+impÜt
+ (
+
+27 
+ty³
+ 
+G’”icAuthRe¥Ú£
+ struct {
+
+28 
+Tok’
+ 
+	m¡ršg
+ `
+	mjsÚ
+:"token"`
+
+32 
+ArgÚTime
+ = 1
+
+33 
+ArgÚMemÜy
+ = 256 * 1024
+
+34 
+ArgÚTh»ads
+ = 4
+
+35 
+ArgÚKeySize
+ = 32
+
+36 
+ArgÚS®tSize
+ = 16
+
+38 
+UUIDSize
+ = 16
+
+39 
+Tok’Size
+ = 32
+
+42 
+	`v¬
+ (
+
+43 
+ArgÚMaxIn¡ªûs
+ = 
+ruÁime
+.
+	$NumCPU
+()
+
+45 
+isV®idU£ºame
+ = 
+»gexp
+.
+	`Mu¡Compe
+(`^\
+w
+{1,16
+	}
+
+}$
+`).
+M©chSŒšg
+
+
+46 
+£m­hÜe
+ = 
+	$make
+(
+chª
+ 
+boŞ
+, 
+ArgÚMaxIn¡ªûs
+)
+
+48 
+GameURL
+ 
+¡ršg
+
+
+49 
+OAuthC®lbackURL
+ 
+¡ršg
+
+
+52 
+func
+ 
+	`d”iveArgÚ2IDKey
+(
+·sswÜd
+, 
+§É
+ []
+by‹
+) []byte {
+
+53 
+£m­hÜe
+ <- 
+Œue
+
+
+54 
+deãr
+ 
+	`func
+(è{ <-
+£m­hÜe
+ }()
+
+56  
+¬gÚ2
+.
+	`IDKey
+(
+·sswÜd
+, 
+§É
+, 
+ArgÚTime
+, 
+ArgÚMemÜy
+, 
+ArgÚTh»ads
+, 
+ArgÚKeySize
+)
+
+57 
+	}
+}
+
+	@api/account/discord.go
+
+18 
+·ckage
+ 
+accouÁ
+
+
+20 
+impÜt
+ (
+
+29 
+	$v¬
+ (
+
+30 
+DiscÜdCl›ÁID
+ 
+¡ršg
+
+
+31 
+DiscÜdCl›ÁSeü‘
+ 
+¡ršg
+
+
+32 
+DiscÜdC®lbackURL
+ 
+¡ršg
+
+
+34 
+DiscÜdSessiÚ
+ *
+discÜdgo
+.
+SessiÚ
+
+
+35 
+DiscÜdGudID
+ 
+¡ršg
+
+
+38 
+func
+ 
+	$HªdËDiscÜdC®lback
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+è(
+¡ršg
+, 
+”rÜ
+) {
+
+39 
+code
+ :ğ
+r
+.
+URL
+.
+	`Qu”y
+().
+	`G‘
+("code")
+
+40 
+code
+ == "" {
+
+41 
+h‰p
+.
+	`Redœeù
+(
+w
+, 
+r
+, 
+GameURL
+, h‰p.
+StusS“Oth”
+)
+
+42  "", 
+”rÜs
+.
+	`New
+("code isƒmpty")
+
+45 
+discÜdId
+, 
+”r
+ :ğ
+	`R‘r›veDiscÜdId
+(
+code
+)
+
+46 
+”r
+ !ğ
+n
+ {
+
+47 
+h‰p
+.
+	`Redœeù
+(
+w
+, 
+r
+, 
+GameURL
+, h‰p.
+StusS“Oth”
+)
+
+48  "", 
+”r
+
+
+51  
+discÜdId
+, 
+n
+
+
+52 
+	}
+}
+
+54 
+func
+ 
+	$R‘r›veDiscÜdId
+(
+code
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+55 
+v
+ :ğ
+	`make
+(
+u¾
+.
+V®ues
+)
+
+56 
+v
+.
+	`S‘
+("ş›Á_id", 
+DiscÜdCl›ÁID
+)
+
+57 
+v
+.
+	`S‘
+("ş›Á_£ü‘", 
+DiscÜdCl›ÁSeü‘
+)
+
+58 
+v
+.
+	`S‘
+("grant_type", "authorization_code")
+
+59 
+v
+.
+	`S‘
+("code", 
+code
+)
+
+60 
+v
+.
+	`S‘
+("»dœeù_uri", 
+DiscÜdC®lbackURL
+)
+
+61 
+v
+.
+	`S‘
+("scope", "identify")
+
+63 
+tok’
+, 
+”r
+ :ğ
+h‰p
+.
+	`Po¡FÜm
+("h‰ps://discÜd.com/­i/ßuth2/tok’", 
+v
+)
+
+64 
+”r
+ !ğ
+n
+ {
+
+65  "", 
+”r
+
+
+69 
+ty³
+ 
+Tok’Re¥Ú£
+ struct {
+
+70 
+AcûssTok’
+ 
+¡ršg
+ `
+jsÚ
+:"access_token"`
+
+71 
+Tok’Ty³
+ 
+¡ršg
+ `
+jsÚ
+:"token_type"`
+
+72 
+ExpœesIn
+ `
+jsÚ
+:"expires_in"`
+
+73 
+Scİe
+ 
+¡ršg
+ `
+jsÚ
+:"scope"`
+
+74 
+ReäeshTok’
+ 
+¡ršg
+ `
+jsÚ
+:"refresh_token"`
+
+77 
+v¬
+ 
+tok’Re¥Ú£
+ 
+Tok’Re¥Ú£
+
+
+78 
+”r
+ = 
+jsÚ
+.
+	`NewDecod”
+(
+tok’
+.
+Body
+).
+	`Decode
+(&
+tok’Re¥Ú£
+)
+
+79 
+”r
+ !ğ
+n
+ {
+
+80  "", 
+”r
+
+
+83 
+acûss_tok’
+ :ğ
+tok’Re¥Ú£
+.
+AcûssTok’
+
+
+84 
+acûss_tok’
+ == "" {
+
+85  "", 
+”rÜs
+.
+	`New
+("accessoken isƒmpty")
+
+88 
+ş›Á
+ :ğ&
+h‰p
+.
+Cl›Á
+{}
+
+89 
+»q
+, 
+”r
+ :ğ
+h‰p
+.
+	`NewReque¡
+("GET", "h‰ps://discÜd.com/­i/u£rs/@me", 
+n
+)
+
+90 
+”r
+ !ğ
+n
+ {
+
+91  "", 
+”r
+
+
+94 
+»q
+.
+H—d”
+.
+	`S‘
+("AuthÜiz©iÚ", "B—»¸"+
+acûss_tok’
+)
+
+95 
+»¥
+, 
+”r
+ :ğ
+ş›Á
+.
+	`Do
+(
+»q
+)
+
+96 
+”r
+ !ğ
+n
+ {
+
+97  "", 
+”r
+
+
+100 
+deãr
+ 
+»¥
+.
+Body
+.
+	`Clo£
+()
+
+102 
+ty³
+ 
+U£r
+ struct {
+
+103 
+Id
+ 
+¡ršg
+ `
+jsÚ
+:"id"`
+
+106 
+v¬
+ 
+u£r
+ 
+U£r
+
+
+107 
+”r
+ = 
+jsÚ
+.
+	`NewDecod”
+(
+»¥
+.
+Body
+).
+	`Decode
+(&
+u£r
+)
+
+108 
+”r
+ !ğ
+n
+ {
+
+109  "", 
+”r
+
+
+112  
+u£r
+.
+Id
+, 
+n
+
+
+113 
+	}
+}
+
+115 
+func
+ 
+	$IsU£rDiscÜdAdmš
+(
+discÜdId
+ 
+¡ršg
+, 
+discÜdGudID
+ sŒšgè(
+boŞ
+, 
+”rÜ
+) {
+
+117 
+rŞes
+, 
+”r
+ :ğ
+DiscÜdSessiÚ
+.
+	`GudRŞes
+(
+discÜdGudID
+)
+
+118 
+”r
+ !ğ
+n
+ {
+
+119  
+çl£
+, 
+”r
+
+
+123 
+u£rRŞes
+, 
+”r
+ :ğ
+DiscÜdSessiÚ
+.
+	`GudMemb”
+(
+discÜdGudID
+, 
+discÜdId
+)
+
+124 
+”r
+ !ğ
+n
+ {
+
+125  
+çl£
+, 
+”r
+
+
+129 
+v¬
+ 
+hasRŞe
+ 
+boŞ
+
+
+130 
+_
+, 
+rŞe
+ :ğ
+¿nge
+ 
+u£rRŞes
+.
+RŞes
+ {
+
+131 
+_
+, 
+gudRŞe
+ :ğ
+¿nge
+ 
+rŞes
+ {
+
+132 
+rŞe
+ =ğ
+gudRŞe
+.
+ID
+ && (gudRŞe.
+Name
+ == "Dev" || guildRole.Name == "Division Heads" || guildRole.Name == "Helper") {
+
+133 
+hasRŞe
+ = 
+Œue
+
+
+139 !
+hasRŞe
+ {
+
+140  
+çl£
+, 
+n
+
+
+143  
+Œue
+, 
+n
+
+
+144 
+	}
+}
+
+	@api/account/google.go
+
+18 
+·ckage
+ 
+accouÁ
+
+
+20 
+impÜt
+ (
+
+29 
+	$v¬
+ (
+
+30 
+GoogËCl›ÁID
+ 
+¡ršg
+
+
+31 
+GoogËCl›ÁSeü‘
+ 
+¡ršg
+
+
+32 
+GoogËC®lbackURL
+ 
+¡ršg
+
+
+35 
+func
+ 
+	$HªdËGoogËC®lback
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+è(
+¡ršg
+, 
+”rÜ
+) {
+
+36 
+code
+ :ğ
+r
+.
+URL
+.
+	`Qu”y
+().
+	`G‘
+("code")
+
+37 
+code
+ == "" {
+
+38 
+h‰p
+.
+	`Redœeù
+(
+w
+, 
+r
+, 
+GameURL
+, h‰p.
+StusS“Oth”
+)
+
+39  "", 
+”rÜs
+.
+	`New
+("code isƒmpty")
+
+42 
+googËId
+, 
+”r
+ :ğ
+	`R‘r›veGoogËId
+(
+code
+)
+
+43 
+”r
+ !ğ
+n
+ {
+
+44 
+h‰p
+.
+	`Redœeù
+(
+w
+, 
+r
+, 
+GameURL
+, h‰p.
+StusS“Oth”
+)
+
+45  "", 
+”r
+
+
+48  
+googËId
+, 
+n
+
+
+49 
+	}
+}
+
+51 
+func
+ 
+	$R‘r›veGoogËId
+(
+code
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+52 
+v
+ :ğ
+	`make
+(
+u¾
+.
+V®ues
+)
+
+53 
+v
+.
+	`S‘
+("ş›Á_id", 
+GoogËCl›ÁID
+)
+
+54 
+v
+.
+	`S‘
+("ş›Á_£ü‘", 
+GoogËCl›ÁSeü‘
+)
+
+55 
+v
+.
+	`S‘
+("code", 
+code
+)
+
+56 
+v
+.
+	`S‘
+("grant_type", "authorization_code")
+
+57 
+v
+.
+	`S‘
+("»dœeù_uri", 
+GoogËC®lbackURL
+)
+
+59 
+tok’
+, 
+”r
+ :ğ
+h‰p
+.
+	`Po¡FÜm
+("h‰ps://ßuth2.googË­is.com/tok’", 
+v
+)
+
+60 
+”r
+ !ğ
+n
+ {
+
+61  "", 
+”r
+
+
+64 
+deãr
+ 
+tok’
+.
+Body
+.
+	`Clo£
+()
+
+66 
+ty³
+ 
+Tok’Re¥Ú£
+ struct {
+
+67 
+AcûssTok’
+ 
+¡ršg
+ `
+jsÚ
+:"access_token"`
+
+68 
+Tok’Ty³
+ 
+¡ršg
+ `
+jsÚ
+:"token_type"`
+
+69 
+ExpœesIn
+ `
+jsÚ
+:"expires_in"`
+
+70 
+IdTok’
+ 
+¡ršg
+ `
+jsÚ
+:"id_token"`
+
+71 
+ReäeshTok’
+ 
+¡ršg
+ `
+jsÚ
+:"refresh_token"`
+
+72 
+Scİe
+ 
+¡ršg
+ `
+jsÚ
+:"scope"`
+
+75 
+v¬
+ 
+tok’Re¥Ú£
+ 
+Tok’Re¥Ú£
+
+
+76 
+”r
+ = 
+jsÚ
+.
+	`NewDecod”
+(
+tok’
+.
+Body
+).
+	`Decode
+(&
+tok’Re¥Ú£
+)
+
+77 
+”r
+ !ğ
+n
+ {
+
+78  "", 
+”r
+
+
+81 
+u£rId
+, 
+”r
+ :ğ
+	`·r£JWTW™houtV®id©iÚ
+(
+tok’Re¥Ú£
+.
+IdTok’
+)
+
+82 
+”r
+ !ğ
+n
+ {
+
+83  "", 
+”r
+
+
+86  
+u£rId
+, 
+n
+
+
+87 
+	}
+}
+
+89 
+func
+ 
+	$·r£JWTW™houtV®id©iÚ
+(
+idTok’
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+90 
+·r£r
+ :ğ
+jwt
+.
+	`NewP¬£r
+()
+
+93 
+·r£dJwt
+, 
+_
+, 
+”r
+ :ğ
+·r£r
+.
+	`P¬£Unv”if›d
+(
+idTok’
+, 
+jwt
+.
+M­CÏims
+{})
+
+94 
+”r
+ !ğ
+n
+ {
+
+95  "", 
+”r
+
+
+98 
+şaims
+, 
+ok
+ :ğ
+·r£dJwt
+.
+CÏims
+.(
+jwt
+.
+M­CÏims
+)
+
+99 !
+ok
+ {
+
+100  "", 
+”rÜs
+.
+	`New
+("invalidoken claims")
+
+103  
+şaims
+.
+	`G‘Subjeù
+()
+
+104 
+	}
+}
+
+	@api/account/info.go
+
+18 
+·ckage
+ 
+accouÁ
+
+
+20 
+impÜt
+ (
+
+24 
+ty³
+ 
+InfoRe¥Ú£
+ struct {
+
+25 
+U£ºame
+ 
+	m¡ršg
+ `
+	mjsÚ
+:"username"`
+
+26 
+DiscÜdId
+ 
+¡ršg
+ `
+jsÚ
+:"discordId"`
+
+27 
+GoogËId
+ 
+¡ršg
+ `
+jsÚ
+:"googleId"`
+
+28 
+La¡SessiÚSlÙ
+ `
+jsÚ
+:"lastSessionSlot"`
+
+29 
+HasAdmšRŞe
+ 
+boŞ
+ `
+jsÚ
+:"hasAdminRole"`
+
+33 
+func
+ 
+	$Info
+(
+u£ºame
+ 
+¡ršg
+, 
+discÜdId
+ sŒšg, 
+googËId
+ sŒšg, 
+uuid
+ []
+by‹
+, 
+hasAdmšRŞe
+ 
+boŞ
+è(
+InfoRe¥Ú£
+, 
+”rÜ
+) {
+
+34 
+¦Ù
+, 
+_
+ :ğ
+db
+.
+	`G‘L©e¡SessiÚSaveD©aSlÙ
+(
+uuid
+)
+
+35 
+»¥Ú£
+ :ğ
+InfoRe¥Ú£
+{
+
+36 
+U£ºame
+: 
+u£ºame
+,
+
+37 
+La¡SessiÚSlÙ
+: 
+¦Ù
+,
+
+38 
+DiscÜdId
+: 
+discÜdId
+,
+
+39 
+GoogËId
+: 
+googËId
+,
+
+40 
+HasAdmšRŞe
+: 
+hasAdmšRŞe
+,
+
+42  
+»¥Ú£
+, 
+n
+
+
+43 
+	}
+}
+
+	@api/account/login.go
+
+18 
+·ckage
+ 
+accouÁ
+
+
+20 
+impÜt
+ (
+
+31 
+ty³
+ 
+LogšRe¥Ú£
+ 
+G’”icAuthRe¥Ú£
+
+
+34 
+func
+ 
+	$Logš
+(
+u£ºame
+, 
+·sswÜd
+ 
+¡ršg
+è(
+LogšRe¥Ú£
+, 
+”rÜ
+) {
+
+35 
+v¬
+ 
+»¥Ú£
+ 
+LogšRe¥Ú£
+
+
+37 !
+	`isV®idU£ºame
+(
+u£ºame
+) {
+
+38  
+»¥Ú£
+, 
+fmt
+.
+	`E¼Üf
+("invalid username")
+
+41 
+	`Ën
+(
+·sswÜd
+) < 6 {
+
+42  
+»¥Ú£
+, 
+fmt
+.
+	`E¼Üf
+("invalid…assword")
+
+45 
+key
+, 
+§É
+, 
+”r
+ :ğ
+db
+.
+	`F‘chAccouÁKeyS®tFromU£ºame
+(
+u£ºame
+)
+
+46 
+”r
+ !ğ
+n
+ {
+
+47 
+”rÜs
+.
+	`Is
+(
+”r
+, 
+sql
+.
+E¼NoRows
+) {
+
+48  
+»¥Ú£
+, 
+fmt
+.
+	`E¼Üf
+("account doesn'tƒxist")
+
+51  
+»¥Ú£
+, 
+”r
+
+
+54 !
+by‹s
+.
+	`Equ®
+(
+key
+, 
+	`d”iveArgÚ2IDKey
+([]
+	`by‹
+(
+·sswÜd
+), 
+§É
+)) {
+
+55  
+»¥Ú£
+, 
+fmt
+.
+	`E¼Üf
+("password doesn't match")
+
+58 
+»¥Ú£
+.
+Tok’
+, 
+”r
+ = 
+	`G’”©eTok’FÜU£ºame
+(
+u£ºame
+)
+
+60 
+”r
+ !ğ
+n
+ {
+
+61  
+»¥Ú£
+, 
+fmt
+.
+	`E¼Üf
+("çedØg’”©tok’: %s", 
+”r
+)
+
+64  
+»¥Ú£
+, 
+n
+
+
+65 
+	}
+}
+
+67 
+func
+ 
+	$G’”©eTok’FÜU£ºame
+(
+u£ºame
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+68 
+tok’
+ :ğ
+	`make
+([]
+by‹
+, 
+Tok’Size
+)
+
+69 
+_
+, 
+”r
+ :ğ
+¿nd
+.
+	`R—d
+(
+tok’
+)
+
+70 
+”r
+ !ğ
+n
+ {
+
+71  "", 
+fmt
+.
+	`E¼Üf
+("çedØg’”©tok’: %s", 
+”r
+)
+
+74 
+”r
+ = 
+db
+.
+	`AddAccouÁSessiÚ
+(
+u£ºame
+, 
+tok’
+)
+
+75 
+”r
+ !ğ
+n
+ {
+
+76  "", 
+fmt
+.
+	`E¼Üf
+("failedo‡dd‡ccount session")
+
+79  
+ba£64
+.
+StdEncodšg
+.
+	`EncodeToSŒšg
+(
+tok’
+), 
+n
+
+
+80 
+	}
+}
+
+	@api/account/logout.go
+
+18 
+·ckage
+ 
+accouÁ
+
+
+20 
+impÜt
+ (
+
+29 
+func
+ 
+	$Logout
+(
+tok’
+ []
+by‹
+è
+”rÜ
+ {
+
+30 
+”r
+ :ğ
+db
+.
+	`RemoveSessiÚFromTok’
+(
+tok’
+)
+
+31 
+”r
+ !ğ
+n
+ {
+
+32 
+”rÜs
+.
+	`Is
+(
+”r
+, 
+sql
+.
+E¼NoRows
+) {
+
+33  
+fmt
+.
+	`E¼Üf
+("token‚ot found")
+
+36  
+fmt
+.
+	`E¼Üf
+("failedo„emove‡ccount session")
+
+39  
+n
+
+
+40 
+	}
+}
+
+	@api/account/register.go
+
+18 
+·ckage
+ 
+accouÁ
+
+
+20 
+impÜt
+ (
+
+28 
+func
+ 
+	$Regi¡”
+(
+u£ºame
+, 
+·sswÜd
+ 
+¡ršg
+è
+”rÜ
+ {
+
+29 !
+	`isV®idU£ºame
+(
+u£ºame
+) {
+
+30  
+fmt
+.
+	`E¼Üf
+("invalid username")
+
+33 
+	`Ën
+(
+·sswÜd
+) < 6 {
+
+34  
+fmt
+.
+	`E¼Üf
+("invalid…assword")
+
+37 
+uuid
+ :ğ
+	`make
+([]
+by‹
+, 
+UUIDSize
+)
+
+38 
+_
+, 
+”r
+ :ğ
+¿nd
+.
+	`R—d
+(
+uuid
+)
+
+39 
+”r
+ !ğ
+n
+ {
+
+40  
+fmt
+.
+	`E¼Üf
+("çedØg’”©uuid: %s", 
+”r
+)
+
+43 
+§É
+ :ğ
+	`make
+([]
+by‹
+, 
+ArgÚS®tSize
+)
+
+44 
+_
+, 
+”r
+ = 
+¿nd
+.
+	`R—d
+(
+§É
+)
+
+45 
+”r
+ !ğ
+n
+ {
+
+46  
+fmt
+.
+	`E¼Üf
+("çedØg’”©§É: %s", 
+”r
+)
+
+49 
+”r
+ = 
+db
+.
+	`AddAccouÁRecÜd
+(
+uuid
+, 
+u£ºame
+, 
+	`d”iveArgÚ2IDKey
+([]
+	`by‹
+(
+·sswÜd
+), 
+§É
+), salt)
+
+50 
+”r
+ !ğ
+n
+ {
+
+51  
+fmt
+.
+	`E¼Üf
+("çedØadd‡ccouÁ„ecÜd: %s", 
+”r
+)
+
+54  
+n
+
+
+55 
+	}
+}
+
+	@api/common.go
+
+18 
+·ckage
+ 
+­i
+
+
+20 
+impÜt
+ (
+
+32 
+func
+ 
+	$In™
+(
+mux
+ *
+h‰p
+.
+S”veMux
+è
+”rÜ
+ {
+
+33 
+”r
+ :ğ
+	`scheduËStReäesh
+()
+
+34 
+”r
+ !ğ
+n
+ {
+
+35  
+”r
+
+
+38 
+”r
+ = 
+day
+.
+	`In™
+()
+
+39 
+”r
+ !ğ
+n
+ {
+
+40  
+”r
+
+
+44 
+mux
+.
+	`HªdËFunc
+("GET /accouÁ/šfo", 
+hªdËAccouÁInfo
+)
+
+45 
+mux
+.
+	`HªdËFunc
+("POST /accouÁ/»gi¡”", 
+hªdËAccouÁRegi¡”
+)
+
+46 
+mux
+.
+	`HªdËFunc
+("POST /accouÁ/logš", 
+hªdËAccouÁLogš
+)
+
+47 
+mux
+.
+	`HªdËFunc
+("POST /accouÁ/chªg•w", 
+hªdËAccouÁChªgePW
+)
+
+48 
+mux
+.
+	`HªdËFunc
+("GET /accouÁ/logout", 
+hªdËAccouÁLogout
+)
+
+51 
+mux
+.
+	`HªdËFunc
+("GET /game/t™Ë¡©s", 
+hªdËGameT™ËSts
+)
+
+52 
+mux
+.
+	`HªdËFunc
+("GET /game/şassic£ssiÚcouÁ", 
+hªdËGameCÏssicSessiÚCouÁ
+)
+
+55 
+mux
+.
+	`HªdËFunc
+("/§ved©a/£ssiÚ/{aùiÚ}", 
+hªdËSessiÚ
+)
+
+56 
+mux
+.
+	`HªdËFunc
+("/§ved©a/sy¡em/{aùiÚ}", 
+hªdËSy¡em
+)
+
+59 
+mux
+.
+	`HªdËFunc
+("POST /§ved©a/upd©—Î", 
+hªdËUpd©eAÎ
+)
+
+62 
+mux
+.
+	`HªdËFunc
+("GET /day/£ed", 
+hªdËDayS“d
+)
+
+63 
+mux
+.
+	`HªdËFunc
+("GET /day/¿nkšgs", 
+hªdËDayRªkšgs
+)
+
+64 
+mux
+.
+	`HªdËFunc
+("GET /day/¿nkšg·gecouÁ", 
+hªdËDayRªkšgPageCouÁ
+)
+
+67 
+mux
+.
+	`HªdËFunc
+("/auth/{´ovid”}/ÿÎback", 
+hªdËProvid”C®lback
+)
+
+68 
+mux
+.
+	`HªdËFunc
+("/auth/{´ovid”}/logout", 
+hªdËProvid”Logout
+)
+
+71 
+mux
+.
+	`HªdËFunc
+("POST /admš/accouÁ/discÜdLšk", 
+hªdËAdmšDiscÜdLšk
+)
+
+72 
+mux
+.
+	`HªdËFunc
+("POST /admš/accouÁ/discÜdUÆšk", 
+hªdËAdmšDiscÜdUÆšk
+)
+
+73 
+mux
+.
+	`HªdËFunc
+("POST /admš/accouÁ/googËLšk", 
+hªdËAdmšGoogËLšk
+)
+
+74 
+mux
+.
+	`HªdËFunc
+("POST /admš/accouÁ/googËUÆšk", 
+hªdËAdmšGoogËUÆšk
+)
+
+75 
+mux
+.
+	`HªdËFunc
+("GET /admš/accouÁ/admšS—rch", 
+hªdËAdmšS—rch
+)
+
+77  
+n
+
+
+78 
+	}
+}
+
+80 
+func
+ 
+tok’FromReque¡
+(
+r
+ *
+h‰p
+.
+Reque¡
+è([]
+	gby‹
+, 
+	g”rÜ
+) {
+
+81 
+	gr
+.
+	gH—d”
+.
+G‘
+("Authorization") == "" {
+
+82  
+n
+, 
+fmt
+.
+E¼Üf
+("missingoken")
+
+85 
+tok’
+, 
+	g”r
+ :ğ
+ba£64
+.
+StdEncodšg
+.
+DecodeSŒšg
+(
+r
+.
+H—d”
+.
+G‘
+("Authorization"))
+
+86 
+”r
+ !ğ
+n
+ {
+
+87  
+n
+, 
+fmt
+.
+E¼Üf
+("çedØdecodtok’: %s", 
+”r
+)
+
+90 
+Ën
+(
+tok’
+è!ğ
+accouÁ
+.
+Tok’Size
+ {
+
+91  
+n
+, 
+fmt
+.
+E¼Üf
+("šv®idok’†’gth: gÙ %d,ƒx³ùed %d", 
+Ën
+(
+tok’
+), 
+accouÁ
+.
+Tok’Size
+)
+
+94  
+tok’
+, 
+	gn
+
+
+97 
+func
+ 
+uuidFromReque¡
+(
+r
+ *
+h‰p
+.
+Reque¡
+è([]
+	gby‹
+, 
+	g”rÜ
+) {
+
+98 
+	g_
+, 
+	guuid
+, 
+	g”r
+ :ğ
+tok’AndUuidFromReque¡
+(
+r
+)
+
+99 
+”r
+ !ğ
+n
+ {
+
+100  
+n
+, 
+”r
+
+
+103  
+uuid
+, 
+	gn
+
+
+106 
+func
+ 
+tok’AndUuidFromReque¡
+(
+r
+ *
+h‰p
+.
+Reque¡
+è([]
+	gby‹
+, []by‹, 
+	g”rÜ
+) {
+
+107 
+	gtok’
+, 
+	g”r
+ :ğ
+tok’FromReque¡
+(
+r
+)
+
+108 
+”r
+ !ğ
+n
+ {
+
+109  
+n
+,‚, 
+”r
+
+
+112 
+uuid
+, 
+	g”r
+ :ğ
+db
+.
+F‘chUUIDFromTok’
+(
+tok’
+)
+
+113 
+”r
+ !ğ
+n
+ {
+
+114  
+n
+,‚, 
+fmt
+.
+E¼Üf
+("çedØv®id©tok’: %s", 
+”r
+)
+
+117  
+tok’
+, 
+	guuid
+, 
+	gn
+
+
+120 
+func
+ 
+	$h‰pE¼Ü
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+, 
+”r
+ 
+”rÜ
+, 
+code
+ ) {
+
+121 
+log
+.
+	`Prštf
+("%s: %s\n", 
+r
+.
+URL
+.
+P©h
+, 
+”r
+)
+
+122 
+h‰p
+.
+	`E¼Ü
+(
+w
+, 
+”r
+.E¼Ü(), 
+code
+)
+
+123 
+	}
+}
+
+125 
+func
+ 
+	$wr™eJSON
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+, 
+d©a
+ 
+ªy
+) {
+
+126 
+w
+.
+	`H—d”
+().
+	`S‘
+("Content-Type", "application/json")
+
+127 
+”r
+ :ğ
+jsÚ
+.
+	`NewEncod”
+(
+w
+).
+	`Encode
+(
+d©a
+)
+
+128 
+”r
+ !ğ
+n
+ {
+
+129 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ’cod»¥Ú£ jsÚ: %s", 
+”r
+), 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+132 
+	}
+}
+
+	@api/daily/common.go
+
+18 
+·ckage
+ 
+day
+
+
+20 
+impÜt
+ (
+
+34 cÚ¡ 
+	g£cÚdsP”Day
+ = 60 * 60 * 24
+
+36 
+v¬
+ (
+
+37 
+scheduËr
+ = 
+üÚ
+.
+New
+(üÚ.
+	$W™hLoÿtiÚ
+(
+time
+.
+UTC
+))
+
+38 
+£ü‘
+ []
+by‹
+
+
+41 
+func
+ 
+	$In™
+(è
+”rÜ
+ {
+
+42 
+v¬
+ 
+”r
+ 
+”rÜ
+
+
+44 
+£ü‘
+, 
+”r
+ = 
+os
+.
+	`R—dFe
+("secret.key")
+
+45 
+”r
+ !ğ
+n
+ {
+
+46 !
+os
+.
+	`IsNÙExi¡
+(
+”r
+) {
+
+47  
+fmt
+.
+	`E¼Üf
+("çedØ»ad day s“d seü‘: %s", 
+”r
+)
+
+50 
+ÃwSeü‘
+ :ğ
+	`make
+([]
+by‹
+, 32)
+
+51 
+_
+, 
+”r
+ :ğ
+¿nd
+.
+	`R—d
+(
+ÃwSeü‘
+)
+
+52 
+”r
+ !ğ
+n
+ {
+
+53  
+fmt
+.
+	`E¼Üf
+("çedØg’”©day s“d seü‘: %s", 
+”r
+)
+
+56 
+”r
+ = 
+os
+.
+	`Wr™eFe
+("£ü‘.key", 
+ÃwSeü‘
+, 0400)
+
+57 
+”r
+ !ğ
+n
+ {
+
+58  
+fmt
+.
+	`E¼Üf
+("çedØwr™day s“d seü‘: %s", 
+”r
+)
+
+61 
+£ü‘
+ = 
+ÃwSeü‘
+
+
+64 
+£ed
+, 
+”r
+ :ğ
+db
+.
+	`TryAddDayRun
+(
+	`S“d
+())
+
+65 
+”r
+ !ğ
+n
+ {
+
+66 
+log
+.
+	`Pršt
+(
+”r
+)
+
+69 
+log
+.
+	`Prštf
+("Day RuÀS“d: %s", 
+£ed
+)
+
+71 
+_
+, 
+”r
+ = 
+scheduËr
+.
+	`AddFunc
+("@day", 
+	`func
+() {
+
+72 
+time
+.
+	`SË•
+Ñime.
+SecÚd
+)
+
+74 
+£ed
+, 
+”r
+ = 
+db
+.
+	`TryAddDayRun
+(
+	`S“d
+())
+
+75 
+”r
+ !ğ
+n
+ {
+
+76 
+log
+.
+	`Prštf
+("”rÜ wh»cÜdšg‚ew day: %s", 
+”r
+)
+
+78 
+log
+.
+	`Prštf
+("Day RuÀS“d: %s", 
+£ed
+)
+
+81 
+”r
+ !ğ
+n
+ {
+
+82  
+”r
+
+
+85 
+scheduËr
+.
+	`S¹
+()
+
+87  
+n
+
+
+88 
+	}
+}
+
+90 
+func
+ 
+	$S“d
+(è
+¡ršg
+ {
+
+91  
+ba£64
+.
+StdEncodšg
+.
+	`EncodeToSŒšg
+(
+	`d”iveS“d
+(
+time
+.
+	`Now
+().
+	`UTC
+()))
+
+92 
+	}
+}
+
+94 
+func
+ 
+d”iveS“d
+(
+£edTime
+ 
+time
+.
+Time
+è[]
+	gby‹
+ {
+
+95 
+	gday
+ :ğ
+make
+([]
+by‹
+, 8)
+
+96 
+	gbš¬y
+.
+	gBigEndŸn
+.
+PutUšt64
+(
+day
+, 
+ušt64
+(
+£edTime
+.
+Unix
+()/
+£cÚdsP”Day
+))
+
+98 
+	ghashedS“d
+ :ğ
+md5
+.
+Sum
+(
+­³nd
+(
+day
+, 
+£ü‘
+...))
+
+100  
+	ghashedS“d
+[:]
+
+	@api/daily/rankings.go
+
+18 
+·ckage
+ 
+day
+
+
+20 
+impÜt
+ (
+
+26 
+func
+ 
+Rªkšgs
+(
+ÿ‹gÜy
+, 
+·ge
+ è([]
+	gdefs
+.
+	gDayRªkšg
+, 
+	g”rÜ
+) {
+
+27 
+	g¿nkšgs
+, 
+	g”r
+ :ğ
+db
+.
+F‘chRªkšgs
+(
+ÿ‹gÜy
+, 
+·ge
+)
+
+28 
+	g”r
+ !ğ
+n
+ {
+
+29  
+¿nkšgs
+, 
+”r
+
+
+32  
+¿nkšgs
+, 
+	gn
+
+
+	@api/daily/rankingspagecount.go
+
+18 
+·ckage
+ 
+day
+
+
+20 
+impÜt
+ (
+
+25 
+func
+ 
+	$RªkšgPageCouÁ
+(
+ÿ‹gÜy
+ è(, 
+”rÜ
+) {
+
+26 
+·geCouÁ
+, 
+”r
+ :ğ
+db
+.
+	`F‘chRªkšgPageCouÁ
+(
+ÿ‹gÜy
+)
+
+27 
+”r
+ !ğ
+n
+ {
+
+28  
+·geCouÁ
+, 
+”r
+
+
+31  
+·geCouÁ
+, 
+n
+
+
+32 
+	}
+}
+
+	@api/endpoints.go
+
+18 
+·ckage
+ 
+­i
+
+
+20 
+impÜt
+ (
+
+46 
+func
+ 
+	$hªdËAccouÁInfo
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+47 
+uuid
+, 
+”r
+ :ğ
+	`uuidFromReque¡
+(
+r
+)
+
+48 
+”r
+ !ğ
+n
+ {
+
+49 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+53 
+u£ºame
+, 
+”r
+ :ğ
+db
+.
+	`F‘chU£ºameFromUUID
+(
+uuid
+)
+
+54 
+”r
+ !ğ
+n
+ {
+
+55 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+58 
+discÜdId
+, 
+”r
+ :ğ
+db
+.
+	`F‘chDiscÜdIdByU£ºame
+(
+u£ºame
+)
+
+59 
+”r
+ !ğ
+n
+ {
+
+60 !
+”rÜs
+.
+	`Is
+(
+”r
+, 
+sql
+.
+E¼NoRows
+) {
+
+61 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+65 
+googËId
+, 
+”r
+ :ğ
+db
+.
+	`F‘chGoogËIdByU£ºame
+(
+u£ºame
+)
+
+66 
+”r
+ !ğ
+n
+ {
+
+67 !
+”rÜs
+.
+	`Is
+(
+”r
+, 
+sql
+.
+E¼NoRows
+) {
+
+68 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+73 
+v¬
+ 
+hasAdmšRŞe
+ 
+boŞ
+
+
+74 
+discÜdId
+ != "" {
+
+75 
+hasAdmšRŞe
+, 
+_
+ = 
+accouÁ
+.
+	`IsU£rDiscÜdAdmš
+(
+discÜdId
+,‡ccouÁ.
+DiscÜdGudID
+)
+
+78 
+»¥Ú£
+, 
+”r
+ :ğ
+accouÁ
+.
+	`Info
+(
+u£ºame
+, 
+discÜdId
+, 
+googËId
+, 
+uuid
+, 
+hasAdmšRŞe
+)
+
+79 
+”r
+ !ğ
+n
+ {
+
+80 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+83 
+	`wr™eJSON
+(
+w
+, 
+r
+, 
+»¥Ú£
+)
+
+84 
+	}
+}
+
+86 
+func
+ 
+	$hªdËAccouÁRegi¡”
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+87 
+”r
+ :ğ
+r
+.
+	`P¬£FÜm
+()
+
+88 
+”r
+ !ğ
+n
+ {
+
+89 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ·r£„eque¡ fÜm: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+93 
+”r
+ = 
+accouÁ
+.
+	`Regi¡”
+(
+r
+.
+FÜm
+.
+	`G‘
+("username"),„.Form.Get("password"))
+
+94 
+”r
+ !ğ
+n
+ {
+
+95 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+99 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+100 
+	}
+}
+
+102 
+func
+ 
+	$hªdËAccouÁLogš
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+103 
+”r
+ :ğ
+r
+.
+	`P¬£FÜm
+()
+
+104 
+”r
+ !ğ
+n
+ {
+
+105 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ·r£„eque¡ fÜm: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+109 
+»¥Ú£
+, 
+”r
+ :ğ
+accouÁ
+.
+	`Logš
+(
+r
+.
+FÜm
+.
+	`G‘
+("username"),„.Form.Get("password"))
+
+110 
+”r
+ !ğ
+n
+ {
+
+111 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+115 
+	`wr™eJSON
+(
+w
+, 
+r
+, 
+»¥Ú£
+)
+
+116 
+	}
+}
+
+118 
+func
+ 
+	$hªdËAccouÁChªgePW
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+119 
+”r
+ :ğ
+r
+.
+	`P¬£FÜm
+()
+
+120 
+”r
+ !ğ
+n
+ {
+
+121 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ·r£„eque¡ fÜm: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+125 
+uuid
+, 
+”r
+ :ğ
+	`uuidFromReque¡
+(
+r
+)
+
+126 
+”r
+ !ğ
+n
+ {
+
+127 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+131 
+”r
+ = 
+accouÁ
+.
+	`ChªgePW
+(
+uuid
+, 
+r
+.
+FÜm
+.
+	`G‘
+("password"))
+
+132 
+”r
+ !ğ
+n
+ {
+
+133 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+137 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+138 
+	}
+}
+
+140 
+func
+ 
+	$hªdËAccouÁLogout
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+141 
+tok’
+, 
+”r
+ :ğ
+	`tok’FromReque¡
+(
+r
+)
+
+142 
+”r
+ !ğ
+n
+ {
+
+143 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusBadReque¡
+)
+
+147 
+”r
+ = 
+accouÁ
+.
+	`Logout
+(
+tok’
+)
+
+148 
+”r
+ !ğ
+n
+ {
+
+150 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+154 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+155 
+	}
+}
+
+158 
+func
+ 
+	$hªdËGameT™ËSts
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+159 
+¡©s
+ :ğ
+defs
+.
+T™ËSts
+{
+
+160 
+PÏy”CouÁ
+: 
+¶ay”CouÁ
+,
+
+161 
+B©eCouÁ
+: 
+b©eCouÁ
+,
+
+164 
+	`wr™eJSON
+(
+w
+, 
+r
+, 
+¡©s
+)
+
+165 
+	}
+}
+
+167 
+func
+ 
+	$hªdËGameCÏssicSessiÚCouÁ
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+168 
+w
+.
+	`Wr™e
+([]
+	`by‹
+(
+¡rcÚv
+.
+	`Itß
+(
+şassicSessiÚCouÁ
+)))
+
+169 
+	}
+}
+
+171 
+func
+ 
+	$hªdËSessiÚ
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+172 
+uuid
+, 
+”r
+ :ğ
+	`uuidFromReque¡
+(
+r
+)
+
+173 
+”r
+ !ğ
+n
+ {
+
+174 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+178 
+¦Ù
+, 
+”r
+ :ğ
+¡rcÚv
+.
+	`Atoi
+(
+r
+.
+URL
+.
+	`Qu”y
+().
+	`G‘
+("slot"))
+
+179 
+”r
+ !ğ
+n
+ {
+
+180 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusBadReque¡
+)
+
+184 
+¦Ù
+ < 0 || slÙ >ğ
+defs
+.
+SessiÚSlÙCouÁ
+ {
+
+185 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("¦Ù id %d ouˆoà¿nge", 
+¦Ù
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+189 !
+r
+.
+URL
+.
+	`Qu”y
+().
+	`Has
+("clientSessionId") {
+
+190 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("missšg cl›ÁSessiÚId"), 
+h‰p
+.
+StusBadReque¡
+)
+
+194 
+”r
+ = 
+db
+.
+	`Upd©eAùiveSessiÚ
+(
+uuid
+, 
+r
+.
+URL
+.
+	`Qu”y
+().
+	`G‘
+("clientSessionId"))
+
+195 
+”r
+ !ğ
+n
+ {
+
+196 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØupd©aùiv£ssiÚ: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+200 
+r
+.
+	`P©hV®ue
+("action") {
+
+202 
+§ve
+, 
+”r
+ :ğ
+§ved©a
+.
+	`G‘SessiÚ
+(
+uuid
+, 
+¦Ù
+)
+
+203 
+”rÜs
+.
+	`Is
+(
+”r
+, 
+sql
+.
+E¼NoRows
+) {
+
+204 
+h‰p
+.
+	`E¼Ü
+(
+w
+, 
+”r
+.E¼Ü(), h‰p.
+StusNÙFound
+)
+
+208 
+”r
+ !ğ
+n
+ {
+
+209 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+213 
+	`wr™eJSON
+(
+w
+, 
+r
+, 
+§ve
+)
+
+215 
+v¬
+ 
+£ssiÚ
+ 
+defs
+.
+SessiÚSaveD©a
+
+
+216 
+”r
+ = 
+jsÚ
+.
+	`NewDecod”
+(
+r
+.
+Body
+).
+	`Decode
+(&
+£ssiÚ
+)
+
+217 
+”r
+ !ğ
+n
+ {
+
+218 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØdecod»que¡ body: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+222 
+exi¡šgSave
+, 
+”r
+ :ğ
+§ved©a
+.
+	`G‘SessiÚ
+(
+uuid
+, 
+¦Ù
+)
+
+223 
+”r
+ !ğ
+n
+ && !
+”rÜs
+.
+	`Is
+Ó¼, 
+sql
+.
+E¼NoRows
+) {
+
+224 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ»Œ›v£ssiÚ savd©a: %s", 
+”r
+), 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+227 
+exi¡šgSave
+.
+S“d
+ =ğ
+£ssiÚ
+.S“d &&ƒxi¡šgSave.
+WaveIndex
+ > session.WaveIndex {
+
+228 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("£ssiÚ ouˆoàd©e:ƒxi¡šg wavšdex i g»©”"), 
+h‰p
+.
+StusBadReque¡
+)
+
+233 
+”r
+ = 
+§ved©a
+.
+	`Upd©eSessiÚ
+(
+uuid
+, 
+¦Ù
+, 
+£ssiÚ
+)
+
+234 
+”r
+ !ğ
+n
+ {
+
+235 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØpuˆ£ssiÚ d©a: %s", 
+”r
+), 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+239 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+241 
+v¬
+ 
+£ssiÚ
+ 
+defs
+.
+SessiÚSaveD©a
+
+
+242 
+”r
+ = 
+jsÚ
+.
+	`NewDecod”
+(
+r
+.
+Body
+).
+	`Decode
+(&
+£ssiÚ
+)
+
+243 
+”r
+ !ğ
+n
+ {
+
+244 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØdecod»que¡ body: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+248 
+£ed
+, 
+”r
+ :ğ
+db
+.
+	`G‘DayRunS“d
+()
+
+249 
+”r
+ !ğ
+n
+ {
+
+250 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+254 
+»¥
+, 
+”r
+ :ğ
+§ved©a
+.
+	`CË¬
+(
+uuid
+, 
+¦Ù
+, 
+£ed
+, 
+£ssiÚ
+)
+
+255 
+”r
+ !ğ
+n
+ {
+
+256 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+260 
+	`wr™eJSON
+(
+w
+, 
+r
+, 
+»¥
+)
+
+262 
+»¥
+, 
+”r
+ :ğ
+§ved©a
+.
+	`NewCË¬
+(
+uuid
+, 
+¦Ù
+)
+
+263 
+”r
+ !ğ
+n
+ {
+
+264 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ»ad‚ew cË¬: %s", 
+”r
+), 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+268 
+	`wr™eJSON
+(
+w
+, 
+r
+, 
+»¥
+)
+
+270 
+”r
+ :ğ
+§ved©a
+.
+	`D–‘eSessiÚ
+(
+uuid
+, 
+¦Ù
+)
+
+271 
+”r
+ !ğ
+n
+ {
+
+272 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+276 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+278 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("unknowÀaùiÚ"), 
+h‰p
+.
+StusBadReque¡
+)
+
+281 
+	}
+}
+
+283 
+ty³
+ 
+CombšedSaveD©a
+ struct {
+
+284 
+Sy¡em
+ 
+	mdefs
+.
+	mSy¡emSaveD©a
+ `
+	mjsÚ
+:"system"`
+
+285 
+SessiÚ
+ 
+defs
+.
+SessiÚSaveD©a
+ `
+jsÚ
+:"session"`
+
+286 
+SessiÚSlÙId
+ `
+jsÚ
+:"sessionSlotId"`
+
+287 
+Cl›ÁSessiÚId
+ 
+¡ršg
+ `
+jsÚ
+:"clientSessionId"`
+
+291 
+func
+ 
+	$hªdËUpd©eAÎ
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+292 
+uuid
+, 
+”r
+ :ğ
+	`uuidFromReque¡
+(
+r
+)
+
+293 
+”r
+ !ğ
+n
+ {
+
+294 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+298 
+v¬
+ 
+d©a
+ 
+CombšedSaveD©a
+
+
+299 
+”r
+ = 
+jsÚ
+.
+	`NewDecod”
+(
+r
+.
+Body
+).
+	`Decode
+(&
+d©a
+)
+
+300 
+”r
+ !ğ
+n
+ {
+
+301 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØdecod»que¡ body: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+305 
+d©a
+.
+Cl›ÁSessiÚId
+ == "" {
+
+306 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("missšg cl›ÁSessiÚId"), 
+h‰p
+.
+StusBadReque¡
+)
+
+310 
+v¬
+ 
+aùive
+ 
+boŞ
+
+
+311 
+aùive
+, 
+”r
+ = 
+db
+.
+	`IsAùiveSessiÚ
+(
+uuid
+, 
+d©a
+.
+Cl›ÁSessiÚId
+)
+
+312 
+”r
+ !ğ
+n
+ {
+
+313 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØcheck‡ùiv£ssiÚ: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+317 !
+aùive
+ {
+
+318 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("£ssiÚ ouˆoàd©e:‚Ù‡ùive"), 
+h‰p
+.
+StusBadReque¡
+)
+
+322 
+¡ÜedT¿š”Id
+, 
+¡ÜedSeü‘Id
+, 
+”r
+ :ğ
+db
+.
+	`F‘chT¿š”Ids
+(
+uuid
+)
+
+323 
+”r
+ !ğ
+n
+ {
+
+324 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+328 
+¡ÜedT¿š”Id
+ > 0 || 
+¡ÜedSeü‘Id
+ > 0 {
+
+329 
+d©a
+.
+Sy¡em
+.
+T¿š”Id
+ !ğ
+¡ÜedT¿š”Id
+ || d©a.Sy¡em.
+Seü‘Id
+ !ğ
+¡ÜedSeü‘Id
+ {
+
+330 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("£ssiÚ ouˆoàd©e: stÜed¿š” o¸£ü‘ ID dÛ nÙ m©ch"), 
+h‰p
+.
+StusBadReque¡
+)
+
+334 
+”r
+ = 
+db
+.
+	`Upd©eT¿š”Ids
+(
+d©a
+.
+Sy¡em
+.
+T¿š”Id
+, d©a.Sy¡em.
+Seü‘Id
+, 
+uuid
+)
+
+335 
+”r
+ !ğ
+n
+ {
+
+336 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+341 
+exi¡šgPÏytime
+, 
+”r
+ :ğ
+db
+.
+	`R‘r›vePÏytime
+(
+uuid
+)
+
+342 
+”r
+ !ğ
+n
+ && !
+”rÜs
+.
+	`Is
+Ó¼, 
+sql
+.
+E¼NoRows
+) {
+
+343 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ»Œ›v¶aytime: %s", 
+”r
+), 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+346 
+¶aytime
+, 
+ok
+ :ğ
+d©a
+.
+Sy¡em
+.
+GameSts
+.(
+m­
+[
+¡ršg
+]
+š‹rçû
+{})["¶ayTime"].(
+æßt64
+)
+
+347 !
+ok
+ {
+
+348 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("nØ¶aytimfound"), 
+h‰p
+.
+StusBadReque¡
+)
+
+352 
+	`æßt64
+(
+exi¡šgPÏytime
+è> 
+¶aytime
+ {
+
+353 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("£ssiÚ ouˆoàd©e:ƒxi¡šg…Ïytimi g»©”"), 
+h‰p
+.
+StusBadReque¡
+)
+
+358 
+log
+.
+	`Pršn
+("hªdËUpd©eAÎ ", 
+uuid
+, 
+d©a
+.
+SessiÚSlÙId
+);
+
+359 
+exi¡šgSave
+, 
+”r
+ :ğ
+§ved©a
+.
+	`G‘SessiÚ
+(
+uuid
+, 
+d©a
+.
+SessiÚSlÙId
+)
+
+360 
+”r
+ !ğ
+n
+ && !
+”rÜs
+.
+	`Is
+Ó¼, 
+sql
+.
+E¼NoRows
+) {
+
+361 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ»Œ›v£ssiÚ savd©a: %s", 
+”r
+), 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+364 
+exi¡šgSave
+.
+S“d
+ =ğ
+d©a
+.
+SessiÚ
+.S“d &&ƒxi¡šgSave.
+WaveIndex
+ > data.Session.WaveIndex {
+
+365 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("£ssiÚ ouˆoàd©e:ƒxi¡šg wavšdex i g»©”"), 
+h‰p
+.
+StusBadReque¡
+)
+
+370 
+log
+.
+	`Pršn
+("Upd©", 
+uuid
+, 
+d©a
+.
+SessiÚSlÙId
+, d©a.
+SessiÚ
+);
+
+371 
+”r
+ = 
+§ved©a
+.
+	`Upd©e
+(
+uuid
+, 
+d©a
+.
+SessiÚSlÙId
+, d©a.
+SessiÚ
+)
+
+372 
+”r
+ !ğ
+n
+ {
+
+373 
+log
+.
+	`Pršt
+(
+”r
+);
+
+374 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+378 
+”r
+ = 
+§ved©a
+.
+	`Upd©e
+(
+uuid
+, 0, 
+d©a
+.
+Sy¡em
+)
+
+379 
+”r
+ !ğ
+n
+ {
+
+380 
+log
+.
+	`Pršt
+(
+”r
+);
+
+381 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+385 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+386 
+	}
+}
+
+388 
+ty³
+ 
+Sy¡emV”ifyRe¥Ú£
+ struct {
+
+389 
+V®id
+ 
+	mboŞ
+ `
+	mjsÚ
+:"valid"`
+
+390 
+Sy¡emD©a
+ 
+defs
+.
+Sy¡emSaveD©a
+ `
+jsÚ
+:"systemData"`
+
+393 
+func
+ 
+	$hªdËSy¡em
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+394 
+uuid
+, 
+”r
+ :ğ
+	`uuidFromReque¡
+(
+r
+)
+
+395 
+”r
+ !ğ
+n
+ {
+
+396 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+400 
+v¬
+ 
+aùive
+ 
+boŞ
+
+
+401 !
+r
+.
+URL
+.
+	`Qu”y
+().
+	`Has
+("clientSessionId") {
+
+402 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("missšg cl›ÁSessiÚId"), 
+h‰p
+.
+StusBadReque¡
+)
+
+406 
+aùive
+, 
+”r
+ = 
+db
+.
+	`IsAùiveSessiÚ
+(
+uuid
+, 
+r
+.
+URL
+.
+	`Qu”y
+().
+	`G‘
+("clientSessionId"))
+
+407 
+”r
+ !ğ
+n
+ {
+
+408 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØcheck‡ùiv£ssiÚ: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+412 
+r
+.
+	`P©hV®ue
+("action") {
+
+414 !
+aùive
+ {
+
+415 
+”r
+ = 
+db
+.
+	`Upd©eAùiveSessiÚ
+(
+uuid
+, 
+r
+.
+URL
+.
+	`Qu”y
+().
+	`G‘
+("clientSessionId"))
+
+416 
+”r
+ !ğ
+n
+ {
+
+417 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØupd©aùiv£ssiÚ: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+422 
+§ve
+, 
+”r
+ :ğ
+§ved©a
+.
+	`G‘Sy¡em
+(
+uuid
+)
+
+423 
+”r
+ !ğ
+n
+ {
+
+424 
+”rÜs
+.
+	`Is
+(
+”r
+, 
+sql
+.
+E¼NoRows
+) {
+
+425 
+h‰p
+.
+	`E¼Ü
+(
+w
+, 
+”r
+.E¼Ü(), h‰p.
+StusNÙFound
+)
+
+427 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØg‘ sy¡em savd©a: %s", 
+”r
+), 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+433 
+	`wr™eJSON
+(
+w
+, 
+r
+, 
+§ve
+)
+
+435 !
+aùive
+ {
+
+436 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("£ssiÚ ouˆoàd©e:‚Ù‡ùive"), 
+h‰p
+.
+StusBadReque¡
+)
+
+440 
+v¬
+ 
+sy¡em
+ 
+defs
+.
+Sy¡emSaveD©a
+
+
+441 
+”r
+ = 
+jsÚ
+.
+	`NewDecod”
+(
+r
+.
+Body
+).
+	`Decode
+(&
+sy¡em
+)
+
+442 
+”r
+ !ğ
+n
+ {
+
+443 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØdecod»que¡ body: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+447 
+exi¡šgPÏytime
+, 
+”r
+ :ğ
+db
+.
+	`R‘r›vePÏytime
+(
+uuid
+)
+
+448 
+”r
+ !ğ
+n
+ && !
+”rÜs
+.
+	`Is
+Ó¼, 
+sql
+.
+E¼NoRows
+) {
+
+449 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ»Œ›v¶aytime: %s", 
+”r
+), 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+452 
+¶aytime
+, 
+ok
+ :ğ
+sy¡em
+.
+GameSts
+.(
+m­
+[
+¡ršg
+]
+š‹rçû
+{})["¶ayTime"].(
+æßt64
+)
+
+453 !
+ok
+ {
+
+454 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("nØ¶aytimfound"), 
+h‰p
+.
+StusBadReque¡
+)
+
+458 
+	`æßt64
+(
+exi¡šgPÏytime
+è> 
+¶aytime
+ {
+
+459 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("£ssiÚ ouˆoàd©e:ƒxi¡šg…Ïytimi g»©”"), 
+h‰p
+.
+StusBadReque¡
+)
+
+464 
+”r
+ = 
+§ved©a
+.
+	`Upd©eSy¡em
+(
+uuid
+, 
+sy¡em
+)
+
+465 
+”r
+ !ğ
+n
+ {
+
+466 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØpuˆsy¡em d©a: %s", 
+”r
+), 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+470 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusNoCÚ‹Á
+)
+
+472 
+»¥Ú£
+ :ğ
+Sy¡emV”ifyRe¥Ú£
+{
+
+473 
+V®id
+: 
+aùive
+,
+
+477 !
+aùive
+ {
+
+478 
+”r
+ = 
+db
+.
+	`Upd©eAùiveSessiÚ
+(
+uuid
+, 
+r
+.
+URL
+.
+	`Qu”y
+().
+	`G‘
+("clientSessionId"))
+
+479 
+”r
+ !ğ
+n
+ {
+
+480 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØupd©aùiv£ssiÚ: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+484 
+v¬
+ 
+¡ÜedSaveD©a
+ 
+defs
+.
+Sy¡emSaveD©a
+
+
+485 
+¡ÜedSaveD©a
+, 
+”r
+ = 
+db
+.
+	`R—dSy¡emSaveD©a
+(
+uuid
+)
+
+486 
+”r
+ !ğ
+n
+ {
+
+487 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ»ad sessiÚ savd©a: %s", 
+”r
+), 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+491 
+»¥Ú£
+.
+Sy¡emD©a
+ = 
+¡ÜedSaveD©a
+
+
+494 
+	`wr™eJSON
+(
+w
+, 
+r
+, 
+»¥Ú£
+)
+
+496 
+”r
+ :ğ
+§ved©a
+.
+	`D–‘eSy¡em
+(
+uuid
+)
+
+497 
+”r
+ !ğ
+n
+ {
+
+498 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+502 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+504 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("unknowÀaùiÚ"), 
+h‰p
+.
+StusBadReque¡
+)
+
+507 
+	}
+}
+
+510 
+func
+ 
+	$hªdËDayS“d
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+511 
+£ed
+, 
+”r
+ :ğ
+db
+.
+	`G‘DayRunS“d
+()
+
+512 
+”r
+ !ğ
+n
+ {
+
+513 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+517 
+_
+, 
+”r
+ = 
+w
+.
+	`Wr™e
+([]
+	`by‹
+(
+£ed
+))
+
+518 
+”r
+ !ğ
+n
+ {
+
+519 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØwr™£ed: %s", 
+”r
+), 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+521 
+	}
+}
+
+523 
+func
+ 
+	$hªdËDayRªkšgs
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+524 
+v¬
+ 
+”r
+ 
+”rÜ
+
+
+526 
+v¬
+ 
+ÿ‹gÜy
+ 
+
+527 
+r
+.
+URL
+.
+	`Qu”y
+().
+	`Has
+("category") {
+
+528 
+ÿ‹gÜy
+, 
+”r
+ = 
+¡rcÚv
+.
+	`Atoi
+(
+r
+.
+URL
+.
+	`Qu”y
+().
+	`G‘
+("category"))
+
+529 
+”r
+ !ğ
+n
+ {
+
+530 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØcÚv”ˆÿ‹gÜy: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+535 
+·ge
+ := 1
+
+536 
+r
+.
+URL
+.
+	`Qu”y
+().
+	`Has
+("page") {
+
+537 
+·ge
+, 
+”r
+ = 
+¡rcÚv
+.
+	`Atoi
+(
+r
+.
+URL
+.
+	`Qu”y
+().
+	`G‘
+("page"))
+
+538 
+”r
+ !ğ
+n
+ {
+
+539 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØcÚv”ˆ·ge: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+544 
+¿nkšgs
+, 
+”r
+ :ğ
+day
+.
+	`Rªkšgs
+(
+ÿ‹gÜy
+, 
+·ge
+)
+
+545 
+”r
+ !ğ
+n
+ {
+
+546 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+550 
+	`wr™eJSON
+(
+w
+, 
+r
+, 
+¿nkšgs
+)
+
+551 
+	}
+}
+
+553 
+func
+ 
+	$hªdËDayRªkšgPageCouÁ
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+554 
+v¬
+ 
+ÿ‹gÜy
+ 
+
+555 
+r
+.
+URL
+.
+	`Qu”y
+().
+	`Has
+("category") {
+
+556 
+v¬
+ 
+”r
+ 
+”rÜ
+
+
+557 
+ÿ‹gÜy
+, 
+”r
+ = 
+¡rcÚv
+.
+	`Atoi
+(
+r
+.
+URL
+.
+	`Qu”y
+().
+	`G‘
+("category"))
+
+558 
+”r
+ !ğ
+n
+ {
+
+559 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØcÚv”ˆÿ‹gÜy: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+564 
+couÁ
+, 
+”r
+ :ğ
+day
+.
+	`RªkšgPageCouÁ
+(
+ÿ‹gÜy
+)
+
+565 
+”r
+ !ğ
+n
+ {
+
+566 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+569 
+w
+.
+	`Wr™e
+([]
+	`by‹
+(
+¡rcÚv
+.
+	`Itß
+(
+couÁ
+)))
+
+570 
+	}
+}
+
+573 
+func
+ 
+	$hªdËProvid”C®lback
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+574 
+´ovid”
+ :ğ
+r
+.
+	`P©hV®ue
+("provider")
+
+575 
+¡©e
+ :ğ
+r
+.
+URL
+.
+	`Qu”y
+().
+	`G‘
+("state")
+
+576 
+v¬
+ 
+ex‹º®AuthId
+ 
+¡ršg
+
+
+577 
+v¬
+ 
+”r
+ 
+”rÜ
+
+
+578 
+´ovid”
+ {
+
+580 
+ex‹º®AuthId
+, 
+”r
+ = 
+accouÁ
+.
+	`HªdËDiscÜdC®lback
+(
+w
+, 
+r
+)
+
+582 
+ex‹º®AuthId
+, 
+”r
+ = 
+accouÁ
+.
+	`HªdËGoogËC®lback
+(
+w
+, 
+r
+)
+
+584 
+h‰p
+.
+	`E¼Ü
+(
+w
+, "šv®id…rovid”", h‰p.
+StusBadReque¡
+)
+
+588 
+”r
+ !ğ
+n
+ {
+
+589 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+593 
+¡©e
+ != "" {
+
+594 
+¡©e
+ = 
+¡ršgs
+.
+	`R•Ïû
+(state, " ", "+", -1)
+
+595 
+¡©eBy‹
+, 
+”r
+ :ğ
+ba£64
+.
+StdEncodšg
+.
+	`DecodeSŒšg
+(
+¡©e
+)
+
+596 
+”r
+ !ğ
+n
+ {
+
+597 
+h‰p
+.
+	`Redœeù
+(
+w
+, 
+r
+, 
+accouÁ
+.
+GameURL
+, h‰p.
+StusS“Oth”
+)
+
+601 
+u£rName
+, 
+”r
+ :ğ
+db
+.
+	`F‘chU£ºameBySessiÚTok’
+(
+¡©eBy‹
+)
+
+602 
+”r
+ !ğ
+n
+ {
+
+603 
+h‰p
+.
+	`Redœeù
+(
+w
+, 
+r
+, 
+accouÁ
+.
+GameURL
+, h‰p.
+StusS“Oth”
+)
+
+607 
+´ovid”
+ {
+
+609 
+”r
+ = 
+db
+.
+	`AddDiscÜdIdByU£ºame
+(
+ex‹º®AuthId
+, 
+u£rName
+)
+
+611 
+”r
+ = 
+db
+.
+	`AddGoogËIdByU£ºame
+(
+ex‹º®AuthId
+, 
+u£rName
+)
+
+614 
+”r
+ !ğ
+n
+ {
+
+615 
+h‰p
+.
+	`Redœeù
+(
+w
+, 
+r
+, 
+accouÁ
+.
+GameURL
+, h‰p.
+StusS“Oth”
+)
+
+620 
+v¬
+ 
+u£rName
+ 
+¡ršg
+
+
+621 
+´ovid”
+ {
+
+623 
+u£rName
+, 
+”r
+ = 
+db
+.
+	`F‘chU£ºameByDiscÜdId
+(
+ex‹º®AuthId
+)
+
+625 
+u£rName
+, 
+”r
+ = 
+db
+.
+	`F‘chU£ºameByGoogËId
+(
+ex‹º®AuthId
+)
+
+627 
+”r
+ !ğ
+n
+ {
+
+628 
+h‰p
+.
+	`Redœeù
+(
+w
+, 
+r
+, 
+accouÁ
+.
+GameURL
+, h‰p.
+StusS“Oth”
+)
+
+632 
+£ssiÚTok’
+, 
+”r
+ :ğ
+accouÁ
+.
+	`G’”©eTok’FÜU£ºame
+(
+u£rName
+)
+
+633 
+”r
+ !ğ
+n
+ {
+
+634 
+h‰p
+.
+	`Redœeù
+(
+w
+, 
+r
+, 
+accouÁ
+.
+GameURL
+, h‰p.
+StusS“Oth”
+)
+
+638 
+h‰p
+.
+	`S‘Cook›
+(
+w
+, &h‰p.
+Cook›
+{
+
+639 
+Name
+: "pokerogue_sessionId",
+
+640 
+V®ue
+: 
+£ssiÚTok’
+,
+
+641 
+P©h
+: "/",
+
+642 
+Secu»
+: 
+Œue
+,
+
+643 
+SameS™e
+: 
+h‰p
+.
+SameS™eSŒiùMode
+,
+
+644 
+Domaš
+: "pokerogue.net",
+
+645 
+Expœes
+: 
+time
+.
+	`Now
+().
+	`Add
+Ñime.
+Hour
+ * 24 * 30 * 3),
+
+649 
+h‰p
+.
+	`Redœeù
+(
+w
+, 
+r
+, 
+accouÁ
+.
+GameURL
+, h‰p.
+StusS“Oth”
+)
+
+650 
+	}
+}
+
+652 
+func
+ 
+	$hªdËProvid”Logout
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+653 
+uuid
+, 
+”r
+ :ğ
+	`uuidFromReque¡
+(
+r
+)
+
+654 
+”r
+ !ğ
+n
+ {
+
+655 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusBadReque¡
+)
+
+659 
+r
+.
+	`P©hV®ue
+("provider") {
+
+661 
+”r
+ = 
+db
+.
+	`RemoveDiscÜdIdByUUID
+(
+uuid
+)
+
+663 
+”r
+ = 
+db
+.
+	`RemoveGoogËIdByUUID
+(
+uuid
+)
+
+665 
+h‰p
+.
+	`E¼Ü
+(
+w
+, "šv®id…rovid”", h‰p.
+StusBadReque¡
+)
+
+668 
+”r
+ !ğ
+n
+ {
+
+669 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+672 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+673 
+	}
+}
+
+675 
+func
+ 
+	$hªdËAdmšDiscÜdLšk
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+676 
+”r
+ :ğ
+r
+.
+	`P¬£FÜm
+()
+
+677 
+”r
+ !ğ
+n
+ {
+
+678 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ·r£„eque¡ fÜm: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+682 
+uuid
+, 
+”r
+ :ğ
+	`uuidFromReque¡
+(
+r
+)
+
+683 
+”r
+ !ğ
+n
+ {
+
+684 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+688 
+u£rDiscÜdId
+, 
+”r
+ :ğ
+db
+.
+	`F‘chDiscÜdIdByUUID
+(
+uuid
+)
+
+689 
+”r
+ !ğ
+n
+ {
+
+690 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+694 
+hasRŞe
+, 
+”r
+ :ğ
+accouÁ
+.
+	`IsU£rDiscÜdAdmš
+(
+u£rDiscÜdId
+,‡ccouÁ.
+DiscÜdGudID
+)
+
+695 !
+hasRŞe
+ || 
+”r
+ !ğ
+n
+ {
+
+696 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("u£¸dÛ nÙ havth»quœed„Şe"), 
+h‰p
+.
+StusFÜbidd’
+)
+
+700 
+u£ºame
+ :ğ
+r
+.
+FÜm
+.
+	`G‘
+("username")
+
+701 
+discÜdId
+ :ğ
+r
+.
+FÜm
+.
+	`G‘
+("discordId")
+
+705 
+_
+, 
+”r
+ = 
+db
+.
+	`CheckU£ºameExi¡s
+(
+u£ºame
+)
+
+706 
+”r
+ !ğ
+n
+ {
+
+707 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("u£ºamdÛ nÙƒxi¡ oÀth£rv”"), 
+h‰p
+.
+StusNÙFound
+)
+
+711 
+u£rUuid
+, 
+”r
+ :ğ
+db
+.
+	`F‘chUUIDFromU£ºame
+(
+u£ºame
+)
+
+712 
+”r
+ !ğ
+n
+ {
+
+713 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+717 
+”r
+ = 
+db
+.
+	`AddDiscÜdIdByUUID
+(
+discÜdId
+, 
+u£rUuid
+)
+
+718 
+”r
+ !ğ
+n
+ {
+
+719 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+723 
+log
+.
+	`Prštf
+("%s: % added discÜd id % tØu£ºam%s", 
+r
+.
+URL
+.
+P©h
+, 
+u£rDiscÜdId
+, 
+discÜdId
+, 
+u£ºame
+)
+
+725 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+726 
+	}
+}
+
+728 
+func
+ 
+	$hªdËAdmšDiscÜdUÆšk
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+729 
+”r
+ :ğ
+r
+.
+	`P¬£FÜm
+()
+
+730 
+”r
+ !ğ
+n
+ {
+
+731 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ·r£„eque¡ fÜm: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+735 
+uuid
+, 
+”r
+ :ğ
+	`uuidFromReque¡
+(
+r
+)
+
+736 
+”r
+ !ğ
+n
+ {
+
+737 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+741 
+u£rDiscÜdId
+, 
+”r
+ :ğ
+db
+.
+	`F‘chDiscÜdIdByUUID
+(
+uuid
+)
+
+742 
+”r
+ !ğ
+n
+ {
+
+743 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+747 
+hasRŞe
+, 
+”r
+ :ğ
+accouÁ
+.
+	`IsU£rDiscÜdAdmš
+(
+u£rDiscÜdId
+,‡ccouÁ.
+DiscÜdGudID
+)
+
+748 !
+hasRŞe
+ || 
+”r
+ !ğ
+n
+ {
+
+749 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("u£¸dÛ nÙ havth»quœed„Şe"), 
+h‰p
+.
+StusFÜbidd’
+)
+
+753 
+u£ºame
+ :ğ
+r
+.
+FÜm
+.
+	`G‘
+("username")
+
+754 
+discÜdId
+ :ğ
+r
+.
+FÜm
+.
+	`G‘
+("discordId")
+
+757 
+u£ºame
+ != "":
+
+758 
+log
+.
+	`Prštf
+("Username given,„emoving discordId")
+
+761 
+_
+, 
+”r
+ = 
+db
+.
+	`CheckU£ºameExi¡s
+(
+u£ºame
+)
+
+762 
+”r
+ !ğ
+n
+ {
+
+763 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("u£ºamdÛ nÙƒxi¡ oÀth£rv”"), 
+h‰p
+.
+StusNÙFound
+)
+
+767 
+u£rUuid
+, 
+”r
+ :ğ
+db
+.
+	`F‘chUUIDFromU£ºame
+(
+u£ºame
+)
+
+768 
+”r
+ !ğ
+n
+ {
+
+769 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+773 
+”r
+ = 
+db
+.
+	`RemoveDiscÜdIdByUUID
+(
+u£rUuid
+)
+
+774 
+”r
+ !ğ
+n
+ {
+
+775 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+778 
+discÜdId
+ != "":
+
+779 
+log
+.
+	`Prštf
+("DiscordID given,„emoving discordId")
+
+780 
+”r
+ = 
+db
+.
+	`RemoveDiscÜdIdByDiscÜdId
+(
+discÜdId
+)
+
+781 
+”r
+ !ğ
+n
+ {
+
+782 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+787 
+log
+.
+	`Prštf
+("%s: % »moved discÜd id % äom u£ºam%s", 
+u£rDiscÜdId
+, 
+r
+.
+URL
+.
+P©h
+,„.
+FÜm
+.
+	`G‘
+("discordId"),„.Form.Get("username"))
+
+789 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+790 
+	}
+}
+
+792 
+func
+ 
+	$hªdËAdmšGoogËLšk
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+793 
+”r
+ :ğ
+r
+.
+	`P¬£FÜm
+()
+
+794 
+”r
+ !ğ
+n
+ {
+
+795 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ·r£„eque¡ fÜm: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+799 
+uuid
+, 
+”r
+ :ğ
+	`uuidFromReque¡
+(
+r
+)
+
+800 
+”r
+ !ğ
+n
+ {
+
+801 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+805 
+u£rDiscÜdId
+, 
+”r
+ :ğ
+db
+.
+	`F‘chDiscÜdIdByUUID
+(
+uuid
+)
+
+806 
+”r
+ !ğ
+n
+ {
+
+807 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+811 
+hasRŞe
+, 
+”r
+ :ğ
+accouÁ
+.
+	`IsU£rDiscÜdAdmš
+(
+u£rDiscÜdId
+,‡ccouÁ.
+DiscÜdGudID
+)
+
+812 !
+hasRŞe
+ || 
+”r
+ !ğ
+n
+ {
+
+813 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("u£¸dÛ nÙ havth»quœed„Şe"), 
+h‰p
+.
+StusFÜbidd’
+)
+
+817 
+u£ºame
+ :ğ
+r
+.
+FÜm
+.
+	`G‘
+("username")
+
+818 
+googËId
+ :ğ
+r
+.
+FÜm
+.
+	`G‘
+("googleId")
+
+822 
+_
+, 
+”r
+ = 
+db
+.
+	`CheckU£ºameExi¡s
+(
+u£ºame
+)
+
+823 
+”r
+ !ğ
+n
+ {
+
+824 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("u£ºamdÛ nÙƒxi¡ oÀth£rv”"), 
+h‰p
+.
+StusNÙFound
+)
+
+828 
+u£rUuid
+, 
+”r
+ :ğ
+db
+.
+	`F‘chUUIDFromU£ºame
+(
+u£ºame
+)
+
+829 
+”r
+ !ğ
+n
+ {
+
+830 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+834 
+”r
+ = 
+db
+.
+	`AddGoogËIdByUUID
+(
+googËId
+, 
+u£rUuid
+)
+
+835 
+”r
+ !ğ
+n
+ {
+
+836 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+840 
+log
+.
+	`Prštf
+("%s: % added googË id % tØu£ºam%s", 
+r
+.
+URL
+.
+P©h
+, 
+u£rDiscÜdId
+, 
+googËId
+, 
+u£ºame
+)
+
+842 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+843 
+	}
+}
+
+845 
+func
+ 
+	$hªdËAdmšGoogËUÆšk
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+846 
+”r
+ :ğ
+r
+.
+	`P¬£FÜm
+()
+
+847 
+”r
+ !ğ
+n
+ {
+
+848 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ·r£„eque¡ fÜm: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+852 
+uuid
+, 
+”r
+ :ğ
+	`uuidFromReque¡
+(
+r
+)
+
+853 
+”r
+ !ğ
+n
+ {
+
+854 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+858 
+u£rDiscÜdId
+, 
+”r
+ :ğ
+db
+.
+	`F‘chDiscÜdIdByUUID
+(
+uuid
+)
+
+859 
+”r
+ !ğ
+n
+ {
+
+860 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+864 
+hasRŞe
+, 
+”r
+ :ğ
+accouÁ
+.
+	`IsU£rDiscÜdAdmš
+(
+u£rDiscÜdId
+,‡ccouÁ.
+DiscÜdGudID
+)
+
+865 !
+hasRŞe
+ || 
+”r
+ !ğ
+n
+ {
+
+866 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("u£¸dÛ nÙ havth»quœed„Şe"), 
+h‰p
+.
+StusFÜbidd’
+)
+
+870 
+u£ºame
+ :ğ
+r
+.
+FÜm
+.
+	`G‘
+("username")
+
+871 
+googËId
+ :ğ
+r
+.
+FÜm
+.
+	`G‘
+("googleId")
+
+874 
+u£ºame
+ != "":
+
+875 
+log
+.
+	`Prštf
+("Username given,„emoving googleId")
+
+878 
+_
+, 
+”r
+ = 
+db
+.
+	`CheckU£ºameExi¡s
+(
+u£ºame
+)
+
+879 
+”r
+ !ğ
+n
+ {
+
+880 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("u£ºamdÛ nÙƒxi¡ oÀth£rv”"), 
+h‰p
+.
+StusNÙFound
+)
+
+884 
+u£rUuid
+, 
+”r
+ :ğ
+db
+.
+	`F‘chUUIDFromU£ºame
+(
+u£ºame
+)
+
+885 
+”r
+ !ğ
+n
+ {
+
+886 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+890 
+”r
+ = 
+db
+.
+	`RemoveGoogËIdByUUID
+(
+u£rUuid
+)
+
+891 
+”r
+ !ğ
+n
+ {
+
+892 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+895 
+googËId
+ != "":
+
+896 
+log
+.
+	`Prštf
+("DiscordID given,„emoving googleId")
+
+897 
+”r
+ = 
+db
+.
+	`RemoveGoogËIdByDiscÜdId
+(
+googËId
+)
+
+898 
+”r
+ !ğ
+n
+ {
+
+899 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+904 
+log
+.
+	`Prštf
+("%s: % »moved googË id % äom u£ºam%s", 
+u£rDiscÜdId
+, 
+r
+.
+URL
+.
+P©h
+,„.
+FÜm
+.
+	`G‘
+("googleId"),„.Form.Get("username"))
+
+906 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+907 
+	}
+}
+
+909 
+func
+ 
+	$hªdËAdmšS—rch
+(
+w
+ 
+h‰p
+.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+910 
+”r
+ :ğ
+r
+.
+	`P¬£FÜm
+()
+
+911 
+”r
+ !ğ
+n
+ {
+
+912 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("çedØ·r£„eque¡ fÜm: %s", 
+”r
+), 
+h‰p
+.
+StusBadReque¡
+)
+
+916 
+uuid
+, 
+”r
+ :ğ
+	`uuidFromReque¡
+(
+r
+)
+
+917 
+”r
+ !ğ
+n
+ {
+
+918 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+922 
+u£rDiscÜdId
+, 
+”r
+ :ğ
+db
+.
+	`F‘chDiscÜdIdByUUID
+(
+uuid
+)
+
+923 
+”r
+ !ğ
+n
+ {
+
+924 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusUÇuthÜized
+)
+
+928 
+hasRŞe
+, 
+”r
+ :ğ
+accouÁ
+.
+	`IsU£rDiscÜdAdmš
+(
+u£rDiscÜdId
+,‡ccouÁ.
+DiscÜdGudID
+)
+
+929 !
+hasRŞe
+ || 
+”r
+ !ğ
+n
+ {
+
+930 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("u£¸dÛ nÙ havth»quœed„Şe"), 
+h‰p
+.
+StusFÜbidd’
+)
+
+934 
+u£ºame
+ :ğ
+r
+.
+FÜm
+.
+	`G‘
+("username")
+
+938 
+_
+, 
+”r
+ = 
+db
+.
+	`CheckU£ºameExi¡s
+(
+u£ºame
+)
+
+939 
+”r
+ !ğ
+n
+ {
+
+940 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+fmt
+.
+	`E¼Üf
+("u£ºamdÛ nÙƒxi¡ oÀth£rv”"), 
+h‰p
+.
+StusNÙFound
+)
+
+945 
+admšS—rchResuÉ
+, 
+”r
+ :ğ
+db
+.
+	`F‘chAdmšD‘asByU£ºame
+(
+u£ºame
+)
+
+946 
+”r
+ !ğ
+n
+ {
+
+947 
+	`h‰pE¼Ü
+(
+w
+, 
+r
+, 
+”r
+, 
+h‰p
+.
+StusIÁ”ÇlS”v”E¼Ü
+)
+
+951 
+	`wr™eJSON
+(
+w
+, 
+r
+, 
+admšS—rchResuÉ
+)
+
+952 
+log
+.
+	`Prštf
+("%s: % £¬ched fÜ u£ºam%s", 
+u£rDiscÜdId
+, 
+r
+.
+URL
+.
+P©h
+, 
+u£ºame
+)
+
+953 
+	}
+}
+
+	@api/savedata/clear.go
+
+18 
+·ckage
+ 
+§ved©a
+
+
+20 
+impÜt
+ (
+
+28 
+ty³
+ 
+CË¬Re¥Ú£
+ struct {
+
+29 
+Sucûss
+ 
+	mboŞ
+ `
+	mjsÚ
+:"success"`
+
+30 
+E¼Ü
+ 
+¡ršg
+ `
+jsÚ
+:"error"`
+
+34 
+func
+ 
+	$CË¬
+(
+uuid
+ []
+by‹
+, 
+¦Ù
+ , 
+£ed
+ 
+¡ršg
+, 
+§ve
+ 
+defs
+.
+SessiÚSaveD©a
+è(
+CË¬Re¥Ú£
+, 
+”rÜ
+) {
+
+35 
+v¬
+ 
+»¥Ú£
+ 
+CË¬Re¥Ú£
+
+
+36 
+”r
+ :ğ
+db
+.
+	`Upd©eAccouÁLa¡Aùiv™y
+(
+uuid
+)
+
+37 
+”r
+ !ğ
+n
+ {
+
+38 
+log
+.
+	`Pršt
+("failedo update‡ccount†ast‡ctivity")
+
+41 
+¦Ù
+ < 0 || slÙ >ğ
+defs
+.
+SessiÚSlÙCouÁ
+ {
+
+42  
+»¥Ú£
+, 
+fmt
+.
+	`E¼Üf
+("¦Ù id %d ouˆoà¿nge", 
+¦Ù
+)
+
+45 
+£ssiÚCom¶‘ed
+ :ğ
+	`v®id©eSessiÚCom¶‘ed
+(
+§ve
+)
+
+47 
+§ve
+.
+GameMode
+ =ğ3 && save.
+S“d
+ =ğ
+£ed
+ {
+
+48 
+waveCom¶‘ed
+ :ğ
+§ve
+.
+WaveIndex
+
+
+49 !
+£ssiÚCom¶‘ed
+ {
+
+50 
+waveCom¶‘ed
+--
+
+53 
+§ve
+.
+ScÜe
+ >= 20000 {
+
+54 
+db
+.
+	`S‘AccouÁBªÃd
+(
+uuid
+, 
+Œue
+)
+
+57 
+”r
+ = 
+db
+.
+	`AddOrUpd©eAccouÁDayRun
+(
+uuid
+, 
+§ve
+.
+ScÜe
+, 
+waveCom¶‘ed
+)
+
+58 
+”r
+ !ğ
+n
+ {
+
+59 
+log
+.
+	`Prštf
+("çedØadd o¸upd©day„uÀ»cÜd: %s", 
+”r
+)
+
+63 
+£ssiÚCom¶‘ed
+ {
+
+64 
+»¥Ú£
+.
+Sucûss
+, 
+”r
+ = 
+db
+.
+	`TryAddS“dCom¶‘iÚ
+(
+uuid
+, 
+§ve
+.
+S“d
+, (§ve.
+GameMode
+))
+
+65 
+”r
+ !ğ
+n
+ {
+
+66 
+log
+.
+	`Prštf
+("çedØm¬k s“d‡ com¶‘ed: %s", 
+”r
+)
+
+70 
+”r
+ = 
+db
+.
+	`D–‘eSessiÚSaveD©a
+(
+uuid
+, 
+¦Ù
+)
+
+71 
+”r
+ !ğ
+n
+ {
+
+72 
+log
+.
+	`Prštf
+("çedØd–‘£ssiÚ savd©a: %s", 
+”r
+)
+
+75  
+»¥Ú£
+, 
+n
+
+
+76 
+	}
+}
+
+	@api/savedata/common.go
+
+18 
+·ckage
+ 
+§ved©a
+
+
+20 
+impÜt
+ (
+
+24 
+func
+ 
+	$v®id©eSessiÚCom¶‘ed
+(
+£ssiÚ
+ 
+defs
+.
+SessiÚSaveD©a
+è
+boŞ
+ {
+
+25 
+£ssiÚ
+.
+GameMode
+ {
+
+27  
+£ssiÚ
+.
+B©eTy³
+ =ğ2 && sessiÚ.
+WaveIndex
+ == 200
+
+29  
+£ssiÚ
+.
+B©eTy³
+ =ğ2 && sessiÚ.
+WaveIndex
+ == 50
+
+32  
+çl£
+
+
+33 
+	}
+}
+
+	@api/savedata/delete.go
+
+18 
+·ckage
+ 
+§ved©a
+
+
+20 
+impÜt
+ (
+
+29 
+func
+ 
+	$D–‘e
+(
+uuid
+ []
+by‹
+, 
+d©©y³
+, 
+¦Ù
+ è
+”rÜ
+ {
+
+30 
+”r
+ :ğ
+db
+.
+	`Upd©eAccouÁLa¡Aùiv™y
+(
+uuid
+)
+
+31 
+”r
+ !ğ
+n
+ {
+
+32 
+log
+.
+	`Pršt
+("failedo update‡ccount†ast‡ctivity")
+
+35 
+d©©y³
+ {
+
+37 
+¦Ù
+ < 0 || slÙ >ğ
+defs
+.
+SessiÚSlÙCouÁ
+ {
+
+38 
+”r
+ = 
+fmt
+.
+	`E¼Üf
+("¦Ù id %d ouˆoà¿nge", 
+¦Ù
+)
+
+42 
+”r
+ = 
+db
+.
+	`D–‘eSessiÚSaveD©a
+(
+uuid
+, 
+¦Ù
+)
+
+44 
+”r
+ = 
+fmt
+.
+	`E¼Üf
+("invalid dataype")
+
+46 
+”r
+ !ğ
+n
+ {
+
+47  
+”r
+
+
+50  
+n
+
+
+51 
+	}
+}
+
+	@api/savedata/newclear.go
+
+18 
+·ckage
+ 
+§ved©a
+
+
+20 
+impÜt
+ (
+
+28 
+func
+ 
+	$NewCË¬
+(
+uuid
+ []
+by‹
+, 
+¦Ù
+ è(
+boŞ
+, 
+”rÜ
+) {
+
+29 
+¦Ù
+ < 0 || slÙ >ğ
+defs
+.
+SessiÚSlÙCouÁ
+ {
+
+30  
+çl£
+, 
+fmt
+.
+	`E¼Üf
+("¦Ù id %d ouˆoà¿nge", 
+¦Ù
+)
+
+33 
+£ssiÚ
+, 
+”r
+ :ğ
+db
+.
+	`R—dSessiÚSaveD©a
+(
+uuid
+, 
+¦Ù
+)
+
+34 
+”r
+ !ğ
+n
+ {
+
+35  
+çl£
+, 
+”r
+
+
+38 
+com¶‘ed
+, 
+”r
+ :ğ
+db
+.
+	`R—dS“dCom¶‘ed
+(
+uuid
+, 
+£ssiÚ
+.
+S“d
+)
+
+39 
+”r
+ !ğ
+n
+ {
+
+40  
+çl£
+, 
+fmt
+.
+	`E¼Üf
+("çedØ»ad s“d com¶‘ed: %s", 
+”r
+)
+
+43  !
+com¶‘ed
+, 
+n
+
+
+44 
+	}
+}
+
+	@api/savedata/session.go
+
+18 
+·ckage
+ 
+§ved©a
+
+
+20 
+impÜt
+ (
+
+25 
+func
+ 
+	$G‘SessiÚ
+(
+uuid
+ []
+by‹
+, 
+¦Ù
+ è(
+defs
+.
+SessiÚSaveD©a
+, 
+”rÜ
+) {
+
+26 
+£ssiÚ
+, 
+”r
+ :ğ
+db
+.
+	`R—dSessiÚSaveD©a
+(
+uuid
+, 
+¦Ù
+)
+
+27 
+”r
+ !ğ
+n
+ {
+
+28  
+£ssiÚ
+, 
+”r
+
+
+31  
+£ssiÚ
+, 
+n
+
+
+32 
+	}
+}
+
+34 
+func
+ 
+	$Upd©eSessiÚ
+(
+uuid
+ []
+by‹
+, 
+¦Ù
+ , 
+d©a
+ 
+defs
+.
+SessiÚSaveD©a
+è
+”rÜ
+ {
+
+35 
+”r
+ :ğ
+db
+.
+	`StÜeSessiÚSaveD©a
+(
+uuid
+, 
+d©a
+, 
+¦Ù
+)
+
+36 
+”r
+ !ğ
+n
+ {
+
+37  
+”r
+
+
+40  
+n
+
+
+41 
+	}
+}
+
+43 
+func
+ 
+	$D–‘eSessiÚ
+(
+uuid
+ []
+by‹
+, 
+¦Ù
+ è
+”rÜ
+ {
+
+44 
+”r
+ :ğ
+db
+.
+	`D–‘eSessiÚSaveD©a
+(
+uuid
+, 
+¦Ù
+)
+
+45 
+”r
+ !ğ
+n
+ {
+
+46  
+”r
+
+
+49  
+n
+
+
+50 
+	}
+}
+
+	@api/savedata/system.go
+
+18 
+·ckage
+ 
+§ved©a
+
+
+20 
+impÜt
+ (
+
+29 
+func
+ 
+	$G‘Sy¡em
+(
+uuid
+ []
+by‹
+è(
+defs
+.
+Sy¡emSaveD©a
+, 
+”rÜ
+) {
+
+30 
+v¬
+ 
+sy¡em
+ 
+defs
+.
+Sy¡emSaveD©a
+
+
+31 
+v¬
+ 
+”r
+ 
+”rÜ
+
+
+33 
+os
+.
+	`G‘’v
+("S3_SYSTEM_BUCKET_NAME") != "" {
+
+34 
+sy¡em
+, 
+”r
+ = 
+db
+.
+	`G‘Sy¡emSaveFromS3
+(
+uuid
+)
+
+36 
+log
+.
+	`Pršn
+("use database GetSystem");
+
+37 
+sy¡em
+, 
+”r
+ = 
+db
+.
+	`R—dSy¡emSaveD©a
+(
+uuid
+)
+
+39 
+”r
+ !ğ
+n
+ {
+
+40  
+sy¡em
+, 
+”r
+
+
+43  
+sy¡em
+, 
+n
+
+
+44 
+	}
+}
+
+46 
+func
+ 
+	$Upd©eSy¡em
+(
+uuid
+ []
+by‹
+, 
+d©a
+ 
+defs
+.
+Sy¡emSaveD©a
+è
+”rÜ
+ {
+
+47 
+d©a
+.
+T¿š”Id
+ =ğ0 && d©a.
+Seü‘Id
+ == 0 {
+
+48  
+fmt
+.
+	`E¼Üf
+("invalid system data")
+
+51 
+”r
+ :ğ
+db
+.
+	`Upd©eAccouÁSts
+(
+uuid
+, 
+d©a
+.
+GameSts
+, d©a.
+Vouch”CouÁs
+)
+
+52 
+”r
+ !ğ
+n
+ {
+
+53  
+fmt
+.
+	`E¼Üf
+("çedØupd©accouÁ sts: %s", 
+”r
+)
+
+56 
+os
+.
+	`G‘’v
+("S3_SYSTEM_BUCKET_NAME") != "" {
+
+57 
+”r
+ = 
+db
+.
+	`StÜeSy¡emSaveD©aS3
+(
+uuid
+, 
+d©a
+)
+
+59 
+”r
+ = 
+db
+.
+	`StÜeSy¡emSaveD©a
+(
+uuid
+, 
+d©a
+)
+
+61 
+”r
+ !ğ
+n
+ {
+
+62  
+”r
+
+
+65  
+n
+
+
+66 
+	}
+}
+
+68 
+func
+ 
+	$D–‘eSy¡em
+(
+uuid
+ []
+by‹
+è
+”rÜ
+ {
+
+69 
+”r
+ :ğ
+db
+.
+	`D–‘eSy¡emSaveD©a
+(
+uuid
+)
+
+70 
+”r
+ !ğ
+n
+ {
+
+71  
+”r
+
+
+74  
+n
+
+
+75 
+	}
+}
+
+	@api/savedata/update.go
+
+18 
+·ckage
+ 
+§ved©a
+
+
+20 
+impÜt
+ (
+
+29 
+func
+ 
+	$Upd©e
+(
+uuid
+ []
+by‹
+, 
+¦Ù
+ , 
+§ve
+ 
+ªy
+è
+”rÜ
+ {
+
+30 
+”r
+ :ğ
+db
+.
+	`Upd©eAccouÁLa¡Aùiv™y
+(
+uuid
+)
+
+31 
+”r
+ !ğ
+n
+ {
+
+32 
+log
+.
+	`Pršt
+("failedo update‡ccount†ast‡ctivity")
+
+35 
+§ve
+ :ğ§ve.(
+ty³
+) {
+
+36 
+defs
+.
+Sy¡emSaveD©a
+:
+
+37 
+§ve
+.
+T¿š”Id
+ =ğ0 && save.
+Seü‘Id
+ == 0 {
+
+38  
+fmt
+.
+	`E¼Üf
+("invalid system data")
+
+41 
+”r
+ = 
+db
+.
+	`Upd©eAccouÁSts
+(
+uuid
+, 
+§ve
+.
+GameSts
+, save.
+Vouch”CouÁs
+)
+
+42 
+”r
+ !ğ
+n
+ {
+
+43  
+fmt
+.
+	`E¼Üf
+("çedØupd©accouÁ sts: %s", 
+”r
+)
+
+46  
+db
+.
+	`StÜeSy¡emSaveD©a
+(
+uuid
+, 
+§ve
+)
+
+48 
+defs
+.
+SessiÚSaveD©a
+:
+
+49 
+¦Ù
+ < 0 || slÙ >ğ
+defs
+.
+SessiÚSlÙCouÁ
+ {
+
+50  
+fmt
+.
+	`E¼Üf
+("¦Ù id %d ouˆoà¿nge", 
+¦Ù
+)
+
+52  
+db
+.
+	`StÜeSessiÚSaveD©a
+(
+uuid
+, 
+§ve
+, 
+¦Ù
+)
+
+55  
+fmt
+.
+	`E¼Üf
+("invalid dataype")
+
+57 
+	}
+}
+
+	@api/stats.go
+
+18 
+·ckage
+ 
+­i
+
+
+20 
+impÜt
+ (
+
+28 
+v¬
+ (
+
+29 
+scheduËr
+ = 
+üÚ
+.
+New
+(üÚ.
+	$W™hLoÿtiÚ
+(
+time
+.
+UTC
+))
+
+30 
+¶ay”CouÁ
+ 
+
+31 
+b©eCouÁ
+ 
+
+32 
+şassicSessiÚCouÁ
+ 
+
+35 
+func
+ 
+	$scheduËStReäesh
+(è
+”rÜ
+ {
+
+36 
+_
+, 
+”r
+ :ğ
+scheduËr
+.
+	`AddFunc
+("@ev”y 30s", 
+	`func
+() {
+
+37 
+”r
+ :ğ
+	`upd©eSts
+()
+
+38 
+”r
+ !ğ
+n
+ {
+
+39 
+log
+.
+	`Prštf
+("çedØupd©¡©s: %s", 
+”r
+)
+
+42 
+”r
+ !ğ
+n
+ {
+
+43  
+”r
+
+
+46 
+scheduËr
+.
+	`S¹
+()
+
+47  
+n
+
+
+48 
+	}
+}
+
+50 
+func
+ 
+	$upd©eSts
+(è
+”rÜ
+ {
+
+51 
+v¬
+ 
+”r
+ 
+”rÜ
+
+
+52 
+¶ay”CouÁ
+, 
+”r
+ = 
+db
+.
+	`F‘chPÏy”CouÁ
+()
+
+53 
+”r
+ !ğ
+n
+ {
+
+54  
+”r
+
+
+57 
+b©eCouÁ
+, 
+”r
+ = 
+db
+.
+	`F‘chB©eCouÁ
+()
+
+58 
+”r
+ !ğ
+n
+ {
+
+59  
+”r
+
+
+62 
+şassicSessiÚCouÁ
+, 
+”r
+ = 
+db
+.
+	`F‘chCÏssicSessiÚCouÁ
+()
+
+63 
+”r
+ !ğ
+n
+ {
+
+64  
+”r
+
+
+67  
+n
+
+
+68 
+	}
+}
+
+	@cache/rediscache.go
+
+1 
+·ckage
+ 
+ÿche
+
+
+3 
+impÜt
+ (
+
+12 
+v¬
+ (
+
+13 
+Ctx
+ = 
+cÚ‹xt
+.
+	$Background
+()
+
+14 
+Rdb
+ *
+»dis
+.
+Cl›Á
+
+
+17 
+func
+ 
+	$In™
+(è
+”rÜ
+ {
+
+18 
+addr
+ :ğ
+	`g‘Env
+("REDIS_ADDR", "redis:6379")
+
+19 
+·ss
+ :ğ
+os
+.
+	`G‘’v
+("REDIS_PASS")
+
+20 
+dbNum
+, 
+_
+ :ğ
+¡rcÚv
+.
+	`Atoi
+(
+	`g‘Env
+("REDIS_DB", "0"))
+
+22 
+Rdb
+ = 
+»dis
+.
+	`NewCl›Á
+(&»dis.
+O±iÚs
+{
+
+23 
+Addr
+: 
+addr
+,
+
+24 
+PasswÜd
+: 
+·ss
+,
+
+25 
+DB
+: 
+dbNum
+,
+
+26 
+PoŞSize
+: 10,
+
+27 
+MšIdËCÚns
+: 5,
+
+31 
+ùx
+, 
+ÿnûl
+ :ğ
+cÚ‹xt
+.
+	`W™hTimeout
+(
+Ctx
+, 
+time
+.
+SecÚd
+)
+
+32 
+deãr
+ 
+	`ÿnûl
+()
+
+33  
+Rdb
+.
+	`Pšg
+(
+ùx
+).
+	`E¼
+()
+
+34 
+	}
+}
+
+36 
+func
+ 
+	$g‘Env
+(
+k
+, 
+def
+ 
+¡ršg
+) string {
+
+37 
+v
+, 
+ok
+ :ğ
+os
+.
+	`LookupEnv
+(
+k
+); ok {
+
+38  
+v
+
+
+40  
+def
+
+
+41 
+	}
+}
+
+	@db/account.go
+
+18 
+·ckage
+ 
+db
+
+
+20 
+impÜt
+ (
+
+26 
+_
+ "github.com/go-sql-driver/mysql"
+
+30 
+func
+ 
+	$AddAccouÁRecÜd
+(
+uuid
+ []
+by‹
+, 
+u£ºame
+ 
+¡ršg
+, 
+key
+, 
+§É
+ []by‹è
+”rÜ
+ {
+
+31 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("INSERT INTO‡ccouÁ (uuid, u£ºame, hash, s®t,„egi¡”edèVALUES (?, ?, ?, ?, UTC_TIMESTAMP())", 
+uuid
+, 
+u£ºame
+, 
+key
+, 
+§É
+)
+
+32 
+”r
+ !ğ
+n
+ {
+
+33  
+”r
+
+
+36  
+n
+
+
+37 
+	}
+}
+
+39 
+func
+ 
+	$AddAccouÁSessiÚ
+(
+u£ºame
+ 
+¡ršg
+, 
+tok’
+ []
+by‹
+è
+”rÜ
+ {
+
+40 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("INSERT INTO sessiÚ (uuid,ok’,ƒxpœeèSELECT‡.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEKèFROM‡ccouÁ ¨WHERE‡.u£ºamğ?", 
+tok’
+, 
+u£ºame
+)
+
+41 
+”r
+ !ğ
+n
+ {
+
+42  
+”r
+
+
+45 
+_
+, 
+”r
+ = 
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET†a¡LoggedIÀğUTC_TIMESTAMP(èWHERE u£ºamğ?", 
+u£ºame
+)
+
+46 
+”r
+ !ğ
+n
+ {
+
+47  
+”r
+
+
+50  
+n
+
+
+51 
+	}
+}
+
+53 
+func
+ 
+	$AddDiscÜdIdByU£ºame
+(
+discÜdId
+ 
+¡ršg
+, 
+u£ºame
+ sŒšgè
+”rÜ
+ {
+
+54 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET discÜdId = ? WHERE u£ºamğ?", 
+discÜdId
+, 
+u£ºame
+)
+
+55 
+”r
+ !ğ
+n
+ {
+
+56  
+”r
+
+
+59  
+n
+
+
+60 
+	}
+}
+
+62 
+func
+ 
+	$AddGoogËIdByU£ºame
+(
+googËId
+ 
+¡ršg
+, 
+u£ºame
+ sŒšgè
+”rÜ
+ {
+
+63 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET googËId = ? WHERE u£ºamğ?", 
+googËId
+, 
+u£ºame
+)
+
+64 
+”r
+ !ğ
+n
+ {
+
+65  
+”r
+
+
+68  
+n
+
+
+69 
+	}
+}
+
+71 
+func
+ 
+	$AddGoogËIdByUUID
+(
+googËId
+ 
+¡ršg
+, 
+uuid
+ []
+by‹
+è
+”rÜ
+ {
+
+72 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET googËId = ? WHERE uuid = ?", 
+googËId
+, 
+uuid
+)
+
+73 
+”r
+ !ğ
+n
+ {
+
+74  
+”r
+
+
+77  
+n
+
+
+78 
+	}
+}
+
+80 
+func
+ 
+	$AddDiscÜdIdByUUID
+(
+discÜdId
+ 
+¡ršg
+, 
+uuid
+ []
+by‹
+è
+”rÜ
+ {
+
+81 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET discÜdId = ? WHERE uuid = ?", 
+discÜdId
+, 
+uuid
+)
+
+82 
+”r
+ !ğ
+n
+ {
+
+83  
+”r
+
+
+86  
+n
+
+
+87 
+	}
+}
+
+89 
+func
+ 
+	$F‘chU£ºameByDiscÜdId
+(
+discÜdId
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+90 
+v¬
+ 
+u£ºame
+ 
+¡ršg
+
+
+91 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT u£ºamFROM‡ccouÁ WHERE discÜdId = ?", 
+discÜdId
+).
+	`Sÿn
+(&
+u£ºame
+)
+
+92 
+”r
+ !ğ
+n
+ {
+
+93  "", 
+”r
+
+
+96  
+u£ºame
+, 
+n
+
+
+97 
+	}
+}
+
+99 
+func
+ 
+	$F‘chU£ºameByGoogËId
+(
+googËId
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+100 
+v¬
+ 
+u£ºame
+ 
+¡ršg
+
+
+101 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT u£ºamFROM‡ccouÁ WHERE googËId = ?", 
+googËId
+).
+	`Sÿn
+(&
+u£ºame
+)
+
+102 
+”r
+ !ğ
+n
+ {
+
+103  "", 
+”r
+
+
+106  
+u£ºame
+, 
+n
+
+
+107 
+	}
+}
+
+109 
+func
+ 
+	$F‘chDiscÜdIdByU£ºame
+(
+u£ºame
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+110 
+v¬
+ 
+discÜdId
+ 
+sql
+.
+NuÎSŒšg
+
+
+111 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT discÜdId FROM‡ccouÁ WHERE u£ºamğ?", 
+u£ºame
+).
+	`Sÿn
+(&
+discÜdId
+)
+
+112 
+”r
+ !ğ
+n
+ {
+
+113  "", 
+”r
+
+
+116 !
+discÜdId
+.
+V®id
+ {
+
+117  "", 
+n
+
+
+120  
+discÜdId
+.
+SŒšg
+, 
+n
+
+
+121 
+	}
+}
+
+123 
+func
+ 
+	$F‘chGoogËIdByU£ºame
+(
+u£ºame
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+124 
+v¬
+ 
+googËId
+ 
+sql
+.
+NuÎSŒšg
+
+
+125 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT googËId FROM‡ccouÁ WHERE u£ºamğ?", 
+u£ºame
+).
+	`Sÿn
+(&
+googËId
+)
+
+126 
+”r
+ !ğ
+n
+ {
+
+127  "", 
+”r
+
+
+130 !
+googËId
+.
+V®id
+ {
+
+131  "", 
+n
+
+
+134  
+googËId
+.
+SŒšg
+, 
+n
+
+
+135 
+	}
+}
+
+137 
+func
+ 
+	$F‘chDiscÜdIdByUUID
+(
+uuid
+ []
+by‹
+è(
+¡ršg
+, 
+”rÜ
+) {
+
+138 
+v¬
+ 
+discÜdId
+ 
+sql
+.
+NuÎSŒšg
+
+
+139 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT discÜdId FROM‡ccouÁ WHERE uuid = ?", 
+uuid
+).
+	`Sÿn
+(&
+discÜdId
+)
+
+140 
+”r
+ !ğ
+n
+ {
+
+141  "", 
+”r
+
+
+144 !
+discÜdId
+.
+V®id
+ {
+
+145  "", 
+n
+
+
+148  
+discÜdId
+.
+SŒšg
+, 
+n
+
+
+149 
+	}
+}
+
+151 
+func
+ 
+	$F‘chGoogËIdByUUID
+(
+uuid
+ []
+by‹
+è(
+¡ršg
+, 
+”rÜ
+) {
+
+152 
+v¬
+ 
+googËId
+ 
+sql
+.
+NuÎSŒšg
+
+
+153 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT googËId FROM‡ccouÁ WHERE uuid = ?", 
+uuid
+).
+	`Sÿn
+(&
+googËId
+)
+
+154 
+”r
+ !ğ
+n
+ {
+
+155  "", 
+”r
+
+
+158 !
+googËId
+.
+V®id
+ {
+
+159  "", 
+n
+
+
+162  
+googËId
+.
+SŒšg
+, 
+n
+
+
+163 
+	}
+}
+
+165 
+func
+ 
+	$F‘chU£ºameBySessiÚTok’
+(
+tok’
+ []
+by‹
+è(
+¡ršg
+, 
+”rÜ
+) {
+
+166 
+v¬
+ 
+u£ºame
+ 
+¡ršg
+
+
+167 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT‡.u£ºamFROM‡ccouÁ ¨JOIN sessiÚ  ON‡.uuid = s.uuid WHERE s.tok’ = ?", 
+tok’
+).
+	`Sÿn
+(&
+u£ºame
+)
+
+168 
+”r
+ !ğ
+n
+ {
+
+169  "", 
+”r
+
+
+172  
+u£ºame
+, 
+n
+
+
+173 
+	}
+}
+
+175 
+func
+ 
+	$CheckU£ºameExi¡s
+(
+u£ºame
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+176 
+v¬
+ 
+dbU£ºame
+ 
+sql
+.
+NuÎSŒšg
+
+
+177 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT u£ºamFROM‡ccouÁ WHERE u£ºamğ?", 
+u£ºame
+).
+	`Sÿn
+(&
+dbU£ºame
+)
+
+178 
+”r
+ !ğ
+n
+ {
+
+179  "", 
+”r
+
+
+181 !
+dbU£ºame
+.
+V®id
+ {
+
+182  "", 
+n
+
+
+185  
+dbU£ºame
+.
+SŒšg
+, 
+n
+
+
+186 
+	}
+}
+
+188 
+func
+ 
+	$F‘chLa¡LoggedInD©eByU£ºame
+(
+u£ºame
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+189 
+v¬
+ 
+Ï¡LoggedIn
+ 
+sql
+.
+NuÎSŒšg
+
+
+190 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT†a¡LoggedIÀFROM‡ccouÁ WHERE u£ºamğ?", 
+u£ºame
+).
+	`Sÿn
+(&
+Ï¡LoggedIn
+)
+
+191 
+”r
+ !ğ
+n
+ {
+
+192  "", 
+”r
+
+
+194 !
+Ï¡LoggedIn
+.
+V®id
+ {
+
+195  "", 
+n
+
+
+198  
+Ï¡LoggedIn
+.
+SŒšg
+, 
+n
+
+
+199 
+	}
+}
+
+201 
+ty³
+ 
+AdmšS—rchRe¥Ú£
+ struct {
+
+202 
+U£ºame
+ 
+	m¡ršg
+ `
+	mjsÚ
+:"username"`
+
+203 
+DiscÜdId
+ 
+¡ršg
+ `
+jsÚ
+:"discordId"`
+
+204 
+GoogËId
+ 
+¡ršg
+ `
+jsÚ
+:"googleId"`
+
+205 
+La¡Aùiv™y
+ 
+¡ršg
+ `
+jsÚ
+:"lastLoggedIn"`
+
+206 
+Regi¡”ed
+ 
+¡ršg
+ `
+jsÚ
+:"registered"`
+
+209 
+func
+ 
+	$F‘chAdmšD‘asByU£ºame
+(
+dbU£ºame
+ 
+¡ršg
+è(
+AdmšS—rchRe¥Ú£
+, 
+”rÜ
+) {
+
+210 
+v¬
+ 
+u£ºame
+, 
+discÜdId
+, 
+googËId
+, 
+Ï¡Aùiv™y
+, 
+»gi¡”ed
+ 
+sql
+.
+NuÎSŒšg
+
+
+211 
+v¬
+ 
+admšRe¥Ú£
+ 
+AdmšS—rchRe¥Ú£
+
+
+213 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT u£ºame, discÜdId, googËId,†a¡Aùiv™y,„egi¡”ed from‡ccouÁ WHERE u£ºamğ?", 
+dbU£ºame
+).
+	`Sÿn
+(&
+u£ºame
+, &
+discÜdId
+, &
+googËId
+, &
+Ï¡Aùiv™y
+, &
+»gi¡”ed
+)
+
+214 
+”r
+ !ğ
+n
+ {
+
+215  
+admšRe¥Ú£
+, 
+”r
+
+
+218 
+admšRe¥Ú£
+ = 
+AdmšS—rchRe¥Ú£
+{
+
+219 
+U£ºame
+: 
+u£ºame
+.
+SŒšg
+,
+
+220 
+DiscÜdId
+: 
+discÜdId
+.
+SŒšg
+,
+
+221 
+GoogËId
+: 
+googËId
+.
+SŒšg
+,
+
+222 
+La¡Aùiv™y
+: 
+Ï¡Aùiv™y
+.
+SŒšg
+,
+
+223 
+Regi¡”ed
+: 
+»gi¡”ed
+.
+SŒšg
+,
+
+226  
+admšRe¥Ú£
+, 
+n
+
+
+227 
+	}
+}
+
+229 
+func
+ 
+	$Upd©eAccouÁPasswÜd
+(
+uuid
+, 
+key
+, 
+§É
+ []
+by‹
+è
+”rÜ
+ {
+
+230 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET (hash, s®tèVALUES (?, ?èWHERE uuid = ?", 
+key
+, 
+§É
+, 
+uuid
+)
+
+231 
+”r
+ !ğ
+n
+ {
+
+232  
+”r
+
+
+235  
+n
+
+
+236 
+	}
+}
+
+238 
+func
+ 
+	$Upd©eAccouÁLa¡Aùiv™y
+(
+uuid
+ []
+by‹
+è
+”rÜ
+ {
+
+239 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET†a¡Aùiv™y = UTC_TIMESTAMP(èWHERE uuid = ?", 
+uuid
+)
+
+240 
+”r
+ !ğ
+n
+ {
+
+241  
+”r
+
+
+244  
+n
+
+
+245 
+	}
+}
+
+247 
+func
+ 
+	$Upd©eAccouÁSts
+(
+uuid
+ []
+by‹
+, 
+¡©s
+ 
+defs
+.
+GameSts
+, 
+vouch”CouÁs
+ 
+m­
+[
+¡ršg
+]è
+”rÜ
+ {
+
+248 
+v¬
+ 
+cŞumns
+ = []
+¡ršg
+{"playTime", "battles", "classicSessionsPlayed", "sessionsWon", "highestEndlessWave", "highestLevel", "pokemonSeen", "pokemonDefeated", "pokemonCaught", "pokemonHatched", "eggsPulled", "regularVouchers", "plusVouchers", "premiumVouchers", "goldenVouchers"}
+
+250 
+v¬
+ 
+¡©CŞs
+ []
+¡ršg
+
+
+251 
+v¬
+ 
+¡©V®ues
+ []
+š‹rçû
+{}
+
+253 
+m
+, 
+ok
+ :ğ
+¡©s
+.(
+m­
+[
+¡ršg
+]
+š‹rçû
+{})
+
+254 !
+ok
+ {
+
+255  
+fmt
+.
+	`E¼Üf
+("ex³ùed m­[¡ršg]š‹rçû{}, gÙ %T", 
+¡©s
+)
+
+258 
+k
+, 
+v
+ :ğ
+¿nge
+ 
+m
+ {
+
+259 
+v®ue
+, 
+ok
+ :ğ
+v
+.(
+æßt64
+)
+
+260 !
+ok
+ {
+
+261  
+fmt
+.
+	`E¼Üf
+("ex³ùed flßt64, gÙ %T", 
+v
+)
+
+264 
+¦iûs
+.
+	`CÚšs
+(
+cŞumns
+, 
+k
+) {
+
+265 
+¡©CŞs
+ = 
+	`­³nd
+(¡©CŞs, 
+k
+)
+
+266 
+¡©V®ues
+ = 
+	`­³nd
+(¡©V®ues, 
+v®ue
+)
+
+270 
+k
+, 
+v
+ :ğ
+¿nge
+ 
+vouch”CouÁs
+ {
+
+271 
+v¬
+ 
+cŞumn
+ 
+¡ršg
+
+
+272 
+k
+ {
+
+274 
+cŞumn
+ = "regularVouchers"
+
+276 
+cŞumn
+ = "plusVouchers"
+
+278 
+cŞumn
+ = "premiumVouchers"
+
+280 
+cŞumn
+ = "goldenVouchers"
+
+284 
+¡©CŞs
+ = 
+	`­³nd
+(¡©CŞs, 
+cŞumn
+)
+
+285 
+¡©V®ues
+ = 
+	`­³nd
+(¡©V®ues, 
+v
+)
+
+288 
+v¬
+ 
+¡©Args
+ []
+š‹rçû
+{}
+
+289 
+¡©Args
+ = 
+	`­³nd
+(¡©Args, 
+uuid
+)
+
+290 
+¿nge
+ 2 {
+
+291 
+¡©Args
+ = 
+	`­³nd
+(¡©Args, 
+¡©V®ues
+...)
+
+294 
+qu”y
+ := "INSERT INTO‡ccountStats (uuid"
+
+296 
+_
+, 
+cŞ
+ :ğ
+¿nge
+ 
+¡©CŞs
+ {
+
+297 
+qu”y
+ +ğ", " + 
+cŞ
+
+
+300 
+qu”y
+ += ") VALUES (?"
+
+302 
+¿nge
+ 
+	`Ën
+(
+¡©CŞs
+) {
+
+303 
+qu”y
+ += ", ?"
+
+306 
+qu”y
+ += ") ON DUPLICATE KEY UPDATE "
+
+308 
+i
+, 
+cŞ
+ :ğ
+¿nge
+ 
+¡©CŞs
+ {
+
+309 
+i
+ > 0 {
+
+310 
+qu”y
+ += ", "
+
+313 
+qu”y
+ +ğ
+cŞ
+ + " = ?"
+
+316 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+(
+qu”y
+, 
+¡©Args
+...)
+
+317 
+”r
+ !ğ
+n
+ {
+
+318  
+”r
+
+
+321  
+n
+
+
+322 
+	}
+}
+
+324 
+func
+ 
+	$S‘AccouÁBªÃd
+(
+uuid
+ []
+by‹
+, 
+bªÃd
+ 
+boŞ
+è
+”rÜ
+ {
+
+325 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET bªÃd = ? WHERE uuid = ?", 
+bªÃd
+, 
+uuid
+)
+
+326 
+”r
+ !ğ
+n
+ {
+
+327  
+”r
+
+
+330  
+n
+
+
+331 
+	}
+}
+
+333 
+func
+ 
+F‘chAccouÁKeyS®tFromU£ºame
+(
+u£ºame
+ 
+¡ršg
+è([]
+	gby‹
+, []by‹, 
+	g”rÜ
+) {
+
+334 
+v¬
+ 
+	gkey
+, 
+	g§É
+ []
+by‹
+
+
+335 
+	g”r
+ :ğ
+hªdË
+.
+Qu”yRow
+("SELECT hash, s®ˆFROM‡ccouÁ WHERE u£ºamğ?", 
+u£ºame
+).
+Sÿn
+(&
+key
+, &
+§É
+)
+
+336 
+	g”r
+ !ğ
+n
+ {
+
+337  
+n
+,‚, 
+”r
+
+
+340  
+key
+, 
+	g§É
+, 
+	gn
+
+
+343 
+func
+ 
+	$F‘chT¿š”Ids
+(
+uuid
+ []
+by‹
+è(
+Œaš”Id
+, 
+£ü‘Id
+ , 
+”r
+ 
+”rÜ
+) {
+
+344 
+”r
+ = 
+hªdË
+.
+	`Qu”yRow
+("SELECT¿š”Id, seü‘Id FROM‡ccouÁ WHERE uuid = ?", 
+uuid
+).
+	`Sÿn
+(&
+Œaš”Id
+, &
+£ü‘Id
+)
+
+345 
+”r
+ !ğ
+n
+ {
+
+346  0, 0, 
+”r
+
+
+349  
+Œaš”Id
+, 
+£ü‘Id
+, 
+n
+
+
+350 
+	}
+}
+
+352 
+func
+ 
+	$Upd©eT¿š”Ids
+(
+Œaš”Id
+, 
+£ü‘Id
+ , 
+uuid
+ []
+by‹
+è
+”rÜ
+ {
+
+353 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET¿š”Id = ?, seü‘Id = ? WHERE uuid = ?", 
+Œaš”Id
+, 
+£ü‘Id
+, 
+uuid
+)
+
+354 
+”r
+ !ğ
+n
+ {
+
+355  
+”r
+
+
+358  
+n
+
+
+359 
+	}
+}
+
+361 
+func
+ 
+	$IsAùiveSessiÚ
+(
+uuid
+ []
+by‹
+, 
+£ssiÚId
+ 
+¡ršg
+è(
+boŞ
+, 
+”rÜ
+) {
+
+362 
+v¬
+ 
+id
+ 
+¡ršg
+
+
+363 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT cl›ÁSessiÚId FROM‡ùiveCl›ÁSessiÚ WHERE uuid = ?", 
+uuid
+).
+	`Sÿn
+(&
+id
+)
+
+364 
+”r
+ !ğ
+n
+ {
+
+365 
+”rÜs
+.
+	`Is
+(
+”r
+, 
+sql
+.
+E¼NoRows
+) {
+
+366 
+”r
+ = 
+	`Upd©eAùiveSessiÚ
+(
+uuid
+, 
+£ssiÚId
+)
+
+367 
+”r
+ !ğ
+n
+ {
+
+368  
+çl£
+, 
+”r
+
+
+371  
+Œue
+, 
+n
+
+
+374  
+çl£
+, 
+”r
+
+
+377  
+id
+ =ğ"" || id =ğ
+£ssiÚId
+, 
+n
+
+
+378 
+	}
+}
+
+380 
+func
+ 
+	$Upd©eAùiveSessiÚ
+(
+uuid
+ []
+by‹
+, 
+ş›ÁSessiÚId
+ 
+¡ršg
+è
+”rÜ
+ {
+
+381 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("INSERT INTO‡ùiveCl›ÁSessiÚ (uuid, cl›ÁSessiÚIdèVALUES (?, ?èON DUPLICATE KEY UPDATE cl›ÁSessiÚId = ?", 
+uuid
+, 
+ş›ÁSessiÚId
+, clientSessionId)
+
+382 
+”r
+ !ğ
+n
+ {
+
+383  
+”r
+
+
+386  
+n
+
+
+387 
+	}
+}
+
+389 
+func
+ 
+F‘chUUIDFromTok’
+(
+tok’
+ []
+by‹
+è([]
+	gby‹
+, 
+	g”rÜ
+) {
+
+390 
+v¬
+ 
+	guuid
+ []
+by‹
+
+
+391 
+	g”r
+ :ğ
+hªdË
+.
+Qu”yRow
+("SELECT uuid FROM sessiÚ WHEREok’ = ?", 
+tok’
+).
+Sÿn
+(&
+uuid
+)
+
+392 
+	g”r
+ !ğ
+n
+ {
+
+393  
+n
+, 
+”r
+
+
+396  
+uuid
+, 
+	gn
+
+
+399 
+func
+ 
+	$RemoveSessiÚFromTok’
+(
+tok’
+ []
+by‹
+è
+”rÜ
+ {
+
+400 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("DELETE FROM sessiÚ WHEREok’ = ?", 
+tok’
+)
+
+401 
+”r
+ !ğ
+n
+ {
+
+402  
+”r
+
+
+405  
+n
+
+
+406 
+	}
+}
+
+408 
+func
+ 
+	$F‘chU£ºameFromUUID
+(
+uuid
+ []
+by‹
+è(
+¡ršg
+, 
+”rÜ
+) {
+
+409 
+v¬
+ 
+u£ºame
+ 
+¡ršg
+
+
+410 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT u£ºamFROM‡ccouÁ WHERE uuid = ?", 
+uuid
+).
+	`Sÿn
+(&
+u£ºame
+)
+
+411 
+”r
+ !ğ
+n
+ {
+
+412  "", 
+”r
+
+
+415  
+u£ºame
+, 
+n
+
+
+416 
+	}
+}
+
+418 
+func
+ 
+F‘chUUIDFromU£ºame
+(
+u£ºame
+ 
+¡ršg
+è([]
+	gby‹
+, 
+	g”rÜ
+) {
+
+419 
+v¬
+ 
+	guuid
+ []
+by‹
+
+
+420 
+	g”r
+ :ğ
+hªdË
+.
+Qu”yRow
+("SELECT uuid FROM‡ccouÁ WHERE u£ºamğ?", 
+u£ºame
+).
+Sÿn
+(&
+uuid
+)
+
+421 
+	g”r
+ !ğ
+n
+ {
+
+422  
+n
+, 
+”r
+
+
+425  
+uuid
+, 
+	gn
+
+
+428 
+func
+ 
+	$RemoveDiscÜdIdByUUID
+(
+uuid
+ []
+by‹
+è
+”rÜ
+ {
+
+429 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET discÜdId = NULL WHERE uuid = ?", 
+uuid
+)
+
+430 
+”r
+ !ğ
+n
+ {
+
+431  
+”r
+
+
+434  
+n
+
+
+435 
+	}
+}
+
+437 
+func
+ 
+	$RemoveGoogËIdByUUID
+(
+uuid
+ []
+by‹
+è
+”rÜ
+ {
+
+438 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET googËId = NULL WHERE uuid = ?", 
+uuid
+)
+
+439 
+”r
+ !ğ
+n
+ {
+
+440  
+”r
+
+
+443  
+n
+
+
+444 
+	}
+}
+
+446 
+func
+ 
+	$RemoveGoogËIdByU£ºame
+(
+u£ºame
+ 
+¡ršg
+è
+”rÜ
+ {
+
+447 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET googËId = NULL WHERE u£ºamğ?", 
+u£ºame
+)
+
+448 
+”r
+ !ğ
+n
+ {
+
+449  
+”r
+
+
+452  
+n
+
+
+453 
+	}
+}
+
+455 
+func
+ 
+	$RemoveDiscÜdIdByU£ºame
+(
+u£ºame
+ 
+¡ršg
+è
+”rÜ
+ {
+
+456 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET discÜdId = NULL WHERE u£ºamğ?", 
+u£ºame
+)
+
+457 
+”r
+ !ğ
+n
+ {
+
+458  
+”r
+
+
+461  
+n
+
+
+462 
+	}
+}
+
+464 
+func
+ 
+	$RemoveDiscÜdIdByDiscÜdId
+(
+discÜdId
+ 
+¡ršg
+è
+”rÜ
+ {
+
+465 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET discÜdId = NULL WHERE discÜdId = ?", 
+discÜdId
+)
+
+466 
+”r
+ !ğ
+n
+ {
+
+467  
+”r
+
+
+470  
+n
+
+
+471 
+	}
+}
+
+473 
+func
+ 
+	$RemoveGoogËIdByDiscÜdId
+(
+discÜdId
+ 
+¡ršg
+è
+”rÜ
+ {
+
+474 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET googËId = NULL WHERE discÜdId = ?", 
+discÜdId
+)
+
+475 
+”r
+ !ğ
+n
+ {
+
+476  
+”r
+
+
+479  
+n
+
+
+480 
+	}
+}
+
+	@db/daily.go
+
+18 
+·ckage
+ 
+db
+
+
+20 
+impÜt
+ (
+
+26 
+func
+ 
+	$TryAddDayRun
+(
+£ed
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+27 
+v¬
+ 
+aùu®S“d
+ 
+¡ršg
+
+
+28 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("INSERT INTO dayRun (£ed, d©eèVALUES (?, UTC_DATE()èON DUPLICATE KEY UPDATE d©ğd©RETURNING s“d", 
+£ed
+).
+	`Sÿn
+(&
+aùu®S“d
+)
+
+29 
+”r
+ !ğ
+n
+ {
+
+30  "", 
+”r
+
+
+33  
+aùu®S“d
+, 
+n
+
+
+34 
+	}
+}
+
+36 
+func
+ 
+	$G‘DayRunS“d
+(è(
+¡ršg
+, 
+”rÜ
+) {
+
+37 
+v¬
+ 
+£ed
+ 
+¡ršg
+
+
+38 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT s“d FROM dayRun WHERE d©ğUTC_DATE()").
+	`Sÿn
+(&
+£ed
+)
+
+39 
+”r
+ !ğ
+n
+ {
+
+40  "", 
+”r
+
+
+43  
+£ed
+, 
+n
+
+
+44 
+	}
+}
+
+46 
+func
+ 
+	$AddOrUpd©eAccouÁDayRun
+(
+uuid
+ []
+by‹
+, 
+scÜe
+ , 
+wave
+ è
+”rÜ
+ {
+
+47 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("INSERT INTO‡ccouÁDayRun (uuid, d©e, scÜe, wave,ime¡ampèVALUES (?, UTC_DATE(), ?, ?, UTC_TIMESTAMP()èON DUPLICATE KEY UPDATE scÜğGREATEST(scÜe, ?), wavğGREATEST(wave, ?),ime¡am°ğIF(scÜ< ?, UTC_TIMESTAMP(),ime¡amp)", 
+uuid
+, 
+scÜe
+, 
+wave
+, score, wave, score)
+
+48 
+”r
+ !ğ
+n
+ {
+
+49  
+”r
+
+
+52  
+n
+
+
+53 
+	}
+}
+
+55 
+func
+ 
+F‘chRªkšgs
+(
+ÿ‹gÜy
+ , 
+·ge
+ è([]
+	gdefs
+.
+	gDayRªkšg
+, 
+	g”rÜ
+) {
+
+56 
+v¬
+ 
+	g¿nkšgs
+ []
+	gdefs
+.
+DayRªkšg
+
+
+58 
+	goff£t
+ :ğ(
+·ge
+ - 1) * 10
+
+60 
+v¬
+ 
+qu”y
+ 
+¡ršg
+
+
+61 
+ÿ‹gÜy
+ {
+
+63 
+qu”y
+ = "SELECT RANK() OVER (ORDER BY‡dr.score DESC,‡dr.timestamp),‡.username,‡dr.score,‡dr.wave FROM‡ccountDailyRuns‡dr JOIN dailyRuns dr ON dr.date =‡dr.date JOIN‡ccounts‡ ON‡dr.uuid =‡.uuid WHERE dr.date = UTC_DATE() AND‡.banned = 0 LIMIT 10 OFFSET ?"
+
+65 
+qu”y
+ = "SELECT RANK() OVER (ORDER BY SUM(adr.score) DESC,‡dr.timestamp),‡.username, SUM(adr.score), 0 FROM‡ccountDailyRuns‡dr JOIN dailyRuns dr ON dr.date =‡dr.date JOIN‡ccounts‡ ON‡dr.uuid =‡.uuid WHERE dr.date >= DATE_SUB(DATE(UTC_TIMESTAMP()), INTERVAL DAYOFWEEK(UTC_TIMESTAMP()) - 1 DAY) AND‡.banned = 0 GROUP BY‡.username ORDER BY 1 LIMIT 10 OFFSET ?"
+
+68 
+»suÉs
+, 
+	g”r
+ :ğ
+hªdË
+.
+Qu”y
+(
+qu”y
+, 
+off£t
+)
+
+69 
+	g”r
+ !ğ
+n
+ {
+
+70  
+¿nkšgs
+, 
+”r
+
+
+73 
+deãr
+ 
+»suÉs
+.
+Clo£
+()
+
+75 
+»suÉs
+.
+Next
+() {
+
+76 
+v¬
+ 
+¿nkšg
+ 
+defs
+.
+DayRªkšg
+
+
+77 
+”r
+ = 
+»suÉs
+.
+Sÿn
+(&
+¿nkšg
+.
+Rªk
+, &¿nkšg.
+U£ºame
+, &¿nkšg.
+ScÜe
+, &¿nkšg.
+Wave
+)
+
+78 
+	g”r
+ !ğ
+n
+ {
+
+79  
+¿nkšgs
+, 
+”r
+
+
+82 
+¿nkšgs
+ = 
+­³nd
+Ôªkšgs, 
+¿nkšg
+)
+
+85  
+	g¿nkšgs
+, 
+	gn
+
+
+88 
+func
+ 
+	$F‘chRªkšgPageCouÁ
+(
+ÿ‹gÜy
+ è(, 
+”rÜ
+) {
+
+89 
+v¬
+ 
+qu”y
+ 
+¡ršg
+
+
+90 
+ÿ‹gÜy
+ {
+
+92 
+qu”y
+ = "SELECT COUNT(a.username) FROM‡ccountDailyRuns‡dr JOIN dailyRuns dr ON dr.date =‡dr.date JOIN‡ccounts‡ ON‡dr.uuid =‡.uuid WHERE dr.date = UTC_DATE()"
+
+94 
+qu”y
+ = "SELECT COUNT(DISTINCT‡.username) FROM‡ccountDailyRuns‡dr JOIN dailyRuns dr ON dr.date =‡dr.date JOIN‡ccounts‡ ON‡dr.uuid =‡.uuid WHERE dr.date >= DATE_SUB(DATE(UTC_TIMESTAMP()), INTERVAL DAYOFWEEK(UTC_TIMESTAMP()) - 1 DAY)"
+
+97 
+v¬
+ 
+»cÜdCouÁ
+ 
+
+98 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+(
+qu”y
+).
+	`Sÿn
+(&
+»cÜdCouÁ
+)
+
+99 
+”r
+ !ğ
+n
+ {
+
+100  0, 
+”r
+
+
+103  (
+m©h
+.
+	`Ce
+(
+	`æßt64
+(
+»cÜdCouÁ
+è/ 10)), 
+n
+
+
+104 
+	}
+}
+
+	@db/db.go
+
+18 
+·ckage
+ 
+db
+
+
+20 
+impÜt
+ (
+
+25 
+_
+ "github.com/go-sql-driver/mysql"
+
+28 
+v¬
+ 
+hªdË
+ *
+	gsql
+.
+DB
+
+
+30 
+func
+ 
+	$In™
+(
+u£ºame
+, 
+·sswÜd
+, 
+´ÙocŞ
+, 
+add»ss
+, 
+d©aba£
+ 
+¡ršg
+è
+”rÜ
+ {
+
+31 
+v¬
+ 
+”r
+ 
+”rÜ
+
+
+33 
+hªdË
+, 
+”r
+ = 
+sql
+.
+	`O³n
+("mysql", 
+u£ºame
++":"+
+·sswÜd
++"@"+
+´ÙocŞ
++"("+
+add»ss
++")/"+
+d©aba£
+)
+
+34 
+”r
+ !ğ
+n
+ {
+
+35  
+fmt
+.
+	`E¼Üf
+("çedØİ’ d©aba£ cÚÃùiÚ: %s", 
+”r
+)
+
+38 
+cÚns
+ := 64
+
+40 
+hªdË
+.
+	`S‘MaxO³nCÚns
+(
+cÚns
+)
+
+41 
+hªdË
+.
+	`S‘MaxIdËCÚns
+(
+cÚns
+)
+
+43 
+tx
+, 
+”r
+ :ğ
+hªdË
+.
+	`Begš
+()
+
+44 
+”r
+ !ğ
+n
+ {
+
+45 
+log
+.
+	`F©®
+(
+”r
+)
+
+48 
+”r
+ = 
+	`£tupDb
+(
+tx
+)
+
+49 
+”r
+ !ğ
+n
+ {
+
+50 
+tx
+.
+	`RŞlback
+()
+
+51 
+log
+.
+	`F©®
+(
+”r
+)
+
+54 
+”r
+ = 
+tx
+.
+	`Comm™
+()
+
+55 
+”r
+ !ğ
+n
+ {
+
+56 
+log
+.
+	`F©®
+(
+”r
+)
+
+59  
+n
+
+
+60 
+	}
+}
+
+62 
+func
+ 
+	$£tupDb
+(
+tx
+ *
+sql
+.
+Tx
+è
+”rÜ
+ {
+
+63 
+qu”›s
+ :ğ[]
+¡ršg
+{
+
+66 `
+CREATE
+ 
+TABLE
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+	`accouÁs
+ (
+uuid
+ 
+	`BINARY
+(16èNOT 
+NULL
+ 
+PRIMARY
+ 
+KEY
+, 
+u£ºame
+ 
+	`VARCHAR
+(16è
+UNIQUE
+ NOT NULL, 
+hash
+ BINARY(32èNOT NULL, 
+§É
+ BINARY(16èNOT NULL, 
+»gi¡”ed
+ 
+TIMESTAMP
+ NOT NULL, 
+Ï¡LoggedIn
+ TIMESTAMP 
+DEFAULT
+ NULL, 
+Ï¡Aùiv™y
+ TIMESTAMP DEFAULT NULL, 
+bªÃd
+ 
+	`TINYINT
+(1èNOT NULL DEFAULT 0, 
+Œaš”Id
+ 
+	`SMALLINT
+(5è
+UNSIGNED
+ DEFAULT 0, 
+£ü‘Id
+ SMALLINT(5) UNSIGNED DEFAULT 0)`,
+
+67 `
+CREATE
+ 
+INDEX
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+accouÁsByAùiv™y
+ 
+ON
+ 
+	`accouÁs
+ (
+Ï¡Aùiv™y
+)`,
+
+69 `
+CREATE
+ 
+TABLE
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+	`£ssiÚs
+ (
+tok’
+ 
+	`BINARY
+(32èNOT 
+NULL
+ 
+PRIMARY
+ 
+KEY
+, 
+uuid
+ BINARY(16èNOT NULL, 
+aùive
+ 
+	`TINYINT
+(1èNOT NULL 
+DEFAULT
+ 0, 
+expœe
+ 
+TIMESTAMP
+ DEFAULT NULL, 
+CONSTRAINT
+ 
+£ssiÚs_ibfk_1
+ 
+FOREIGN
+ 
+	`KEY
+ (uuidè
+REFERENCES
+ 
+	`accouÁs
+ (uuidè
+ON
+ 
+DELETE
+ 
+CASCADE
+ ON 
+UPDATE
+ CASCADE)`,
+
+70 `
+CREATE
+ 
+INDEX
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+£ssiÚsByUuid
+ 
+ON
+ 
+	`£ssiÚs
+ (
+uuid
+)`,
+
+72 `
+CREATE
+ 
+TABLE
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+	`accouÁSts
+ (
+uuid
+ 
+	`BINARY
+(16èNOT 
+NULL
+ 
+PRIMARY
+ 
+KEY
+, 
+¶ayTime
+ 
+	`INT
+(11èNOT NULL 
+DEFAULT
+ 0, 
+b©es
+ INT(11èNOT NULL DEFAULT 0, 
+şassicSessiÚsPÏyed
+ INT(11èNOT NULL DEFAULT 0, 
+£ssiÚsWÚ
+ INT(11èNOT NULL DEFAULT 0, 
+highe¡EndËssWave
+ INT(11èNOT NULL DEFAULT 0, 
+highe¡Lev–
+ INT(11èNOT NULL DEFAULT 0, 
+pokemÚS“n
+ INT(11èNOT NULL DEFAULT 0, 
+pokemÚDeã©ed
+ INT(11èNOT NULL DEFAULT 0, 
+pokemÚCaught
+ INT(11èNOT NULL DEFAULT 0, 
+pokemÚH©ched
+ INT(11èNOT NULL DEFAULT 0, 
+eggsPuÎed
+ INT(11èNOT NULL DEFAULT 0, 
+»guÏrVouch”s
+ INT(11èNOT NULL DEFAULT 0, 
+¶usVouch”s
+ INT(11èNOT NULL DEFAULT 0, 
+´emiumVouch”s
+ INT(11èNOT NULL DEFAULT 0, 
+gŞd’Vouch”s
+ INT(11èNOT NULL DEFAULT 0, 
+CONSTRAINT
+ 
+accouÁSts_ibfk_1
+ 
+FOREIGN
+ 
+	`KEY
+ (uuidè
+REFERENCES
+ 
+	`accouÁs
+ (uuidè
+ON
+ 
+DELETE
+ 
+CASCADE
+ ON 
+UPDATE
+ CASCADE)`,
+
+74 `
+CREATE
+ 
+TABLE
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+	`accouÁCom³n§tiÚs
+ (
+id
+ 
+	`INT
+(11èNOT 
+NULL
+ 
+AUTO_INCREMENT
+ 
+PRIMARY
+ 
+KEY
+, 
+uuid
+ 
+	`BINARY
+(16èNOT NULL, 
+vouch”Ty³
+ INT(11èNOT NULL, 
+couÁ
+ INT(11èNOT NULL 
+DEFAULT
+ 1, 
+şaimed
+ 
+	`BIT
+(1èNOT NULL DEFAULT 
+b
+'0', 
+CONSTRAINT
+ 
+accouÁCom³n§tiÚs_ibfk_1
+ 
+FOREIGN
+ 
+	`KEY
+ (uuidè
+REFERENCES
+ 
+	`accouÁs
+ (uuidè
+ON
+ 
+DELETE
+ 
+CASCADE
+ ON 
+UPDATE
+ CASCADE)`,
+
+75 `
+CREATE
+ 
+INDEX
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+accouÁCom³n§tiÚsByUuid
+ 
+ON
+ 
+	`accouÁCom³n§tiÚs
+ (
+uuid
+)`,
+
+77 `
+CREATE
+ 
+TABLE
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+	`dayRuns
+ (
+d©e
+ 
+DATE
+ NOT 
+NULL
+ 
+PRIMARY
+ 
+KEY
+, 
+£ed
+ 
+	`CHAR
+(24è
+CHARACTER
+ 
+SET
+ 
+ascii
+ 
+COLLATE
+ 
+ascii_bš
+ NOT NULL)`,
+
+78 `
+CREATE
+ 
+INDEX
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+dayRunsByD©eAndS“d
+ 
+ON
+ 
+	`dayRuns
+ (
+d©e
+, 
+£ed
+)`,
+
+80 `
+CREATE
+ 
+TABLE
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+	`dayRunCom¶‘iÚs
+ (
+uuid
+ 
+	`BINARY
+(16èNOT 
+NULL
+, 
+£ed
+ 
+	`CHAR
+(24è
+CHARACTER
+ 
+SET
+ 
+ascii
+ 
+COLLATE
+ 
+ascii_bš
+ NOT NULL, 
+mode
+ 
+	`INT
+(11èNOT NULL 
+DEFAULT
+ 0, 
+scÜe
+ INT(11èNOT NULL DEFAULT 0, 
+time¡amp
+ 
+TIMESTAMP
+ NOT NULL DEFAULT 
+CURRENT_TIMESTAMP
+, 
+PRIMARY
+ 
+	`KEY
+ (uuid, s“d), 
+CONSTRAINT
+ 
+dayRunCom¶‘iÚs_ibfk_1
+ 
+FOREIGN
+ KEY (uuidè
+REFERENCES
+ 
+	`accouÁs
+ (uuidè
+ON
+ 
+DELETE
+ 
+CASCADE
+ ON 
+UPDATE
+ CASCADE)`,
+
+81 `
+CREATE
+ 
+INDEX
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+dayRunCom¶‘iÚsByUuidAndS“d
+ 
+ON
+ 
+	`dayRunCom¶‘iÚs
+ (
+uuid
+, 
+£ed
+)`,
+
+83 `
+CREATE
+ 
+TABLE
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+	`accouÁDayRuns
+ (
+uuid
+ 
+	`BINARY
+(16èNOT 
+NULL
+, 
+d©e
+ 
+DATE
+ NOT NULL, 
+scÜe
+ 
+	`INT
+(11èNOT NULL 
+DEFAULT
+ 0, 
+wave
+ INT(11èNOT NULL DEFAULT 0, 
+time¡amp
+ 
+TIMESTAMP
+ NOT NULL DEFAULT 
+CURRENT_TIMESTAMP
+, 
+PRIMARY
+ 
+	`KEY
+ (uuid, d©e), 
+CONSTRAINT
+ 
+accouÁDayRuns_ibfk_1
+ 
+FOREIGN
+ KEY (uuidè
+REFERENCES
+ 
+	`accouÁs
+ (uuidè
+ON
+ 
+DELETE
+ 
+CASCADE
+ ON 
+UPDATE
+ CASCADE, CONSTRAINT 
+accouÁDayRuns_ibfk_2
+ FOREIGN KEY (d©eèREFERENCES 
+	`dayRuns
+ (d©eèON DELETE 
+NO
+ 
+ACTION
+ ON UPDATE NO ACTION)`,
+
+84 `
+CREATE
+ 
+INDEX
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+accouÁDayRunsByD©e
+ 
+ON
+ 
+	`accouÁDayRuns
+ (
+d©e
+)`,
+
+86 `
+CREATE
+ 
+TABLE
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+	`sy¡emSaveD©a
+ (
+uuid
+ 
+	`BINARY
+(16è
+PRIMARY
+ 
+KEY
+, 
+d©a
+ 
+LONGBLOB
+, 
+time¡amp
+ 
+TIMESTAMP
+, 
+FOREIGN
+ 
+	`KEY
+ (uuidè
+REFERENCES
+ 
+	`accouÁs
+ (uuidè
+ON
+ 
+DELETE
+ 
+CASCADE
+ ON 
+UPDATE
+ CASCADE)`,
+
+88 `
+CREATE
+ 
+TABLE
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+	`£ssiÚSaveD©a
+ (
+uuid
+ 
+	`BINARY
+(16), 
+¦Ù
+ 
+TINYINT
+, 
+d©a
+ 
+LONGBLOB
+, 
+time¡amp
+ 
+TIMESTAMP
+, 
+PRIMARY
+ 
+	`KEY
+ (uuid, slÙ), 
+FOREIGN
+ KEY (uuidè
+REFERENCES
+ 
+	`accouÁs
+ (uuidè
+ON
+ 
+DELETE
+ 
+CASCADE
+ ON 
+UPDATE
+ CASCADE)`,
+
+93 `
+ALTER
+ 
+TABLE
+ 
+£ssiÚs
+ 
+DROP
+ 
+COLUMN
+ 
+IF
+ 
+EXISTS
+ 
+aùive
+`,
+
+94 `
+CREATE
+ 
+TABLE
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+	`aùiveCl›ÁSessiÚs
+ (
+uuid
+ 
+	`BINARY
+(16èNOT 
+NULL
+ 
+PRIMARY
+ 
+KEY
+, 
+ş›ÁSessiÚId
+ 
+	`VARCHAR
+(32èNOT NULL, 
+FOREIGN
+ 
+	`KEY
+ (uuidè
+REFERENCES
+ 
+	`accouÁs
+ (uuidè
+ON
+ 
+DELETE
+ 
+CASCADE
+ ON 
+UPDATE
+ CASCADE)`,
+
+99 `
+DROP
+ 
+TABLE
+ 
+accouÁCom³n§tiÚs
+`,
+
+104 `
+ALTER
+ 
+TABLE
+ 
+accouÁs
+ 
+ADD
+ 
+COLUMN
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+discÜdId
+ 
+	`VARCHAR
+(32è
+UNIQUE
+ 
+DEFAULT
+ 
+NULL
+`,
+
+105 `
+ALTER
+ 
+TABLE
+ 
+accouÁs
+ 
+ADD
+ 
+COLUMN
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+googËId
+ 
+	`VARCHAR
+(32è
+UNIQUE
+ 
+DEFAULT
+ 
+NULL
+`,
+
+110 `
+ALTER
+ 
+TABLE
+ 
+accouÁs
+ 
+ADD
+ 
+COLUMN
+ 
+IF
+ 
+NOT
+ 
+EXISTS
+ 
+isInLoÿlDb
+ 
+	`TINYINT
+(1èNOT 
+NULL
+ 
+DEFAULT
+ 1`,
+
+115 `
+ALTER
+ 
+TABLE
+ 
+accouÁs
+ 
+DROP
+ 
+COLUMN
+ 
+IF
+ 
+EXISTS
+ 
+isInLoÿlDb
+`,
+
+118 
+_
+, 
+q
+ :ğ
+¿nge
+ 
+qu”›s
+ {
+
+119 
+_
+, 
+”r
+ :ğ
+tx
+.
+	`Exec
+(
+q
+)
+
+120 
+”r
+ !ğ
+n
+ {
+
+121  
+fmt
+.
+	`E¼Üf
+("çedØexecu‹ qu”y: %w, qu”y: %s", 
+”r
+, 
+q
+)
+
+125  
+n
+
+
+126 
+	}
+}
+
+	@db/game.go
+
+18 
+·ckage
+ 
+db
+
+
+20 
+func
+ 
+	$F‘chPÏy”CouÁ
+(è(, 
+”rÜ
+) {
+
+21 
+v¬
+ 
+¶ay”CouÁ
+ 
+
+22 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT COUNT(*èFROM‡ccouÁ WHERE†a¡Aùiv™y > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 5 MINUTE)").
+	`Sÿn
+(&
+¶ay”CouÁ
+)
+
+23 
+”r
+ !ğ
+n
+ {
+
+24  0, 
+”r
+
+
+27  
+¶ay”CouÁ
+, 
+n
+
+
+28 
+	}
+}
+
+30 
+func
+ 
+	$F‘chB©eCouÁ
+(è(, 
+”rÜ
+) {
+
+31 
+v¬
+ 
+b©eCouÁ
+ 
+
+32 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT COALESCE(SUM(s.b©es), 0èFROM‡ccouÁSt  JOIN‡ccouÁ ¨ON‡.uuid = s.uuid WHERE‡.bªÃd = 0").
+	`Sÿn
+(&
+b©eCouÁ
+)
+
+33 
+”r
+ !ğ
+n
+ {
+
+34  0, 
+”r
+
+
+37  
+b©eCouÁ
+, 
+n
+
+
+38 
+	}
+}
+
+40 
+func
+ 
+	$F‘chCÏssicSessiÚCouÁ
+(è(, 
+”rÜ
+) {
+
+41 
+v¬
+ 
+şassicSessiÚCouÁ
+ 
+
+42 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT COALESCE(SUM(s.şassicSessiÚsPÏyed), 0èFROM‡ccouÁSt  JOIN‡ccouÁ ¨ON‡.uuid = s.uuid WHERE‡.bªÃd = 0").
+	`Sÿn
+(&
+şassicSessiÚCouÁ
+)
+
+43 
+”r
+ !ğ
+n
+ {
+
+44  0, 
+”r
+
+
+47  
+şassicSessiÚCouÁ
+, 
+n
+
+
+48 
+	}
+}
+
+	@db/savedata.go
+
+18 
+·ckage
+ 
+db
+
+
+20 
+impÜt
+ (
+
+37 
+func
+ 
+	$TryAddS“dCom¶‘iÚ
+(
+uuid
+ []
+by‹
+, 
+£ed
+ 
+¡ršg
+, 
+mode
+ è(
+boŞ
+, 
+”rÜ
+) {
+
+38 
+v¬
+ 
+couÁ
+ 
+
+39 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT COUNT(*èFROM dayRunCom¶‘iÚ WHERE uuid = ? AND s“d = ?", 
+uuid
+, 
+£ed
+).
+	`Sÿn
+(&
+couÁ
+)
+
+40 
+”r
+ !ğ
+n
+ {
+
+41  
+çl£
+, 
+”r
+
+
+42 } 
+couÁ
+ > 0 {
+
+43  
+çl£
+, 
+n
+
+
+46 
+_
+, 
+”r
+ = 
+hªdË
+.
+	`Exec
+("INSERT INTO dayRunCom¶‘iÚ (uuid, s“d, mode,ime¡ampèVALUES (?, ?, ?, UTC_TIMESTAMP())", 
+uuid
+, 
+£ed
+, 
+mode
+)
+
+47 
+”r
+ !ğ
+n
+ {
+
+48  
+çl£
+, 
+”r
+
+
+51  
+Œue
+, 
+n
+
+
+52 
+	}
+}
+
+54 
+func
+ 
+	$R—dS“dCom¶‘ed
+(
+uuid
+ []
+by‹
+, 
+£ed
+ 
+¡ršg
+è(
+boŞ
+, 
+”rÜ
+) {
+
+55 
+v¬
+ 
+couÁ
+ 
+
+56 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT COUNT(*èFROM dayRunCom¶‘iÚ WHERE uuid = ? AND s“d = ?", 
+uuid
+, 
+£ed
+).
+	`Sÿn
+(&
+couÁ
+)
+
+57 
+”r
+ !ğ
+n
+ {
+
+58  
+çl£
+, 
+”r
+
+
+61  
+couÁ
+ > 0, 
+n
+
+
+62 
+	}
+}
+
+64 
+func
+ 
+	$R—dSy¡emSaveD©a
+(
+uuid
+ []
+by‹
+è(
+defs
+.
+Sy¡emSaveD©a
+, 
+”rÜ
+) {
+
+65 
+log
+.
+	`Pršn
+("R—dSy¡emSaveD©¨", 
+uuid
+);
+
+66 
+v¬
+ 
+sy¡em
+ 
+defs
+.
+Sy¡emSaveD©a
+
+
+68 
+v¬
+ 
+d©a
+ []
+by‹
+
+
+69 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT d©¨FROM sy¡emSaveD©¨WHERE uuid = ?", 
+uuid
+).
+	`Sÿn
+(&
+d©a
+)
+
+70 
+”r
+ !ğ
+n
+ {
+
+71 
+log
+.
+	`Pršn
+("Not Find Data");
+
+72  
+sy¡em
+, 
+”r
+
+
+76 
+log
+.
+	`Pršn
+(
+d©a
+);
+
+77 
+zr
+, 
+”r
+ :ğ
+z¡d
+.
+	`NewR—d”
+(
+by‹s
+.NewR—d”(
+d©a
+))
+
+78 
+”r
+ !ğ
+n
+ {
+
+79  
+sy¡em
+, 
+”r
+
+
+82 
+deãr
+ 
+zr
+.
+	`Clo£
+()
+
+84 
+”r
+ = 
+gob
+.
+	`NewDecod”
+(
+zr
+).
+	`Decode
+(&
+sy¡em
+)
+
+85 
+”r
+ !ğ
+n
+ {
+
+86  
+sy¡em
+, 
+”r
+
+
+89  
+sy¡em
+, 
+n
+
+
+90 
+	}
+}
+
+92 
+func
+ 
+	$StÜeSy¡emSaveD©a
+(
+uuid
+ []
+by‹
+, 
+d©a
+ 
+defs
+.
+Sy¡emSaveD©a
+è
+”rÜ
+ {
+
+93 
+log
+.
+	`Pršn
+("StÜeSy¡emSaveD©¨", 
+uuid
+, 
+d©a
+);
+
+95 
+buf
+ :ğ
+	`Ãw
+(
+by‹s
+.
+Bufãr
+)
+
+97 
+zw
+, 
+”r
+ :ğ
+z¡d
+.
+	`NewWr™”
+(
+buf
+)
+
+98 
+”r
+ !ğ
+n
+ {
+
+99  
+”r
+
+
+104 
+”r
+ = 
+gob
+.
+	`NewEncod”
+(
+zw
+).
+	`Encode
+(
+d©a
+)
+
+105 
+”r
+ !ğ
+n
+ {
+
+106 
+log
+.
+	`Pršn
+("Encodšg E¼Ü:", 
+”r
+)
+
+107  
+”r
+
+
+110 
+zw
+.
+	`Flush
+()
+
+111 
+log
+.
+	`Pršn
+("âœ… Data flushedo buffer!")
+
+113 
+”r
+ = 
+zw
+.
+	`Clo£
+()
+
+114 
+”r
+ !ğ
+n
+ {
+
+115 
+log
+.
+	`Pršn
+("âŒ FaedØşo£ ZSTD wr™”:", 
+”r
+)
+
+117 
+log
+.
+	`Pršn
+("âœ… ZSTD writer closed successfully")
+
+121 
+log
+.
+	`Pršn
+("Com´es£d D©¨L’gth:", 
+	`Ën
+(
+buf
+.
+	`By‹s
+()))
+
+122 
+log
+.
+	`Pršn
+("Com´es£d D©¨CÚ‹Á:", 
+buf
+.
+	`By‹s
+())
+
+123 
+fmt
+.
+	`Pršn
+("Origš D©a:", 
+d©a
+);
+
+125 
+_
+, 
+”r
+ = 
+hªdË
+.
+	`Exec
+("REPLACE INTO sy¡emSaveD©¨(uuid, d©a,ime¡ampèVALUES (?, ?, UTC_TIMESTAMP())", 
+uuid
+, 
+buf
+.
+	`By‹s
+())
+
+126 
+”r
+ !ğ
+n
+ {
+
+127  
+”r
+
+
+130  
+n
+
+
+131 
+	}
+}
+
+133 
+func
+ 
+	$StÜeSy¡emSaveD©aS3
+(
+uuid
+ []
+by‹
+, 
+d©a
+ 
+defs
+.
+Sy¡emSaveD©a
+è
+”rÜ
+ {
+
+134 
+cfg
+, 
+_
+ :ğ
+cÚfig
+.
+	`LßdDeçuÉCÚfig
+(
+cÚ‹xt
+.
+	`TODO
+())
+
+136 
+ş›Á
+ :ğ
+s3
+.
+	`NewFromCÚfig
+(
+cfg
+, 
+	`func
+(
+o
+ *s3.
+O±iÚs
+) {
+
+137 
+o
+.
+Ba£Endpošt
+ = 
+aws
+.
+	`SŒšg
+(
+os
+.
+	`G‘’v
+("AWS_ENDPOINT_URL_S3"))
+
+140 
+u£ºame
+, 
+”r
+ :ğ
+	`F‘chU£ºameFromUUID
+(
+uuid
+)
+
+141 
+”r
+ !ğ
+n
+ {
+
+142  
+”r
+
+
+145 
+buf
+ :ğ
+	`Ãw
+(
+by‹s
+.
+Bufãr
+)
+
+147 
+”r
+ = 
+jsÚ
+.
+	`NewEncod”
+(
+buf
+).
+	`Encode
+(
+d©a
+)
+
+148 
+”r
+ !ğ
+n
+ {
+
+149  
+”r
+
+
+152 
+_
+, 
+”r
+ = 
+ş›Á
+.
+	`PutObjeù
+(
+cÚ‹xt
+.
+	`Background
+(), &
+s3
+.
+PutObjeùIÅut
+{
+
+153 
+Buck‘
+: 
+aws
+.
+	`SŒšg
+(
+os
+.
+	`G‘’v
+("S3_SYSTEM_BUCKET_NAME")),
+
+154 
+Key
+: 
+aws
+.
+	`SŒšg
+(
+u£ºame
+),
+
+155 
+Body
+: 
+buf
+,
+
+157 
+”r
+ !ğ
+n
+ {
+
+158  
+”r
+
+
+161  
+n
+
+
+162 
+	}
+}
+
+164 
+func
+ 
+	$D–‘eSy¡emSaveD©a
+(
+uuid
+ []
+by‹
+è
+”rÜ
+ {
+
+165 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("DELETE FROM sy¡emSaveD©¨WHERE uuid = ?", 
+uuid
+)
+
+166 
+”r
+ !ğ
+n
+ {
+
+167  
+”r
+
+
+170  
+n
+
+
+171 
+	}
+}
+
+173 
+func
+ 
+	$R—dSessiÚSaveD©a
+(
+uuid
+ []
+by‹
+, 
+¦Ù
+ è(
+defs
+.
+SessiÚSaveD©a
+, 
+”rÜ
+) {
+
+174 
+log
+.
+	`Pršn
+("R—dSessiÚSaveD©a", 
+uuid
+, 
+¦Ù
+);
+
+175 
+v¬
+ 
+£ssiÚ
+ 
+defs
+.
+SessiÚSaveD©a
+
+
+177 
+v¬
+ 
+d©a
+ []
+by‹
+
+
+178 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT d©¨FROM sessiÚSaveD©¨WHERE uuid = ? AND slÙ = ?", 
+uuid
+, 
+¦Ù
+).
+	`Sÿn
+(&
+d©a
+)
+
+179 
+”r
+ !ğ
+n
+ {
+
+180  
+£ssiÚ
+, 
+”r
+
+
+183 
+zr
+, 
+”r
+ :ğ
+z¡d
+.
+	`NewR—d”
+(
+by‹s
+.NewR—d”(
+d©a
+))
+
+184 
+”r
+ !ğ
+n
+ {
+
+185  
+£ssiÚ
+, 
+”r
+
+
+188 
+deãr
+ 
+zr
+.
+	`Clo£
+()
+
+190 
+”r
+ = 
+gob
+.
+	`NewDecod”
+(
+zr
+).
+	`Decode
+(&
+£ssiÚ
+)
+
+191 
+”r
+ !ğ
+n
+ {
+
+192  
+£ssiÚ
+, 
+”r
+
+
+195  
+£ssiÚ
+, 
+n
+
+
+196 
+	}
+}
+
+198 
+func
+ 
+	$G‘L©e¡SessiÚSaveD©aSlÙ
+(
+uuid
+ []
+by‹
+è(, 
+”rÜ
+) {
+
+199 
+v¬
+ 
+¦Ù
+ 
+
+200 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT slÙ FROM sessiÚSaveD©¨WHERE uuid = ? ORDER BYime¡am°DESC, slÙ ASC LIMIT 1", 
+uuid
+).
+	`Sÿn
+(&
+¦Ù
+)
+
+201 
+”r
+ !ğ
+n
+ {
+
+202  -1, 
+”r
+
+
+205  
+¦Ù
+, 
+n
+
+
+206 
+	}
+}
+
+208 
+func
+ 
+	$StÜeSessiÚSaveD©a
+(
+uuid
+ []
+by‹
+, 
+d©a
+ 
+defs
+.
+SessiÚSaveD©a
+, 
+¦Ù
+ è
+”rÜ
+ {
+
+209 
+log
+.
+	`Pršn
+("StÜeSessiÚSaveD©a", 
+uuid
+, 
+d©a
+, 
+¦Ù
+);
+
+210 
+buf
+ :ğ
+	`Ãw
+(
+by‹s
+.
+Bufãr
+)
+
+212 
+zw
+, 
+”r
+ :ğ
+z¡d
+.
+	`NewWr™”
+(
+buf
+)
+
+213 
+”r
+ !ğ
+n
+ {
+
+214  
+”r
+
+
+219 
+”r
+ = 
+gob
+.
+	`NewEncod”
+(
+zw
+).
+	`Encode
+(
+d©a
+)
+
+220 
+”r
+ !ğ
+n
+ {
+
+221  
+”r
+
+
+224 
+zw
+.
+	`Clo£
+();
+
+226 
+_
+, 
+”r
+ = 
+hªdË
+.
+	`Exec
+("REPLACE INTO sessiÚSaveD©¨(uuid, slÙ, d©a,ime¡ampèVALUES (?, ?, ?, UTC_TIMESTAMP())", 
+uuid
+, 
+¦Ù
+, 
+buf
+.
+	`By‹s
+())
+
+227 
+”r
+ !ğ
+n
+ {
+
+228  
+”r
+
+
+231  
+n
+
+
+232 
+	}
+}
+
+234 
+func
+ 
+	$D–‘eSessiÚSaveD©a
+(
+uuid
+ []
+by‹
+, 
+¦Ù
+ è
+”rÜ
+ {
+
+235 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("DELETE FROM sessiÚSaveD©¨WHERE uuid = ? AND slÙ = ?", 
+uuid
+, 
+¦Ù
+)
+
+236 
+”r
+ !ğ
+n
+ {
+
+237  
+”r
+
+
+240  
+n
+
+
+241 
+	}
+}
+
+243 
+func
+ 
+	$R‘r›vePÏytime
+(
+uuid
+ []
+by‹
+è(, 
+”rÜ
+) {
+
+244 
+v¬
+ 
+¶aytime
+ 
+
+245 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT…ÏyTimFROM‡ccouÁSt WHERE uuid = ?", 
+uuid
+).
+	`Sÿn
+(&
+¶aytime
+)
+
+246 
+”r
+ !ğ
+n
+ {
+
+247  0, 
+”r
+
+
+250  
+¶aytime
+, 
+n
+
+
+251 
+	}
+}
+
+253 
+func
+ 
+	$G‘Sy¡emSaveFromS3
+(
+uuid
+ []
+by‹
+è(
+defs
+.
+Sy¡emSaveD©a
+, 
+”rÜ
+) {
+
+254 
+v¬
+ 
+sy¡em
+ 
+defs
+.
+Sy¡emSaveD©a
+
+
+256 
+u£ºame
+, 
+”r
+ :ğ
+	`F‘chU£ºameFromUUID
+(
+uuid
+)
+
+257 
+”r
+ !ğ
+n
+ {
+
+258  
+sy¡em
+, 
+”r
+
+
+261 
+cfg
+, 
+”r
+ :ğ
+cÚfig
+.
+	`LßdDeçuÉCÚfig
+(
+cÚ‹xt
+.
+	`TODO
+())
+
+262 
+”r
+ !ğ
+n
+ {
+
+263  
+sy¡em
+, 
+”r
+
+
+266 
+ş›Á
+ :ğ
+s3
+.
+	`NewFromCÚfig
+(
+cfg
+)
+
+268 
+s3Objeù
+ :ğ
+s3
+.
+G‘ObjeùIÅut
+{
+
+269 
+Buck‘
+: 
+aws
+.
+	`SŒšg
+(
+os
+.
+	`G‘’v
+("S3_SYSTEM_BUCKET_NAME")),
+
+270 
+Key
+: 
+aws
+.
+	`SŒšg
+(
+u£ºame
+),
+
+273 
+»¥
+, 
+”r
+ :ğ
+ş›Á
+.
+	`G‘Objeù
+(
+cÚ‹xt
+.
+	`TODO
+(), &
+s3Objeù
+)
+
+274 
+”r
+ !ğ
+n
+ {
+
+275  
+sy¡em
+, 
+”r
+
+
+278 
+”r
+ = 
+jsÚ
+.
+	`NewDecod”
+(
+»¥
+.
+Body
+).
+	`Decode
+(&
+sy¡em
+)
+
+279 
+”r
+ !ğ
+n
+ {
+
+280  
+sy¡em
+, 
+”r
+
+
+283  
+sy¡em
+, 
+n
+
+
+284 
+	}
+}
+
+	@defs/daily.go
+
+18 
+·ckage
+ 
+defs
+
+
+20 
+ty³
+ 
+DayRªkšg
+ struct {
+
+21 
+Rªk
+ `
+	mjsÚ
+:"rank"`
+
+22 
+U£ºame
+ 
+¡ršg
+ `
+jsÚ
+:"username"`
+
+23 
+ScÜe
+ `
+jsÚ
+:"score"`
+
+24 
+Wave
+ `
+jsÚ
+:"wave"`
+
+	@defs/game.go
+
+18 
+·ckage
+ 
+defs
+
+
+20 
+ty³
+ 
+T™ËSts
+ struct {
+
+21 
+PÏy”CouÁ
+ `
+	mjsÚ
+:"playerCount"`
+
+22 
+B©eCouÁ
+ `
+jsÚ
+:"battleCount"`
+
+	@defs/savedata.go
+
+18 
+·ckage
+ 
+defs
+
+
+20 cÚ¡ 
+	gSessiÚSlÙCouÁ
+ = 5
+
+22 
+ty³
+ 
+Sy¡emSaveD©a
+ struct {
+
+23 
+T¿š”Id
+ `
+jsÚ
+:"trainerId"`
+
+24 
+Seü‘Id
+ `
+jsÚ
+:"secretId"`
+
+25 
+G’d”
+ `
+jsÚ
+:"gender"`
+
+26 
+DexD©a
+ DexD©¨`
+jsÚ
+:"dexData"`
+
+27 
+S¹”D©a
+ S¹”D©¨`
+jsÚ
+:"starterData"`
+
+28 
+S¹”MoveD©a
+ S¹”MoveD©¨`
+jsÚ
+:"starterMoveData"`
+
+29 
+S¹”EggMoveD©a
+ S¹”EggMoveD©¨`
+jsÚ
+:"starterEggMoveData"`
+
+30 
+GameSts
+ GameSt `
+jsÚ
+:"gameStats"`
+
+31 
+UÆocks
+ UÆock `
+jsÚ
+:"unlocks"`
+
+32 
+AchvUÆocks
+ AchvUÆock `
+jsÚ
+:"achvUnlocks"`
+
+33 
+Vouch”UÆocks
+ Vouch”UÆock `
+jsÚ
+:"voucherUnlocks"`
+
+34 
+Vouch”CouÁs
+ Vouch”CouÁ `
+jsÚ
+:"voucherCounts"`
+
+35 
+Eggs
+ []
+EggD©a
+ `
+jsÚ
+:"eggs"`
+
+36 
+EggP™y
+ []`
+jsÚ
+:"eggPity"`
+
+37 
+UÆockP™y
+ []`
+jsÚ
+:"unlockPity"`
+
+38 
+GameV”siÚ
+ 
+¡ršg
+ `
+jsÚ
+:"gameVersion"`
+
+39 
+Time¡amp
+ `
+jsÚ
+:"timestamp"`
+
+42 
+ty³
+ 
+DexD©a
+ 
+m­
+[]
+DexEÁry
+
+
+44 
+ty³
+ 
+DexEÁry
+ struct {
+
+45 
+S“nA‰r
+ 
+š‹rçû
+{} `
+jsÚ
+:"seenAttr"`
+
+46 
+CaughtA‰r
+ 
+š‹rçû
+{} `
+jsÚ
+:"caughtAttr"`
+
+47 
+N©u»A‰r
+ `
+jsÚ
+:"natureAttr"`
+
+48 
+S“nCouÁ
+ `
+jsÚ
+:"seenCount"`
+
+49 
+CaughtCouÁ
+ `
+jsÚ
+:"caughtCount"`
+
+50 
+H©chedCouÁ
+ `
+jsÚ
+:"hatchedCount"`
+
+51 
+Ivs
+ []`
+jsÚ
+:"ivs"`
+
+54 
+ty³
+ 
+S¹”D©a
+ 
+m­
+[]
+S¹”EÁry
+
+
+56 
+ty³
+ 
+S¹”EÁry
+ struct {
+
+57 
+Move£t
+ 
+š‹rçû
+{} `
+jsÚ
+:"moveset"`
+
+58 
+EggMoves
+ `
+jsÚ
+:"eggMoves"`
+
+59 
+CªdyCouÁ
+ `
+jsÚ
+:"candyCount"`
+
+60 
+Fr›ndsh
+ `
+jsÚ
+:"friendship"`
+
+61 
+Ab™yA‰r
+ `
+jsÚ
+:"abilityAttr"`
+
+62 
+PassiveA‰r
+ `
+jsÚ
+:"passiveAttr"`
+
+63 
+V®ueReduùiÚ
+ `
+jsÚ
+:"valueReduction"`
+
+64 
+CÏssicWšCouÁ
+ `
+jsÚ
+:"classicWinCount"`
+
+67 
+ty³
+ 
+S¹”MoveD©a
+ 
+m­
+[]
+š‹rçû
+{}
+
+69 
+ty³
+ 
+S¹”EggMoveD©a
+ 
+m­
+[]
+
+71 
+ty³
+ 
+GameSts
+ 
+š‹rçû
+{}
+
+73 
+ty³
+ 
+UÆocks
+ 
+m­
+[]
+boŞ
+
+
+75 
+ty³
+ 
+AchvUÆocks
+ 
+m­
+[
+¡ršg
+]
+
+77 
+ty³
+ 
+Vouch”UÆocks
+ 
+m­
+[
+¡ršg
+]
+
+79 
+ty³
+ 
+Vouch”CouÁs
+ 
+m­
+[
+¡ršg
+]
+
+81 
+ty³
+ 
+EggD©a
+ struct {
+
+82 
+Id
+ `
+jsÚ
+:"id"`
+
+83 
+GachaTy³
+ GachaTy³ `
+jsÚ
+:"gachaType"`
+
+84 
+H©chWaves
+ `
+jsÚ
+:"hatchWaves"`
+
+85 
+Time¡amp
+ `
+jsÚ
+:"timestamp"`
+
+86 
+T›r
+ `
+jsÚ
+:"tier"`
+
+87 
+SourûTy³
+ `
+jsÚ
+:"sourceType"`
+
+88 
+V¬ŸÁT›r
+ `
+jsÚ
+:"variantTier"`
+
+89 
+IsShšy
+ 
+boŞ
+ `
+jsÚ
+:"isShiny"`
+
+90 
+S³c›s
+ `
+jsÚ
+:"species"`
+
+91 
+EggMoveIndex
+ `
+jsÚ
+:"eggMoveIndex"`
+
+92 
+Ov”rideHidd’Ab™y
+ 
+boŞ
+ `
+jsÚ
+:"overrideHiddenAbility"`
+
+95 
+ty³
+ 
+GachaTy³
+ 
+
+97 
+ty³
+ 
+SessiÚSaveD©a
+ struct {
+
+98 
+S“d
+ 
+¡ršg
+ `
+jsÚ
+:"seed"`
+
+99 
+PÏyTime
+ `
+jsÚ
+:"playTime"`
+
+100 
+GameMode
+ GameMod`
+jsÚ
+:"gameMode"`
+
+101 
+P¬ty
+ []
+PokemÚD©a
+ `
+jsÚ
+:"party"`
+
+102 
+EÃmyP¬ty
+ []
+PokemÚD©a
+ `
+jsÚ
+:"enemyParty"`
+
+103 
+Modif›rs
+ []
+P”si¡’tModif›rD©a
+ `
+jsÚ
+:"modifiers"`
+
+104 
+EÃmyModif›rs
+ []
+P”si¡’tModif›rD©a
+ `
+jsÚ
+:"enemyModifiers"`
+
+105 
+A»Ç
+ 
+A»ÇD©a
+ `
+jsÚ
+:"arena"`
+
+106 
+Pokeb®lCouÁs
+ Pokeb®lCouÁ `
+jsÚ
+:"pokeballCounts"`
+
+107 
+MÚey
+ `
+jsÚ
+:"money"`
+
+108 
+ScÜe
+ `
+jsÚ
+:"score"`
+
+109 
+ViùÜyCouÁ
+ `
+jsÚ
+:"victoryCount"`
+
+110 
+FaštCouÁ
+ `
+jsÚ
+:"faintCount"`
+
+111 
+ReviveCouÁ
+ `
+jsÚ
+:"reviveCount"`
+
+112 
+WaveIndex
+ `
+jsÚ
+:"waveIndex"`
+
+113 
+B©eTy³
+ B©eTy³ `
+jsÚ
+:"battleType"`
+
+114 
+T¿š”
+ 
+T¿š”D©a
+ `
+jsÚ
+:"trainer"`
+
+115 
+GameV”siÚ
+ 
+¡ršg
+ `
+jsÚ
+:"gameVersion"`
+
+116 
+Time¡amp
+ `
+jsÚ
+:"timestamp"`
+
+117 
+Ch®Ënges
+ []
+Ch®ËngeD©a
+ `
+jsÚ
+:"challenges"`
+
+118 
+My¡”yEncouÁ”Ty³
+ My¡”yEncouÁ”Ty³ `
+jsÚ
+:"mysteryEncounterType"`
+
+119 
+My¡”yEncouÁ”SaveD©a
+ My¡”yEncouÁ”SaveD©¨`
+jsÚ
+:"mysteryEncounterSaveData"`
+
+122 
+ty³
+ 
+Ch®ËngeD©a
+ struct {
+
+123 
+Id
+ `
+jsÚ
+:"id"`
+
+124 
+V®ue
+ `
+jsÚ
+:"value"`
+
+125 
+Sev”™y
+ `
+jsÚ
+:"severity"`
+
+128 
+ty³
+ 
+My¡”yEncouÁ”Ty³
+ 
+
+130 
+ty³
+ 
+My¡”yEncouÁ”T›r
+ 
+
+132 
+ty³
+ 
+S“nEncouÁ”D©a
+ struct {
+
+133 
+Ty³
+ 
+My¡”yEncouÁ”Ty³
+ `
+jsÚ
+:"type"`
+
+134 
+T›r
+ 
+My¡”yEncouÁ”T›r
+ `
+jsÚ
+:"tier"`
+
+135 
+WaveIndex
+ `
+jsÚ
+:"waveIndex"`
+
+136 
+S–eùedO±iÚ
+ `
+jsÚ
+:"selectedOption"`
+
+139 
+ty³
+ 
+QueuedEncouÁ”
+ struct {
+
+140 
+Ty³
+ 
+My¡”yEncouÁ”Ty³
+ `
+jsÚ
+:"type"`
+
+141 
+S·wnP”ûÁ
+ `
+jsÚ
+:"spawnPercent"`
+
+144 
+ty³
+ 
+My¡”yEncouÁ”SaveD©a
+ struct {
+
+145 
+EncouÁ”edEv’ts
+ []
+S“nEncouÁ”D©a
+ `
+jsÚ
+:"encounteredEvents"`
+
+146 
+EncouÁ”S·wnChªû
+ `
+jsÚ
+:"encounterSpawnChance"`
+
+147 
+QueuedEncouÁ”s
+ []
+QueuedEncouÁ”
+ `
+jsÚ
+:"queuedEncounters"`
+
+150 
+ty³
+ 
+GameMode
+ 
+
+152 
+ty³
+ 
+PokemÚD©a
+ 
+š‹rçû
+{}
+
+154 
+ty³
+ 
+P”si¡’tModif›rD©a
+ 
+š‹rçû
+{}
+
+156 
+ty³
+ 
+A»ÇD©a
+ 
+š‹rçû
+{}
+
+158 
+ty³
+ 
+Pokeb®lCouÁs
+ 
+m­
+[
+¡ršg
+]
+
+160 
+ty³
+ 
+B©eTy³
+ 
+
+162 
+ty³
+ 
+T¿š”D©a
+ 
+š‹rçû
+{}
+
+164 
+ty³
+ 
+SessiÚHi¡ÜyD©a
+ struct {
+
+165 
+S“d
+ 
+¡ršg
+ `
+jsÚ
+:"seed"`
+
+166 
+PÏyTime
+ `
+jsÚ
+:"playTime"`
+
+167 
+ResuÉ
+ 
+SessiÚHi¡ÜyResuÉ
+ `
+jsÚ
+:"sessionHistoryResult"`
+
+168 
+GameMode
+ GameMod`
+jsÚ
+:"gameMode"`
+
+169 
+P¬ty
+ []
+PokemÚD©a
+ `
+jsÚ
+:"party"`
+
+170 
+Modif›rs
+ []
+P”si¡’tModif›rD©a
+ `
+jsÚ
+:"modifiers"`
+
+171 
+MÚey
+ `
+jsÚ
+:"money"`
+
+172 
+ScÜe
+ `
+jsÚ
+:"score"`
+
+173 
+WaveIndex
+ `
+jsÚ
+:"waveIndex"`
+
+174 
+B©eTy³
+ B©eTy³ `
+jsÚ
+:"battleType"`
+
+175 
+GameV”siÚ
+ 
+¡ršg
+ `
+jsÚ
+:"gameVersion"`
+
+176 
+Time¡amp
+ `
+jsÚ
+:"timestamp"`
+
+179 
+ty³
+ 
+SessiÚHi¡ÜyResuÉ
+ 
+
+	@redis_ping.go
+
+5 
+·ckage
+ 
+maš
+
+
+7 
+impÜt
+ (
+
+17 
+func
+ 
+	$mu¡
+(
+”r
+ 
+”rÜ
+) {
+
+18 
+”r
+ !ğ
+n
+ {
+
+19 
+	`·nic
+(
+”r
+)
+
+21 
+	}
+}
+
+23 
+func
+ 
+	$maš
+() {
+
+24 
+ùx
+ :ğ
+cÚ‹xt
+.
+	`Background
+()
+
+27 
+addr
+ :ğ
+os
+.
+	`G‘’v
+("REDIS_ADDR")
+
+28 
+·ss
+ :ğ
+os
+.
+	`G‘’v
+("REDIS_PASS")
+
+29 
+dbNum
+ := 0
+
+30 
+s
+ :ğ
+os
+.
+	`G‘’v
+("REDIS_DB"); s != "" {
+
+31 
+n
+, 
+_
+ :ğ
+¡rcÚv
+.
+	`Atoi
+(
+s
+)
+
+32 
+dbNum
+ = 
+n
+
+
+36 
+rdb
+ :ğ
+»dis
+.
+	`NewCl›Á
+(&»dis.
+O±iÚs
+{
+
+37 
+Addr
+: 
+addr
+,
+
+38 
+PasswÜd
+: 
+·ss
+,
+
+39 
+DB
+: 
+dbNum
+,
+
+41 
+	`mu¡
+(
+rdb
+.
+	`Pšg
+(
+ùx
+).
+	`E¼
+())
+
+42 
+fmt
+.
+	`Prštf
+("âœ… Redi PING OK (%s)\n", 
+addr
+)
+
+45 
+key
+ := "test-key"
+
+46 
+v®
+ :ğ
+fmt
+.
+	`S´štf
+("time-%d", 
+time
+.
+	`Now
+().
+	`Unix
+())
+
+48 
+	`mu¡
+(
+rdb
+.
+	`S‘
+(
+ùx
+, 
+key
+, 
+v®
+, 
+time
+.
+Mšu‹
+).
+	`E¼
+())
+
+49 
+gÙ
+, 
+”r
+ :ğ
+rdb
+.
+	`G‘
+(
+ùx
+, 
+key
+).
+	`ResuÉ
+()
+
+50 
+	`mu¡
+(
+”r
+)
+
+52 
+gÙ
+ =ğ
+v®
+ {
+
+53 
+fmt
+.
+	`Prštf
+("ğŸ‰ SET/GET ì„±ê³µ: % ğ%s\n", 
+key
+, 
+gÙ
+)
+
+55 
+fmt
+.
+	`Prštf
+("âš ï¸ ê°’ ë¶ˆì¼ì¹˜! ê¸°ëŒ€: %s, ì‹¤ì œ: %s\n", 
+v®
+, 
+gÙ
+)
+
+57 
+	}
+}
+
+	@rogueserver.go
+
+18 
+·ckage
+ 
+maš
+
+
+20 
+impÜt
+ (
+
+35 
+func
+ 
+	$maš
+() {
+
+37 
+debug
+, 
+_
+ :ğ
+¡rcÚv
+.
+	`P¬£BoŞ
+(
+os
+.
+	`G‘’v
+("debug"))
+
+39 
+´Ùo
+ :ğ
+	`g‘Env
+("proto", "tcp")
+
+40 
+addr
+ :ğ
+	`g‘Env
+("addr", "0.0.0.0:8001")
+
+41 
+sû¹
+ :ğ
+	`g‘Env
+("tlscert", "")
+
+42 
+skey
+ :ğ
+	`g‘Env
+("tlskey", "")
+
+44 
+dbu£r
+ :ğ
+	`g‘Env
+("dbuser", "pokerogue")
+
+45 
+db·ss
+ :ğ
+	`g‘Env
+("dbpass", "pokerogue")
+
+46 
+db´Ùo
+ :ğ
+	`g‘Env
+("dbproto", "tcp")
+
+47 
+dbaddr
+ :ğ
+	`g‘Env
+("dbaddr", "localhost")
+
+48 
+dbÇme
+ :ğ
+	`g‘Env
+("dbname", "pokeroguedb")
+
+50 
+discÜdş›Áid
+ :ğ
+	`g‘Env
+("discordclientid", "")
+
+51 
+discÜd£ü‘id
+ :ğ
+	`g‘Env
+("discordsecretid", "")
+
+53 
+googËş›Áid
+ :ğ
+	`g‘Env
+("googleclientid", "")
+
+54 
+googË£ü‘id
+ :ğ
+	`g‘Env
+("googlesecretid", "")
+
+56 
+ÿÎbacku¾
+ :ğ
+	`g‘Env
+("callbackurl", "http://localhost:8001/")
+
+58 
+gameu¾
+ :ğ
+	`g‘Env
+("gameurl", "https://pokerogue.net")
+
+60 
+discÜdbÙtok’
+ :ğ
+	`g‘Env
+("discordbottoken", "")
+
+61 
+discÜdgudid
+ :ğ
+	`g‘Env
+("discordguildid", "")
+
+63 
+accouÁ
+.
+GameURL
+ = 
+gameu¾
+
+
+65 
+accouÁ
+.
+DiscÜdCl›ÁID
+ = 
+discÜdş›Áid
+
+
+66 
+accouÁ
+.
+DiscÜdCl›ÁSeü‘
+ = 
+discÜd£ü‘id
+
+
+67 
+accouÁ
+.
+DiscÜdC®lbackURL
+ = 
+ÿÎbacku¾
+ + "/auth/discord/callback"
+
+69 
+accouÁ
+.
+GoogËCl›ÁID
+ = 
+googËş›Áid
+
+
+70 
+accouÁ
+.
+GoogËCl›ÁSeü‘
+ = 
+googË£ü‘id
+
+
+71 
+accouÁ
+.
+GoogËC®lbackURL
+ = 
+ÿÎbacku¾
+ + "/auth/google/callback"
+
+72 
+accouÁ
+.
+DiscÜdSessiÚ
+, 
+_
+ = 
+discÜdgo
+.
+	`New
+("BÙ " + 
+discÜdbÙtok’
+)
+
+73 
+accouÁ
+.
+DiscÜdGudID
+ = 
+discÜdgudid
+
+
+76 
+gob
+.
+	`Regi¡”
+([]
+š‹rçû
+{}{})
+
+77 
+gob
+.
+	`Regi¡”
+(
+m­
+[
+¡ršg
+]
+š‹rçû
+{}{})
+
+80 
+”r
+ :ğ
+ÿche
+.
+	`In™
+();ƒ¼ !ğ
+n
+ {
+
+81 
+log
+.
+	`F©®f
+("çedØcÚÃù„edis: %v", 
+”r
+)
+
+83 
+log
+.
+	`Pršn
+("Redis connected")
+
+86 
+”r
+ :ğ
+db
+.
+	`In™
+(
+dbu£r
+, 
+db·ss
+, 
+db´Ùo
+, 
+dbaddr
+, 
+dbÇme
+)
+
+87 
+”r
+ !ğ
+n
+ {
+
+88 
+log
+.
+	`F©®f
+("çedØš™Ÿlizd©aba£: %s", 
+”r
+)
+
+92 
+li¡’”
+, 
+”r
+ :ğ
+	`ü—‹Li¡’”
+(
+´Ùo
+, 
+addr
+)
+
+93 
+”r
+ !ğ
+n
+ {
+
+94 
+log
+.
+	`F©®f
+("çedØü—‹‚‘†i¡’”: %s", 
+”r
+)
+
+97 
+mux
+ :ğ
+h‰p
+.
+	`NewS”veMux
+()
+
+100 
+”r
+ :ğ
+­i
+.
+	`In™
+(
+mux
+);ƒ¼ !ğ
+n
+ {
+
+101 
+log
+.
+	`F©®
+(
+”r
+)
+
+105 
+hªdËr
+ :ğ
+	`´odHªdËr
+(
+mux
+, 
+gameu¾
+)
+
+106 
+debug
+ {
+
+107 
+hªdËr
+ = 
+	`debugHªdËr
+(
+mux
+)
+
+110 
+sû¹
+ == "" {
+
+111 
+”r
+ = 
+h‰p
+.
+	`S”ve
+(
+li¡’”
+, 
+hªdËr
+)
+
+113 
+”r
+ = 
+h‰p
+.
+	`S”veTLS
+(
+li¡’”
+, 
+hªdËr
+, 
+sû¹
+, 
+skey
+)
+
+115 
+”r
+ !ğ
+n
+ {
+
+116 
+log
+.
+	`F©®f
+("çedØü—‹ h‰°£rv” o¸£rv”ƒ¼Üed: %s", 
+”r
+)
+
+118 
+	}
+}
+
+120 
+func
+ 
+	$ü—‹Li¡’”
+(
+´Ùo
+, 
+addr
+ 
+¡ršg
+è(
+Ãt
+.
+Li¡’”
+, 
+”rÜ
+) {
+
+121 
+´Ùo
+ == "unix" {
+
+122 
+os
+.
+	`Remove
+(
+addr
+)
+
+125 
+li¡’”
+, 
+”r
+ :ğ
+Ãt
+.
+	`Li¡’
+(
+´Ùo
+, 
+addr
+)
+
+126 
+”r
+ !ğ
+n
+ {
+
+127  
+n
+, 
+”r
+
+
+130 
+´Ùo
+ == "unix" {
+
+131 
+”r
+ :ğ
+os
+.
+	`Chmod
+(
+addr
+, 0777);ƒ¼ !ğ
+n
+ {
+
+132 
+li¡’”
+.
+	`Clo£
+()
+
+133  
+n
+, 
+”r
+
+
+137  
+li¡’”
+, 
+n
+
+
+138 
+	}
+}
+
+140 
+func
+ 
+	$´odHªdËr
+(
+rou‹r
+ *
+h‰p
+.
+S”veMux
+, 
+ş›Áu¾
+ 
+¡ršg
+èh‰p.
+HªdËr
+ {
+
+141  
+h‰p
+.
+	`HªdËrFunc
+(
+	`func
+(
+w
+ h‰p.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+142 
+w
+.
+	`H—d”
+().
+	`S‘
+("Access-Control-Allow-Headers", "Authorization, Content-Type")
+
+143 
+w
+.
+	`H—d”
+().
+	`S‘
+("Access-Control-Allow-Methods", "OPTIONS, GET, POST")
+
+144 
+w
+.
+	`H—d”
+().
+	`S‘
+("Acûss-CÚŒŞ-AÎow-Origš", 
+ş›Áu¾
+)
+
+146 
+r
+.
+M‘hod
+ == "OPTIONS" {
+
+147 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+151 
+rou‹r
+.
+	`S”veHTTP
+(
+w
+, 
+r
+)
+
+153 
+	}
+}
+
+155 
+func
+ 
+	$debugHªdËr
+(
+rou‹r
+ *
+h‰p
+.
+S”veMux
+èh‰p.
+HªdËr
+ {
+
+156  
+h‰p
+.
+	`HªdËrFunc
+(
+	`func
+(
+w
+ h‰p.
+Re¥Ú£Wr™”
+, 
+r
+ *h‰p.
+Reque¡
+) {
+
+157 
+w
+.
+	`H—d”
+().
+	`S‘
+("Access-Control-Allow-Headers", "*")
+
+158 
+w
+.
+	`H—d”
+().
+	`S‘
+("Access-Control-Allow-Methods", "*")
+
+159 
+w
+.
+	`H—d”
+().
+	`S‘
+("Access-Control-Allow-Origin", "*")
+
+161 
+r
+.
+M‘hod
+ == "OPTIONS" {
+
+162 
+w
+.
+	`Wr™eH—d”
+(
+h‰p
+.
+StusOK
+)
+
+166 
+rou‹r
+.
+	`S”veHTTP
+(
+w
+, 
+r
+)
+
+168 
+	}
+}
+
+170 
+func
+ 
+	$g‘Env
+(
+key
+ 
+¡ršg
+, 
+deçuÉV®ue
+ string) string {
+
+171 
+v®ue
+, 
+ok
+ :ğ
+os
+.
+	`LookupEnv
+(
+key
+); ok {
+
+172  
+v®ue
+
+
+175  
+deçuÉV®ue
+
+
+176 
+	}
+}
+
+	@
+1
+.
+1
+/usr/include
+32
+612
+api/account/changepw.go
+api/account/common.go
+api/account/discord.go
+api/account/google.go
+api/account/info.go
+api/account/login.go
+api/account/logout.go
+api/account/register.go
+api/common.go
+api/daily/common.go
+api/daily/rankings.go
+api/daily/rankingspagecount.go
+api/endpoints.go
+api/savedata/clear.go
+api/savedata/common.go
+api/savedata/delete.go
+api/savedata/newclear.go
+api/savedata/session.go
+api/savedata/system.go
+api/savedata/update.go
+api/stats.go
+cache/rediscache.go
+db/account.go
+db/daily.go
+db/db.go
+db/game.go
+db/savedata.go
+defs/daily.go
+defs/game.go
+defs/savedata.go
+redis_ping.go
+rogueserver.go
