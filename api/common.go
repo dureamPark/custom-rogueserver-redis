@@ -23,11 +23,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/redis/go-redis/v9"
+	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/api/account"
 	"github.com/pagefaultgames/rogueserver/api/daily"
 	"github.com/pagefaultgames/rogueserver/db"
 )
+
+const (
+    sessionUUIDKeyFmt = "session:uuid:%s"
+    sessionTTL        = 7 * 24 * time.Hour
+)
+
 
 func Init(mux *http.ServeMux) error {
 	err := scheduleStatRefresh()
@@ -104,6 +113,58 @@ func uuidFromRequest(r *http.Request) ([]byte, error) {
 }
 
 func tokenAndUuidFromRequest(r *http.Request) ([]byte, []byte, error) {
+    // 1) Header에서 토큰 추출
+    token, err := tokenFromRequest(r)
+    if err != nil {
+        return nil, nil, err
+    }
+
+    // 2) Redis 캐시 조회 (token→uuid)
+    tokStr := base64.StdEncoding.EncodeToString(token)
+    cacheKey := fmt.Sprintf(sessionUUIDKeyFmt, tokStr)
+    if u, err := cache.Rdb.Get(cache.Ctx, cacheKey).Result(); err == nil {
+        // hit!
+        return token, []byte(u), nil
+    } else if err != redis.Nil {
+        // 실제 Redis 에러
+        return nil, nil, fmt.Errorf("redis GET error: %w", err)
+    }
+
+    // 3) cache miss → DB 조회
+    uuid, err := db.FetchUUIDFromToken(token)
+    if err != nil {
+        return nil, nil, fmt.Errorf("failed to validate token: %w", err)
+    }
+    // 4) 캐시에 SET
+    cache.Rdb.Set(cache.Ctx, cacheKey, string(uuid), sessionTTL)
+    return token, uuid, nil
+}
+
+/*
+func tokenAndUuidFromRequest(r *http.Request) ([]byte, []byte, error) {
+    token, err := tokenFromRequest(r)
+    if err != nil {
+        return nil, nil, err
+    }
+    // 1) 캐시로 UUID 조회
+    tokStr := base64.StdEncoding.EncodeToString(token)
+    if u, err := cache.Rdb.Get(cache.Ctx, fmt.Sprintf(sessionUUIDKeyFmt, tokStr)).Result(); err == nil {
+        return token, []byte(u), nil
+    } else if err != redis.Nil {
+        return nil, nil, fmt.Errorf("redis GET uuid error: %w", err)
+    }
+    // 2) 캐시 miss → DB 조회
+    uuid, err := db.FetchUUIDFromToken(token)
+    if err != nil {
+        return nil, nil, fmt.Errorf("failed to validate token: %s", err)
+    }
+    // 3) 캐시에 token→uuid 매핑 저장 (optional, TTL=1주일)
+    cache.Rdb.Set(cache.Ctx, fmt.Sprintf(sessionUUIDKeyFmt, tokStr), string(uuid), sessionTTL)
+    return token, uuid, nil
+}
+*/
+
+/*func tokenAndUuidFromRequest(r *http.Request) ([]byte, []byte, error) {
 	token, err := tokenFromRequest(r)
 	if err != nil {
 		return nil, nil, err
@@ -115,7 +176,7 @@ func tokenAndUuidFromRequest(r *http.Request) ([]byte, []byte, error) {
 	}
 
 	return token, uuid, nil
-}
+}*/
 
 func httpError(w http.ResponseWriter, r *http.Request, err error, code int) {
 	log.Printf("%s: %s\n", r.URL.Path, err)
