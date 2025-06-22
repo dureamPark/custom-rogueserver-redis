@@ -26,18 +26,18 @@ import (
 	"slices"
 	"time"
 
-	redis "github.com/redis/go-redis/v9"
-	"github.com/pagefaultgames/rogueserver/metrics"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/metrics"
+	redis "github.com/redis/go-redis/v9"
 )
 
 const (
-    sessionTokenKeyFmt = "session:token:%s"
-    sessionUUIDKeyFmt  = "session:uuid:%s"
-    dirtySetKey        = "dirty:sessions"
-    sessionTTL         = 7 * 24 * time.Hour
+	sessionTokenKeyFmt = "session:token:%s"
+	sessionUUIDKeyFmt  = "session:uuid:%s"
+	dirtySetKey        = "dirty:sessions"
+	sessionTTL         = 7 * 24 * time.Hour
 )
 
 func AddAccountRecord(uuid []byte, username string, key, salt []byte) error {
@@ -50,134 +50,98 @@ func AddAccountRecord(uuid []byte, username string, key, salt []byte) error {
 }
 
 func AddAccountSession(username string, token []byte) error {
-    ctx := cache.Ctx
+	ctx := cache.Ctx
 
-    // 캐시 조회 과정
-    cacheKey := fmt.Sprintf(sessionTokenKeyFmt, username)//key:value=username:token
-    s, err := cache.Rdb.Get(ctx, cacheKey).Result()//cache hit or cache miss
-    
-    log.Printf("cache getttt")
+	// 캐시 조회 과정
+	cacheKey := fmt.Sprintf(sessionTokenKeyFmt, username) //key:value=username:token
+	s, err := cache.Rdb.Get(ctx, cacheKey).Result()       //cache hit or cache miss
 
-    if err == nil {
-        //cache hit인 경우.
-	metrics.CacheHits.Inc()//prometheus에서 cache miss 확인하기 위한 준비 중..
-        log.Printf("[CACHE HIT]   key=%s", cacheKey)
-	//redis 에 저장할 때 문제가 발생하지 않도록 인코딩 및 디코딩을 진행하여 사용.
-        if decoded, decErr := base64.StdEncoding.DecodeString(s); decErr == nil && len(decoded) == len(token) {
-	    log.Printf("token copy")
-            copy(token, decoded)
-            return nil
-        }
-        // 디코드 실패 시 DB 로직으로 넘어감
-    } else if err != redis.Nil {
-        // ── CACHE ERROR ──
-	log.Printf("redis error")
-        return fmt.Errorf("redis GET error: %w", err)
-    }
+	log.Printf("cache getttt")
 
-    // err == redis.Nil → CACHE MISS인 경우.
-    log.Printf("[CACHE MISS]  key=%s", cacheKey)
+	if err == nil {
+		//cache hit인 경우.
+		metrics.CacheHits.Inc() //prometheus에서 cache miss 확인하기 위한 준비 중..
+		log.Printf("[CACHE HIT]   key=%s", cacheKey)
+		//redis 에 저장할 때 문제가 발생하지 않도록 인코딩 및 디코딩을 진행하여 사용.
+		if decoded, decErr := base64.StdEncoding.DecodeString(s); decErr == nil && len(decoded) == len(token) {
+			log.Printf("token copy")
+			copy(token, decoded)
+			return nil
+		}
+		// 디코드 실패 시 DB 로직으로 넘어감
+	} else if err != redis.Nil {
+		// ── CACHE ERROR ──
+		log.Printf("redis error")
+		return fmt.Errorf("redis GET error: %w", err)
+	}
 
-    metrics.CacheMisses.Inc()//cache miss 확인하기 위한 준비 중..
+	// err == redis.Nil → CACHE MISS인 경우.
+	log.Printf("[CACHE MISS]  key=%s", cacheKey)
 
-    // DB data 추가 sessions 테이블->해당 과정은 write-back 구조와 맞지 않음.
-    //주석 처리해두고 추후에 write-back에 맞게 구조 수정할 예정.
-    /*
-    log.Printf("DB insert before")
-    if _, err := handle.Exec(`INSERT INTO sessions (uuid, token, expire) SELECT a.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEK) FROM accounts a WHERE a.username = ?`, token, username,); err != nil {
-        log.Printf("DB insert error: %v", err)
-        return err
-    }
+	metrics.CacheMisses.Inc() //cache miss 확인하기 위한 준비 중..
 
-    // 3) DB 업데이트: lastLoggedIn **업데이트부분은 일단 pass**
-    log.Printf("DB update before")
-    if _, err := handle.Exec(`UPDATE accounts SET lastLoggedIn = UTC_TIMESTAMP() WHERE username = ?`, username,); err != nil {
-        log.Printf("DB update error: %v", err)
-        return err
-    }
-    */
+	// DB data 추가 sessions 테이블->해당 과정은 write-back 구조와 맞지 않음.
+	//주석 처리해두고 추후에 write-back에 맞게 구조 수정할 예정.
+	/*
+	   log.Printf("DB insert before")
+	   if _, err := handle.Exec(`INSERT INTO sessions (uuid, token, expire) SELECT a.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEK) FROM accounts a WHERE a.username = ?`, token, username,); err != nil {
+	       log.Printf("DB insert error: %v", err)
+	       return err
+	   }
 
-    //캐시에 저장하는 부분 구현.
-    log.Printf("cache save before")
-    tokenStr := base64.StdEncoding.EncodeToString(token)
+	   // 3) DB 업데이트: lastLoggedIn **업데이트부분은 일단 pass**
+	   log.Printf("DB update before")
+	   if _, err := handle.Exec(`UPDATE accounts SET lastLoggedIn = UTC_TIMESTAMP() WHERE username = ?`, username,); err != nil {
+	       log.Printf("DB update error: %v", err)
+	       return err
+	   }
+	*/
 
-    //1.username → token, username과 token, TTL을 cache로 설정.
-    if err := cache.Rdb.Set(ctx, cacheKey, tokenStr, sessionTTL).Err(); err != nil {
-        return fmt.Errorf("redis SET token error: %w", err)
-    }
-    log.Printf("username -> token")
+	//캐시에 저장하는 부분 구현.
+	log.Printf("cache save before")
+	tokenStr := base64.StdEncoding.EncodeToString(token)
 
-    metrics.CacheHits.Inc()
+	//1.username → token, username과 token, TTL을 cache로 설정.
+	if err := cache.Rdb.Set(ctx, cacheKey, tokenStr, sessionTTL).Err(); err != nil {
+		return fmt.Errorf("redis SET token error: %w", err)
+	}
+	log.Printf("username -> token")
 
-    //2.token → uuid 역매핑
-    // DB에서 uuid를 다시 조회해서 저장 -> uuid설정이 없으면 로그인 이후 페이지로 이동이
-    //안 되는 문제가 있음. 해당 문제 원인 파악 중..
-    var uuid []byte
-    if err := handle.QueryRow(
-        "SELECT uuid FROM accounts WHERE username = ?", username,).Scan(&uuid); err != nil {
-        return fmt.Errorf("fetch uuid for cache: %w", err)
-    }
-    uuidKey := fmt.Sprintf(sessionUUIDKeyFmt, tokenStr)
-    if err := cache.Rdb.Set(ctx, uuidKey, string(uuid), sessionTTL).Err(); err != nil {
-        return fmt.Errorf("redis SET uuid error: %w", err)
-    }
+	metrics.CacheHits.Inc()
 
-    log.Printf("return nil")
-    return nil
+	//2.token → uuid 역매핑
+	// DB에서 uuid를 다시 조회해서 저장 -> uuid설정이 없으면 로그인 이후 페이지로 이동이
+	//안 되는 문제가 있음. 해당 문제 원인 파악 중..
+	var uuid []byte
+	if err := handle.QueryRow(
+		"SELECT uuid FROM accounts WHERE username = ?", username).Scan(&uuid); err != nil {
+		return fmt.Errorf("fetch uuid for cache: %w", err)
+	}
+	uuidKey := fmt.Sprintf(sessionUUIDKeyFmt, tokenStr)
+	if err := cache.Rdb.Set(ctx, uuidKey, string(uuid), sessionTTL).Err(); err != nil {
+		return fmt.Errorf("redis SET uuid error: %w", err)
+	}
+
+	log.Printf("return nil")
+	return nil
 }
 
-/*06220232
+//아래가 원본 함수.
+/*
 func AddAccountSession(username string, token []byte) error {
-	cacheKey := fmt.Sprintf(sessionTokenKeyFmt, username)
-	_, err := cache.Rdb.Get(cache.Ctx, cacheKey).Result()
-	if err == nil {
-		log.Printf("[CACHE HIT] key=%s", cacheKey)
-	} else if err == redis.Nil {
-		log.Printf("[CACHE MISS] key=%s", cacheKey)
-	} else {
-		log.Printf("[CACHE ERROR] key=%s err=%v", cacheKey, err)
-	}
-
-	// 2) DB 삽입: sessions 테이블
-	log.Printf("DB insert before")
-	if _, err := handle.Exec("INSERT INTO sessions (uuid, token, expire) SELECT a.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEK) FROM accounts a WHERE a.username = ?", token, username); err != nil {
-		log.Printf("DB insert")
-		return err
-	}
-	// 3) DB 업데이트: lastLoggedIn
-	log.Printf("DB update before")
-	if _, err := handle.Exec("UPDATE accounts SET lastLoggedIn = UTC_TIMESTAMP() WHERE username = ?", username); err != nil {
-		log.Printf("DB update")
+	_, err := handle.Exec("INSERT INTO sessions (uuid, token, expire) SELECT a.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEK) FROM accounts a WHERE a.username = ?", token, username)
+	if err != nil {
 		return err
 	}
 
-	// 4) 캐시에 저장 (base64, TTL=1주일)
-	log.Printf("cache save before")
-	encoded := base64.StdEncoding.EncodeToString(token)
-	if err := cache.Rdb.Set(cache.Ctx, cacheKey, encoded, 7*24*time.Hour).Err(); err != nil {
-		log.Printf("error")
-		return fmt.Errorf("redis SET error: %w", err)
+	_, err = handle.Exec("UPDATE accounts SET lastLoggedIn = UTC_TIMESTAMP() WHERE username = ?", username)
+	if err != nil {
+		return err
 	}
-	
-	log.Printf("return nill")
+
 	return nil
 }
 */
-
-//아래가 원본 함수.
-// func AddAccountSession(username string, token []byte) error {
-// 	_, err := handle.Exec("INSERT INTO sessions (uuid, token, expire) SELECT a.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEK) FROM accounts a WHERE a.username = ?", token, username)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	_, err = handle.Exec("UPDATE accounts SET lastLoggedIn = UTC_TIMESTAMP() WHERE username = ?", username)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
 
 func AddDiscordIdByUsername(discordId string, username string) error {
 	_, err := handle.Exec("UPDATE accounts SET discordId = ? WHERE username = ?", discordId, username)
@@ -515,40 +479,40 @@ func UpdateActiveSession(uuid []byte, clientSessionId string) error {
 	return nil
 }
 
-func FetchUUIDFromToken(token []byte) ([]byte, error) {//uuid를 미리 cache에 설정하지 않으면
-    							//문제가 발생하는 것으로 추정되던 곳
-    ctx := cache.Ctx
-    tokenStr := base64.StdEncoding.EncodeToString(token)
-    cacheKey := fmt.Sprintf(sessionUUIDKeyFmt, tokenStr)
-    
-    log.Printf("cache before")
+func FetchUUIDFromToken(token []byte) ([]byte, error) { //uuid를 미리 cache에 설정하지 않으면
+	//문제가 발생하는 것으로 추정되던 곳
+	ctx := cache.Ctx
+	tokenStr := base64.StdEncoding.EncodeToString(token)
+	cacheKey := fmt.Sprintf(sessionUUIDKeyFmt, tokenStr)
 
-    // 1.cache 조회
-    if u, err := cache.Rdb.Get(ctx, cacheKey).Result(); err == nil {
-        // cache hit
-	log.Printf("cache hit")
-        return []byte(u), nil
-    } else if err != nil && err != redis.Nil {
-        // 실제 Redis 에러
-	log.Printf("redis error")
-        return nil, fmt.Errorf("redis GET error: %w", err)
-    }
-    
-    // err == redis.Nil 일 때만 아래로 (cache miss)
-    log.Printf("cache miss")
-    
-    // 2.DB 조회
-    var uuid []byte
-    err := handle.QueryRow("SELECT uuid FROM sessions WHERE token = ?", token,).Scan(&uuid)
-    
-    log.Printf("query complete")
-    if err != nil {
-        return nil, err
-    }
+	log.Printf("cache before")
 
-    // 3.Redis에 캐시 설정. 다음 인증부터는 무조건적으로 hit 발생하도록.
-    cache.Rdb.Set(ctx, cacheKey, string(uuid), sessionTTL)
-    return uuid, nil
+	// 1.cache 조회
+	if u, err := cache.Rdb.Get(ctx, cacheKey).Result(); err == nil {
+		// cache hit
+		log.Printf("cache hit")
+		return []byte(u), nil
+	} else if err != nil && err != redis.Nil {
+		// 실제 Redis 에러
+		log.Printf("redis error")
+		return nil, fmt.Errorf("redis GET error: %w", err)
+	}
+
+	// err == redis.Nil 일 때만 아래로 (cache miss)
+	log.Printf("cache miss")
+
+	// 2.DB 조회
+	var uuid []byte
+	err := handle.QueryRow("SELECT uuid FROM sessions WHERE token = ?", token).Scan(&uuid)
+
+	log.Printf("query complete")
+	if err != nil {
+		return nil, err
+	}
+
+	// 3.Redis에 캐시 설정. 다음 인증부터는 무조건적으로 hit 발생하도록.
+	cache.Rdb.Set(ctx, cacheKey, string(uuid), sessionTTL)
+	return uuid, nil
 }
 
 /* 위 함수의 기존 함수.
