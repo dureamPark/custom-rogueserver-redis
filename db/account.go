@@ -49,7 +49,7 @@ func AddAccountRecord(uuid []byte, username string, key, salt []byte) error {
 	return nil
 }
 
-func AddAccountSession(username string, token []byte) error {
+func AddAccountSession(username string, token []byte) error { //로그인 시 username에 token 저장해주는 함수.
 	ctx := cache.Ctx
 
 	// 캐시 조회 과정
@@ -481,6 +481,7 @@ func UpdateActiveSession(uuid []byte, clientSessionId string) error {
 
 func FetchUUIDFromToken(token []byte) ([]byte, error) { //uuid를 미리 cache에 설정하지 않으면
 	//문제가 발생하는 것으로 추정되던 곳
+	//token을 가지고 있는 uuid가 누구인지 찾는 함수.
 	ctx := cache.Ctx
 	tokenStr := base64.StdEncoding.EncodeToString(token)
 	cacheKey := fmt.Sprintf(sessionUUIDKeyFmt, tokenStr)
