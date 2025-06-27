@@ -32,8 +32,10 @@ import (
 	"github.com/pagefaultgames/rogueserver/api/account"
 	"github.com/pagefaultgames/rogueserver/api/daily"
 	"github.com/pagefaultgames/rogueserver/api/savedata"
+	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/redis/go-redis/v9"
 )
 
 /*
@@ -191,7 +193,8 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
+	//err = db.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
+	err = cache.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
 	if err != nil {
 		httpError(w, r, fmt.Errorf("failed to update active session: %s", err), http.StatusBadRequest)
 		return
@@ -308,21 +311,27 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var active bool
-	active, err = db.IsActiveSession(uuid, data.ClientSessionId)
+	// cache로 변경
+	//active, err = db.IsActiveSession(uuid, data.ClientSessionId)
+	active, err = cache.IsActiveSession(uuid, data.ClientSessionId)
+
 	if err != nil {
 		httpError(w, r, fmt.Errorf("failed to check active session: %s", err), http.StatusBadRequest)
 		return
 	}
 
 	if !active {
-		httpError(w, r, fmt.Errorf("session out of date: not active"), http.StatusBadRequest)
+		httpError(w, r, fmt.Errorf("session out of date: not active : %s", err), http.StatusBadRequest)
 		return
 	}
 
-	storedTrainerId, storedSecretId, err := db.FetchTrainerIds(uuid)
+	//storedTrainerId, storedSecretId, err := db.FetchTrainerIds(uuid)
+	storedTrainerId, storedSecretId, err := cache.FetchTrainerIds(uuid)
 	if err != nil {
-		httpError(w, r, err, http.StatusInternalServerError)
-		return
+		if errors.Is(err, redis.Nil) {
+			httpError(w, r, err, http.StatusInternalServerError)
+			return
+		}
 	}
 
 	if storedTrainerId > 0 || storedSecretId > 0 {
@@ -331,14 +340,20 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		err = db.UpdateTrainerIds(data.System.TrainerId, data.System.SecretId, uuid)
+		//err = db.UpdateTrainerIds(data.System.TrainerId, data.System.SecretId, uuid)
+		err = cache.UpdateTrainerIds(data.System.TrainerId, data.System.SecretId, uuid)
+		//if err != nil {
 		if err != nil {
-			httpError(w, r, err, http.StatusInternalServerError)
-			return
+			if errors.Is(err, redis.Nil) {
+				httpError(w, r, err, http.StatusInternalServerError)
+				return
+			}
 		}
 	}
 
-	existingPlaytime, err := db.RetrievePlaytime(uuid)
+	// cache로 변경
+	//existingPlaytime, err := db.RetrievePlaytime(uuid)
+	existingPlaytime, err := cache.RetrievePlaytime(uuid)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		httpError(w, r, fmt.Errorf("failed to retrieve playtime: %s", err), http.StatusInternalServerError)
 		return
@@ -355,7 +370,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	log.Println("handleUpdateAll  ", uuid, data.SessionSlotId);
+	log.Println("handleUpdateAll  ", uuid, data.SessionSlotId)
 	existingSave, err := savedata.GetSession(uuid, data.SessionSlotId)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		httpError(w, r, fmt.Errorf("failed to retrieve session save data: %s", err), http.StatusInternalServerError)
@@ -367,17 +382,17 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	log.Println("Update ", uuid, data.SessionSlotId, data.Session);
+	log.Println("Update ", uuid, data.SessionSlotId, data.Session)
 	err = savedata.Update(uuid, data.SessionSlotId, data.Session)
 	if err != nil {
-		log.Print(err);
+		log.Print(err)
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
 	err = savedata.Update(uuid, 0, data.System)
 	if err != nil {
-		log.Print(err);
+		log.Print(err)
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
 	}
@@ -403,7 +418,8 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	active, err = db.IsActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
+	//active, err = db.IsActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
+	active, err = cache.IsActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
 	if err != nil {
 		httpError(w, r, fmt.Errorf("failed to check active session: %s", err), http.StatusBadRequest)
 		return
@@ -412,7 +428,8 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 	switch r.PathValue("action") {
 	case "get":
 		if !active {
-			err = db.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
+			//err = db.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
+			err = cache.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
 			if err != nil {
 				httpError(w, r, fmt.Errorf("failed to update active session: %s", err), http.StatusBadRequest)
 				return
@@ -433,7 +450,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, r, save)
 	case "update":
 		if !active {
-			httpError(w, r, fmt.Errorf("session out of date: not active"), http.StatusBadRequest)
+			httpError(w, r, fmt.Errorf("session out of date: not active : %s", err), http.StatusBadRequest)
 			return
 		}
 
