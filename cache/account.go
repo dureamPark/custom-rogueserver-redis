@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/pagefaultgames/rogueserver/defs"
@@ -115,8 +116,12 @@ func CacheAccountStatsInRedis(dbStats defs.AccountStatsData) error {
 // session 활성화
 func UpdateActiveSession(uuid []byte, sessionId string) error {
 
+	log.Printf("UpdateActiveSession uuid : %s, sessionId : %s", base64.StdEncoding.EncodeToString(uuid), sessionId)
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
-	return Rdb.JSONSet(Ctx, redisKey, "$.activeClientSession", sessionId).Err()
+	if sessionId == "" {
+		return fmt.Errorf("sessionId is empty")
+	}
+	return Rdb.JSONSet(Ctx, redisKey, "$.activeClientSession", fmt.Sprintf("\"%s\"", sessionId)).Err()
 }
 
 // 현재 session이 활성화되어 있는지 확인, 비활성화 시 새롭게 활성화
@@ -135,8 +140,9 @@ func IsActiveSession(uuid []byte, sessionId string) (bool, error) {
 		return true, nil
 	}
 
+	id = strings.Trim(id, "\"") // 쌍따옴표 제거
 	log.Printf("id : %s, session id : %s", id, sessionId)
-	return id == "\"\"" || id == sessionId, nil
+	return id == "" || id == sessionId, nil
 }
 
 // StoreSessionToken stores a token-uuid pair in Redis with TTL.

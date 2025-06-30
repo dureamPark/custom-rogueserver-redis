@@ -18,11 +18,11 @@ func IsValidCacheData(uuid []byte) error {
 	if exists == 0 {
 		// UserCacheData의 초기 상태 정의
 		initialData := defs.UserCacheData{
-			ActiveClientSessions: "",                                    // 빈 문자열 슬라이스로 초기화 (JSON: [])
-			Account:              nil,                                   // 명시적으로 nil (JSON에서 생략 또는 null)
-			AccountStats:         nil,                                   // 명시적으로 nil (JSON에서 생략 또는 null)
-			SystemSaveData:       nil,                                   // 명시적으로 nil (JSON에서 생략 또는 null)
-			SessionSaveData:      make(map[string]defs.SessionSaveData), // 빈 맵으로 초기화 (JSON: {})
+			ActiveClientSession: "",                                    // 빈 문자열 슬라이스로 초기화 (JSON: [])
+			Account:             nil,                                   // 명시적으로 nil (JSON에서 생략 또는 null)
+			AccountStats:        nil,                                   // 명시적으로 nil (JSON에서 생략 또는 null)
+			SystemSaveData:      nil,                                   // 명시적으로 nil (JSON에서 생략 또는 null)
+			SessionSaveData:     make(map[string]defs.SessionSaveData), // 빈 맵으로 초기화 (JSON: {})
 		}
 
 		// JSON으로 마샬링

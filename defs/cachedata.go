@@ -18,9 +18,9 @@
 package defs
 
 type UserCacheData struct {
-	ActiveClientSessions string                     `json:"activeClientSession"`
-	Account              *AccountRedisData          `json:"account"`
-	AccountStats         *AccountStatsRedisData     `json:"accountStats"`
-	SystemSaveData       *SystemSaveData            `json:"systemSaveData"`
-	SessionSaveData      map[string]SessionSaveData `json:"sessionSaveData"`
+	ActiveClientSession string                     `json:"activeClientSession"`
+	Account             *AccountRedisData          `json:"account"`
+	AccountStats        *AccountStatsRedisData     `json:"accountStats"`
+	SystemSaveData      *SystemSaveData            `json:"systemSaveData"`
+	SessionSaveData     map[string]SessionSaveData `json:"sessionSaveData"`
 }

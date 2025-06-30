@@ -196,7 +196,7 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 	//err = db.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
 	err = cache.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
 	if err != nil {
-		httpError(w, r, fmt.Errorf("failed to update active session: %s", err), http.StatusBadRequest)
+		httpError(w, r, fmt.Errorf("handlesession : failed to update active session: %s", err), http.StatusBadRequest)
 		return
 	}
 
@@ -431,7 +431,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 			//err = db.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
 			err = cache.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
 			if err != nil {
-				httpError(w, r, fmt.Errorf("failed to update active session: %s", err), http.StatusBadRequest)
+				httpError(w, r, fmt.Errorf("handleSystem_get : failed to update active session: %s", err), http.StatusBadRequest)
 				return
 			}
 		}
@@ -494,7 +494,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 		if !active {
 			err = db.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
 			if err != nil {
-				httpError(w, r, fmt.Errorf("failed to update active session: %s", err), http.StatusBadRequest)
+				httpError(w, r, fmt.Errorf("handleSystem_verify : failed to update active session: %s", err), http.StatusBadRequest)
 				return
 			}
 

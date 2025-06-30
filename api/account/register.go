@@ -20,6 +20,7 @@ package account
 import (
 	"crypto/rand"
 	"fmt"
+	"log"
 
 	"github.com/pagefaultgames/rogueserver/db"
 )
