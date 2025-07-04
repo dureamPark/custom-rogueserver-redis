@@ -15,28 +15,12 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package account
+package defs
 
-import (
-	"database/sql"
-	"errors"
-	"fmt"
-
-	"github.com/pagefaultgames/rogueserver/cache"
-)
-
-// /account/logout - log out of account
-func Logout(token []byte) error {
-	// err := db.RemoveSessionFromToken(token)
-	err := cache.RemoveSessionFromToken(token)
-	// TODO. 남아있는 데이터를 로그아웃할 때, 전부 DB에 저장할건지, Cache 정책에 따라 저장할 것인지
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return fmt.Errorf("token not found")
-		}
-
-		return fmt.Errorf("failed to remove account session")
-	}
-
-	return nil
+type UserCacheData struct {
+	ActiveClientSession string                     `json:"activeClientSession"`
+	Account             *AccountRedisData          `json:"account"`
+	AccountStats        *AccountStatsRedisData     `json:"accountStats"`
+	SystemSaveData      *SystemSaveData            `json:"systemSaveData"`
+	SessionSaveData     map[string]SessionSaveData `json:"sessionSaveData"`
 }

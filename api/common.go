@@ -20,13 +20,22 @@ package api
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/pagefaultgames/rogueserver/api/account"
 	"github.com/pagefaultgames/rogueserver/api/daily"
-	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/pagefaultgames/rogueserver/cache"
+	"github.com/redis/go-redis/v9"
+	//"github.com/pagefaultgames/rogueserver/db"
+)
+
+const (
+	sessionUUIDKeyFmt = "session:uuid:%s"
+	sessionTTL        = 7 * 24 * time.Hour
 )
 
 func Init(mux *http.ServeMux) error {
@@ -41,27 +50,27 @@ func Init(mux *http.ServeMux) error {
 	}
 
 	// account
-	mux.HandleFunc("GET /account/info", handleAccountInfo)//user info -> login 때문에 필요.
-	mux.HandleFunc("POST /account/register", handleAccountRegister)//register 제외. 실험 환경과 연관 없음.
-	mux.HandleFunc("POST /account/login", handleAccountLogin)//login 때문에 필요.
-	mux.HandleFunc("POST /account/changepw", handleAccountChangePW)//changePW 제외. 실험 환경과 연관 없음.
-	mux.HandleFunc("GET /account/logout", handleAccountLogout)//logout 때문에 필요.
+	mux.HandleFunc("GET /account/info", handleAccountInfo)          //user info -> login 때문에 필요.
+	mux.HandleFunc("POST /account/register", handleAccountRegister) //register 제외. 실험 환경과 연관 없음.
+	mux.HandleFunc("POST /account/login", handleAccountLogin)       //login 때문에 필요.
+	mux.HandleFunc("POST /account/changepw", handleAccountChangePW) //changePW 제외. 실험 환경과 연관 없음.
+	mux.HandleFunc("GET /account/logout", handleAccountLogout)      //logout 때문에 필요.
 
 	// game
-	mux.HandleFunc("GET /game/titlestats", handleGameTitleStats)//game loop 때문에 필요.
-	mux.HandleFunc("GET /game/classicsessioncount", handleGameClassicSessionCount)//game loop 때문에 필요.
+	mux.HandleFunc("GET /game/titlestats", handleGameTitleStats)                   //game loop 때문에 필요.
+	mux.HandleFunc("GET /game/classicsessioncount", handleGameClassicSessionCount) //game loop 때문에 필요.
 
 	// savedata
-	mux.HandleFunc("/savedata/session/{action}", handleSession)//game loop 때문에 필요.
-	mux.HandleFunc("/savedata/system/{action}", handleSystem)//game loop 때문에 필요.
+	mux.HandleFunc("/savedata/session/{action}", handleSession) //game loop 때문에 필요.
+	mux.HandleFunc("/savedata/system/{action}", handleSystem)   //game loop 때문에 필요.
 
 	// new session
-	mux.HandleFunc("POST /savedata/updateall", handleUpdateAll)//game loop 때문에 필요.
+	mux.HandleFunc("POST /savedata/updateall", handleUpdateAll) //game loop 때문에 필요.
 
 	// daily
-	mux.HandleFunc("GET /daily/seed", handleDailySeed)//Jmeter 실험에서 game loop에 없음. 제외.
-	mux.HandleFunc("GET /daily/rankings", handleDailyRankings)//daily run은 Jmeter 실험에서 제외.
-	mux.HandleFunc("GET /daily/rankingpagecount", handleDailyRankingPageCount)//daily run은 Jmeter 실험에서 제외.
+	mux.HandleFunc("GET /daily/seed", handleDailySeed)                         //Jmeter 실험에서 game loop에 없음. 제외.
+	mux.HandleFunc("GET /daily/rankings", handleDailyRankings)                 //daily run은 Jmeter 실험에서 제외.
+	mux.HandleFunc("GET /daily/rankingpagecount", handleDailyRankingPageCount) //daily run은 Jmeter 실험에서 제외.
 
 	// auth
 	mux.HandleFunc("/auth/{provider}/callback", handleProviderCallback)
@@ -104,6 +113,59 @@ func uuidFromRequest(r *http.Request) ([]byte, error) {
 }
 
 func tokenAndUuidFromRequest(r *http.Request) ([]byte, []byte, error) {
+	// 토큰은 cache에서만 확인하기
+
+	// 1) Header에서 토큰 추출
+	token, err := tokenFromRequest(r)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// 2) Redis 캐시 조회 (token→uuid)
+	log.Printf("token : %s\n", base64.StdEncoding.EncodeToString(token))
+	uuid, err := cache.FetchSessionToken(token)
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return nil, nil, fmt.Errorf("redis GET error: %w", err)
+		}
+	}
+
+	// // 3) cache miss → DB 조회
+	// uuid, err := db.FetchUUIDFromToken(token)
+	// if err != nil {
+	//     return nil, nil, fmt.Errorf("failed to validate token: %w", err)
+	// }
+	// // 4) 캐시에 SET
+	// cache.Rdb.Set(cache.Ctx, cacheKey, string(uuid), sessionTTL)
+
+	return token, uuid, nil
+}
+
+/*
+func tokenAndUuidFromRequest(r *http.Request) ([]byte, []byte, error) {
+    token, err := tokenFromRequest(r)
+    if err != nil {
+        return nil, nil, err
+    }
+    // 1) 캐시로 UUID 조회
+    tokStr := base64.StdEncoding.EncodeToString(token)
+    if u, err := cache.Rdb.Get(cache.Ctx, fmt.Sprintf(sessionUUIDKeyFmt, tokStr)).Result(); err == nil {
+        return token, []byte(u), nil
+    } else if err != redis.Nil {
+        return nil, nil, fmt.Errorf("redis GET uuid error: %w", err)
+    }
+    // 2) 캐시 miss → DB 조회
+    uuid, err := db.FetchUUIDFromToken(token)
+    if err != nil {
+        return nil, nil, fmt.Errorf("failed to validate token: %s", err)
+    }
+    // 3) 캐시에 token→uuid 매핑 저장 (optional, TTL=1주일)
+    cache.Rdb.Set(cache.Ctx, fmt.Sprintf(sessionUUIDKeyFmt, tokStr), string(uuid), sessionTTL)
+    return token, uuid, nil
+}
+*/
+
+/*func tokenAndUuidFromRequest(r *http.Request) ([]byte, []byte, error) {
 	token, err := tokenFromRequest(r)
 	if err != nil {
 		return nil, nil, err
@@ -115,7 +177,7 @@ func tokenAndUuidFromRequest(r *http.Request) ([]byte, []byte, error) {
 	}
 
 	return token, uuid, nil
-}
+}*/
 
 func httpError(w http.ResponseWriter, r *http.Request, err error, code int) {
 	log.Printf("%s: %s\n", r.URL.Path, err)

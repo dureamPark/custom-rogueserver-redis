@@ -20,6 +20,7 @@ package account
 import (
 	"crypto/rand"
 	"fmt"
+	"log"
 
 	"github.com/pagefaultgames/rogueserver/db"
 )
@@ -34,11 +35,15 @@ func Register(username, password string) error {
 		return fmt.Errorf("invalid password")
 	}
 
+	log.Printf("name and password pass")
+
 	uuid := make([]byte, UUIDSize)
 	_, err := rand.Read(uuid)
 	if err != nil {
 		return fmt.Errorf("failed to generate uuid: %s", err)
 	}
+
+	log.Printf("make uuid")
 
 	salt := make([]byte, ArgonSaltSize)
 	_, err = rand.Read(salt)
@@ -46,8 +51,11 @@ func Register(username, password string) error {
 		return fmt.Errorf("failed to generate salt: %s", err)
 	}
 
+	log.Printf("make salt")
+
 	err = db.AddAccountRecord(uuid, username, deriveArgon2IDKey([]byte(password), salt), salt)
 	if err != nil {
+		log.Printf("addaccountrecord error")
 		return fmt.Errorf("failed to add account record: %s", err)
 	}
 

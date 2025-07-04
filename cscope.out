@@ -1,4 +1,4 @@
-cscope 15 /home/user/duream/custom-rogueserver-redis               0000083235
+cscope 15 /home/user/duream/custom-rogueserver-redis               0000086240
 	@api/account/changepw.go
 
 18 
@@ -1947,7 +1947,19 @@ n
 impÜt
  (
 
-32 
+36 
+	g£ssiÚUUIDKeyFmt
+ = "session:uuid:%s"
+
+37 
+£ssiÚTTL
+ = 7 * 24 * 
+time
+.
+Hour
+
+
+41 
 func
  
 	$In™
@@ -1961,23 +1973,23 @@ S”veMux
 ”rÜ
  {
 
-33 
+42 
 ”r
  :ğ
 	`scheduËStReäesh
 ()
 
-34 
+43 
 ”r
  !ğ
 n
  {
 
-35  
+44  
 ”r
 
 
-38 
+47 
 ”r
  = 
 day
@@ -1985,17 +1997,17 @@ day
 	`In™
 ()
 
-39 
+48 
 ”r
  !ğ
 n
  {
 
-40  
+49  
 ”r
 
 
-44 
+53 
 mux
 .
 	`HªdËFunc
@@ -2003,7 +2015,7 @@ mux
 hªdËAccouÁInfo
 )
 
-45 
+54 
 mux
 .
 	`HªdËFunc
@@ -2011,7 +2023,7 @@ mux
 hªdËAccouÁRegi¡”
 )
 
-46 
+55 
 mux
 .
 	`HªdËFunc
@@ -2019,7 +2031,7 @@ mux
 hªdËAccouÁLogš
 )
 
-47 
+56 
 mux
 .
 	`HªdËFunc
@@ -2027,7 +2039,7 @@ mux
 hªdËAccouÁChªgePW
 )
 
-48 
+57 
 mux
 .
 	`HªdËFunc
@@ -2035,7 +2047,7 @@ mux
 hªdËAccouÁLogout
 )
 
-51 
+60 
 mux
 .
 	`HªdËFunc
@@ -2043,7 +2055,7 @@ mux
 hªdËGameT™ËSts
 )
 
-52 
+61 
 mux
 .
 	`HªdËFunc
@@ -2051,7 +2063,7 @@ mux
 hªdËGameCÏssicSessiÚCouÁ
 )
 
-55 
+64 
 mux
 .
 	`HªdËFunc
@@ -2059,7 +2071,7 @@ mux
 hªdËSessiÚ
 )
 
-56 
+65 
 mux
 .
 	`HªdËFunc
@@ -2067,7 +2079,7 @@ mux
 hªdËSy¡em
 )
 
-59 
+68 
 mux
 .
 	`HªdËFunc
@@ -2075,7 +2087,7 @@ mux
 hªdËUpd©eAÎ
 )
 
-62 
+71 
 mux
 .
 	`HªdËFunc
@@ -2083,7 +2095,7 @@ mux
 hªdËDayS“d
 )
 
-63 
+72 
 mux
 .
 	`HªdËFunc
@@ -2091,7 +2103,7 @@ mux
 hªdËDayRªkšgs
 )
 
-64 
+73 
 mux
 .
 	`HªdËFunc
@@ -2099,7 +2111,7 @@ mux
 hªdËDayRªkšgPageCouÁ
 )
 
-67 
+76 
 mux
 .
 	`HªdËFunc
@@ -2107,7 +2119,7 @@ mux
 hªdËProvid”C®lback
 )
 
-68 
+77 
 mux
 .
 	`HªdËFunc
@@ -2115,7 +2127,7 @@ mux
 hªdËProvid”Logout
 )
 
-71 
+80 
 mux
 .
 	`HªdËFunc
@@ -2123,7 +2135,7 @@ mux
 hªdËAdmšDiscÜdLšk
 )
 
-72 
+81 
 mux
 .
 	`HªdËFunc
@@ -2131,7 +2143,7 @@ mux
 hªdËAdmšDiscÜdUÆšk
 )
 
-73 
+82 
 mux
 .
 	`HªdËFunc
@@ -2139,7 +2151,7 @@ mux
 hªdËAdmšGoogËLšk
 )
 
-74 
+83 
 mux
 .
 	`HªdËFunc
@@ -2147,7 +2159,7 @@ mux
 hªdËAdmšGoogËUÆšk
 )
 
-75 
+84 
 mux
 .
 	`HªdËFunc
@@ -2155,15 +2167,15 @@ mux
 hªdËAdmšS—rch
 )
 
-77  
+86  
 n
 
 
-78 
+87 
 	}
 }
 
-80 
+89 
 func
  
 tok’FromReque¡
@@ -2179,7 +2191,7 @@ Reque¡
 	g”rÜ
 ) {
 
-81 
+90 
 	gr
 .
 	gH—d”
@@ -2187,7 +2199,7 @@ Reque¡
 G‘
 ("Authorization") == "" {
 
-82  
+91  
 n
 , 
 fmt
@@ -2195,7 +2207,7 @@ fmt
 E¼Üf
 ("missingoken")
 
-85 
+94 
 tok’
 , 
 	g”r
@@ -2213,13 +2225,13 @@ H—d”
 G‘
 ("Authorization"))
 
-86 
+95 
 ”r
  !ğ
 n
  {
 
-87  
+96  
 n
 , 
 fmt
@@ -2229,7 +2241,7 @@ E¼Üf
 ”r
 )
 
-90 
+99 
 Ën
 (
 tok’
@@ -2239,7 +2251,7 @@ accouÁ
 Tok’Size
  {
 
-91  
+100  
 n
 , 
 fmt
@@ -2255,13 +2267,13 @@ accouÁ
 Tok’Size
 )
 
-94  
+103  
 tok’
 , 
 	gn
 
 
-97 
+106 
 func
  
 uuidFromReque¡
@@ -2277,7 +2289,7 @@ Reque¡
 	g”rÜ
 ) {
 
-98 
+107 
 	g_
 , 
 	guuid
@@ -2289,25 +2301,25 @@ tok’AndUuidFromReque¡
 r
 )
 
-99 
+108 
 ”r
  !ğ
 n
  {
 
-100  
+109  
 n
 , 
 ”r
 
 
-103  
+112  
 uuid
 , 
 	gn
 
 
-106 
+115 
 func
  
 tok’AndUuidFromReque¡
@@ -2323,7 +2335,7 @@ Reque¡
 	g”rÜ
 ) {
 
-107 
+117 
 	gtok’
 , 
 	g”r
@@ -2333,19 +2345,91 @@ tok’FromReque¡
 r
 )
 
-108 
+118 
 ”r
  !ğ
 n
  {
 
-109  
+119  
 n
 ,‚, 
 ”r
 
 
-112 
+123 
+tokSŒ
+ :ğ
+ba£64
+.
+StdEncodšg
+.
+EncodeToSŒšg
+(
+tok’
+)
+
+124 
+ÿcheKey
+ :ğ
+fmt
+.
+S´štf
+(
+£ssiÚUUIDKeyFmt
+, 
+tokSŒ
+)
+
+125 
+	gu
+, 
+	g”r
+ :ğ
+ÿche
+.
+Rdb
+.
+G‘
+(ÿche.
+Ctx
+, 
+ÿcheKey
+).
+ResuÉ
+();ƒ¼ =ğ
+n
+ {
+
+127  
+tok’
+, []
+by‹
+(
+u
+), 
+n
+
+
+128 } 
+”r
+ !ğ
+»dis
+.
+N
+ {
+
+130  
+n
+,‚, 
+fmt
+.
+E¼Üf
+("»di GETƒ¼Ü: %w", 
+”r
+)
+
+134 
 uuid
 , 
 	g”r
@@ -2357,31 +2441,49 @@ F‘chUUIDFromTok’
 tok’
 )
 
-113 
+135 
 ”r
  !ğ
 n
  {
 
-114  
+136  
 n
 ,‚, 
 fmt
 .
 E¼Üf
-("çedØv®id©tok’: %s", 
+("çedØv®id©tok’: %w", 
 ”r
 )
 
-117  
-tok’
+139 
+ÿche
+.
+Rdb
+.
+S‘
+(ÿche.
+Ctx
+, 
+ÿcheKey
+, 
+¡ršg
+(
+uuid
+), 
+£ssiÚTTL
+)
+
+140  
+	gtok’
 , 
 	guuid
 , 
 	gn
 
 
-120 
+181 
 func
  
 	$h‰pE¼Ü
@@ -2403,7 +2505,7 @@ Reque¡
 code
  ) {
 
-121 
+182 
 log
 .
 	`Prštf
@@ -2417,7 +2519,7 @@ P©h
 ”r
 )
 
-122 
+183 
 h‰p
 .
 	`E¼Ü
@@ -2429,11 +2531,11 @@ w
 code
 )
 
-123 
+184 
 	}
 }
 
-125 
+186 
 func
  
 	$wr™eJSON
@@ -2453,7 +2555,7 @@ d©a
 ªy
 ) {
 
-126 
+187 
 w
 .
 	`H—d”
@@ -2461,7 +2563,7 @@ w
 	`S‘
 ("Content-Type", "application/json")
 
-127 
+188 
 ”r
  :ğ
 jsÚ
@@ -2475,13 +2577,13 @@ w
 d©a
 )
 
-128 
+189 
 ”r
  !ğ
 n
  {
 
-129 
+190 
 	`h‰pE¼Ü
 (
 w
@@ -2499,7 +2601,7 @@ h‰p
 StusIÁ”ÇlS”v”E¼Ü
 )
 
-132 
+193 
 	}
 }
 
@@ -9671,11 +9773,35 @@ db
 impÜt
  (
 
-26 
+29 
+»dis
+ "github.com/redis/go-redis/v9"
+
+30 
 _
  "github.com/go-sql-driver/mysql"
 
-30 
+36 
+	g£ssiÚTok’KeyFmt
+ = "session:token:%s"
+
+37 
+£ssiÚUUIDKeyFmt
+ = "session:uuid:%s"
+
+38 
+dœtyS‘Key
+ = "dirty:sessions"
+
+39 
+£ssiÚTTL
+ = 7 * 24 * 
+time
+.
+Hour
+
+
+42 
 func
  
 	$AddAccouÁRecÜd
@@ -9695,7 +9821,7 @@ key
 ”rÜ
  {
 
-31 
+43 
 _
 , 
 ”r
@@ -9713,25 +9839,25 @@ key
 §É
 )
 
-32 
+44 
 ”r
  !ğ
 n
  {
 
-33  
+45  
 ”r
 
 
-36  
+48  
 n
 
 
-37 
+49 
 	}
 }
 
-39 
+93 
 func
  
 	$AddAccouÁSessiÚ
@@ -9747,7 +9873,139 @@ by‹
 ”rÜ
  {
 
-40 
+94 
+ùx
+ :ğ
+ÿche
+.
+Ctx
+
+
+97 
+ÿcheKey
+ :ğ
+fmt
+.
+	`S´štf
+(
+£ssiÚTok’KeyFmt
+, 
+u£ºame
+)
+
+98 
+s
+, 
+”r
+ :ğ
+ÿche
+.
+Rdb
+.
+	`G‘
+(
+ùx
+, 
+ÿcheKey
+).
+	`ResuÉ
+()
+
+99 
+log
+.
+	`Prštf
+("cache getttt")
+
+100 
+”r
+ =ğ
+n
+ {
+
+102 
+log
+.
+	`Prštf
+("[CACHE HIT] key=%s", 
+ÿcheKey
+)
+
+103 
+decoded
+, 
+decE¼
+ :ğ
+ba£64
+.
+StdEncodšg
+.
+	`DecodeSŒšg
+(
+s
+); decE¼ =ğ
+n
+ && 
+	`Ën
+(decodedè=ğËn(
+tok’
+) {
+
+104 
+log
+.
+	`Prštf
+("token copypyppyp")
+
+105 
+	`cİy
+(
+tok’
+, 
+decoded
+)
+
+106  
+n
+
+
+109 } 
+”r
+ !ğ
+»dis
+.
+N
+ {
+
+111 
+log
+.
+	`Prštf
+("redisƒrrrorrrrrrr")
+
+112  
+fmt
+.
+	`E¼Üf
+("»di GETƒ¼Ü: %w", 
+”r
+)
+
+116 
+log
+.
+	`Prštf
+("[CACHE MISS] key=%s", 
+ÿcheKey
+)
+
+119 
+log
+.
+	`Prštf
+("DB insert before")
+
+120 
 _
 , 
 ”r
@@ -9755,53 +10013,283 @@ _
 hªdË
 .
 	`Exec
-("INSERT INTO sessiÚ (uuid,ok’,ƒxpœeèSELECT‡.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEKèFROM‡ccouÁ ¨WHERE‡.u£ºamğ?", 
+(
+
+121 `
+INSERT
+ 
+INTO
+ 
+	`£ssiÚs
+ (
+uuid
+, 
+tok’
+, 
+expœe
+)
+
+122 
+SELECT
+ 
+a
+.
+uuid
+, ?, 
+	`DATE_ADD
+(
+	`UTC_TIMESTAMP
+(), 
+INTERVAL
+ 1 
+WEEK
+)
+
+123 
+FROM
+ 
+accouÁs
+ 
+a
+
+
+124 
+WHERE
+ 
+a
+.
+u£ºame
+ = ?`,
+
+125 
 tok’
 , 
 u£ºame
-)
+,
 
-41 
+126 ); 
 ”r
  !ğ
 n
  {
 
-42  
+127 
+log
+.
+	`Prštf
+("DB in£¹ƒ¼Ü: %v", 
+”r
+)
+
+128  
 ”r
 
 
-45 
+132 
+log
+.
+	`Prštf
+("DB update before")
+
+133 
 _
 , 
 ”r
- = 
+ :ğ
 hªdË
 .
 	`Exec
-("UPDATE‡ccouÁ SET†a¡LoggedIÀğUTC_TIMESTAMP(èWHERE u£ºamğ?", 
-u£ºame
-)
+(
 
-46 
+134 `
+UPDATE
+ 
+accouÁs
+ 
+SET
+ 
+Ï¡LoggedIn
+ = 
+	`UTC_TIMESTAMP
+(è
+WHERE
+ 
+u£ºame
+ = ?`,
+
+135 
+u£ºame
+,
+
+136 ); 
 ”r
  !ğ
 n
  {
 
-47  
+137 
+log
+.
+	`Prštf
+("DB upd©”rÜ: %v", 
+”r
+)
+
+138  
 ”r
 
 
-50  
+142 
+log
+.
+	`Prštf
+("cache save before")
+
+143 
+tok’SŒ
+ :ğ
+ba£64
+.
+StdEncodšg
+.
+	`EncodeToSŒšg
+(
+tok’
+)
+
+146 
+”r
+ :ğ
+ÿche
+.
+Rdb
+.
+	`S‘
+(
+ùx
+, 
+ÿcheKey
+, 
+tok’SŒ
+, 
+£ssiÚTTL
+).
+	`E¼
+();ƒ¼ !ğ
+n
+ {
+
+147  
+fmt
+.
+	`E¼Üf
+("»di SETok’ƒ¼Ü: %w", 
+”r
+)
+
+149 
+log
+.
+	`Prštf
+("username ->oken")
+
+153 
+v¬
+ 
+uuid
+ []
+by‹
+
+
+154 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+(
+
+155 "SELECT uuid FROM‡ccouÁ WHERE u£ºamğ?", 
+u£ºame
+,
+
+156 ).
+	`Sÿn
+(&
+uuid
+); 
+”r
+ !ğ
+n
+ {
+
+157  
+fmt
+.
+	`E¼Üf
+("ãtch uuid fÜ cache: %w", 
+”r
+)
+
+159 
+uuidKey
+ :ğ
+fmt
+.
+	`S´štf
+(
+£ssiÚUUIDKeyFmt
+, 
+tok’SŒ
+)
+
+160 
+”r
+ :ğ
+ÿche
+.
+Rdb
+.
+	`S‘
+(
+ùx
+, 
+uuidKey
+, 
+	`¡ršg
+(
+uuid
+), 
+£ssiÚTTL
+).
+	`E¼
+();ƒ¼ !ğ
+n
+ {
+
+161  
+fmt
+.
+	`E¼Üf
+("»di SET uuidƒ¼Ü: %w", 
+”r
+)
+
+164 
+log
+.
+	`Prštf
+("return‚il")
+
+165  
 n
 
 
-51 
+166 
 	}
 }
 
-53 
+220 
 func
  
 	$AddDiscÜdIdByU£ºame
@@ -9815,7 +10303,7 @@ u£ºame
 ”rÜ
  {
 
-54 
+221 
 _
 , 
 ”r
@@ -9829,25 +10317,25 @@ discÜdId
 u£ºame
 )
 
-55 
+222 
 ”r
  !ğ
 n
  {
 
-56  
+223  
 ”r
 
 
-59  
+226  
 n
 
 
-60 
+227 
 	}
 }
 
-62 
+229 
 func
  
 	$AddGoogËIdByU£ºame
@@ -9861,7 +10349,7 @@ u£ºame
 ”rÜ
  {
 
-63 
+230 
 _
 , 
 ”r
@@ -9873,904 +10361,6 @@ hªdË
 googËId
 , 
 u£ºame
-)
-
-64 
-”r
- !ğ
-n
- {
-
-65  
-”r
-
-
-68  
-n
-
-
-69 
-	}
-}
-
-71 
-func
- 
-	$AddGoogËIdByUUID
-(
-googËId
- 
-¡ršg
-, 
-uuid
- []
-by‹
-è
-”rÜ
- {
-
-72 
-_
-, 
-”r
- :ğ
-hªdË
-.
-	`Exec
-("UPDATE‡ccouÁ SET googËId = ? WHERE uuid = ?", 
-googËId
-, 
-uuid
-)
-
-73 
-”r
- !ğ
-n
- {
-
-74  
-”r
-
-
-77  
-n
-
-
-78 
-	}
-}
-
-80 
-func
- 
-	$AddDiscÜdIdByUUID
-(
-discÜdId
- 
-¡ršg
-, 
-uuid
- []
-by‹
-è
-”rÜ
- {
-
-81 
-_
-, 
-”r
- :ğ
-hªdË
-.
-	`Exec
-("UPDATE‡ccouÁ SET discÜdId = ? WHERE uuid = ?", 
-discÜdId
-, 
-uuid
-)
-
-82 
-”r
- !ğ
-n
- {
-
-83  
-”r
-
-
-86  
-n
-
-
-87 
-	}
-}
-
-89 
-func
- 
-	$F‘chU£ºameByDiscÜdId
-(
-discÜdId
- 
-¡ršg
-è(¡ršg, 
-”rÜ
-) {
-
-90 
-v¬
- 
-u£ºame
- 
-¡ršg
-
-
-91 
-”r
- :ğ
-hªdË
-.
-	`Qu”yRow
-("SELECT u£ºamFROM‡ccouÁ WHERE discÜdId = ?", 
-discÜdId
-).
-	`Sÿn
-(&
-u£ºame
-)
-
-92 
-”r
- !ğ
-n
- {
-
-93  "", 
-”r
-
-
-96  
-u£ºame
-, 
-n
-
-
-97 
-	}
-}
-
-99 
-func
- 
-	$F‘chU£ºameByGoogËId
-(
-googËId
- 
-¡ršg
-è(¡ršg, 
-”rÜ
-) {
-
-100 
-v¬
- 
-u£ºame
- 
-¡ršg
-
-
-101 
-”r
- :ğ
-hªdË
-.
-	`Qu”yRow
-("SELECT u£ºamFROM‡ccouÁ WHERE googËId = ?", 
-googËId
-).
-	`Sÿn
-(&
-u£ºame
-)
-
-102 
-”r
- !ğ
-n
- {
-
-103  "", 
-”r
-
-
-106  
-u£ºame
-, 
-n
-
-
-107 
-	}
-}
-
-109 
-func
- 
-	$F‘chDiscÜdIdByU£ºame
-(
-u£ºame
- 
-¡ršg
-è(¡ršg, 
-”rÜ
-) {
-
-110 
-v¬
- 
-discÜdId
- 
-sql
-.
-NuÎSŒšg
-
-
-111 
-”r
- :ğ
-hªdË
-.
-	`Qu”yRow
-("SELECT discÜdId FROM‡ccouÁ WHERE u£ºamğ?", 
-u£ºame
-).
-	`Sÿn
-(&
-discÜdId
-)
-
-112 
-”r
- !ğ
-n
- {
-
-113  "", 
-”r
-
-
-116 !
-discÜdId
-.
-V®id
- {
-
-117  "", 
-n
-
-
-120  
-discÜdId
-.
-SŒšg
-, 
-n
-
-
-121 
-	}
-}
-
-123 
-func
- 
-	$F‘chGoogËIdByU£ºame
-(
-u£ºame
- 
-¡ršg
-è(¡ršg, 
-”rÜ
-) {
-
-124 
-v¬
- 
-googËId
- 
-sql
-.
-NuÎSŒšg
-
-
-125 
-”r
- :ğ
-hªdË
-.
-	`Qu”yRow
-("SELECT googËId FROM‡ccouÁ WHERE u£ºamğ?", 
-u£ºame
-).
-	`Sÿn
-(&
-googËId
-)
-
-126 
-”r
- !ğ
-n
- {
-
-127  "", 
-”r
-
-
-130 !
-googËId
-.
-V®id
- {
-
-131  "", 
-n
-
-
-134  
-googËId
-.
-SŒšg
-, 
-n
-
-
-135 
-	}
-}
-
-137 
-func
- 
-	$F‘chDiscÜdIdByUUID
-(
-uuid
- []
-by‹
-è(
-¡ršg
-, 
-”rÜ
-) {
-
-138 
-v¬
- 
-discÜdId
- 
-sql
-.
-NuÎSŒšg
-
-
-139 
-”r
- :ğ
-hªdË
-.
-	`Qu”yRow
-("SELECT discÜdId FROM‡ccouÁ WHERE uuid = ?", 
-uuid
-).
-	`Sÿn
-(&
-discÜdId
-)
-
-140 
-”r
- !ğ
-n
- {
-
-141  "", 
-”r
-
-
-144 !
-discÜdId
-.
-V®id
- {
-
-145  "", 
-n
-
-
-148  
-discÜdId
-.
-SŒšg
-, 
-n
-
-
-149 
-	}
-}
-
-151 
-func
- 
-	$F‘chGoogËIdByUUID
-(
-uuid
- []
-by‹
-è(
-¡ršg
-, 
-”rÜ
-) {
-
-152 
-v¬
- 
-googËId
- 
-sql
-.
-NuÎSŒšg
-
-
-153 
-”r
- :ğ
-hªdË
-.
-	`Qu”yRow
-("SELECT googËId FROM‡ccouÁ WHERE uuid = ?", 
-uuid
-).
-	`Sÿn
-(&
-googËId
-)
-
-154 
-”r
- !ğ
-n
- {
-
-155  "", 
-”r
-
-
-158 !
-googËId
-.
-V®id
- {
-
-159  "", 
-n
-
-
-162  
-googËId
-.
-SŒšg
-, 
-n
-
-
-163 
-	}
-}
-
-165 
-func
- 
-	$F‘chU£ºameBySessiÚTok’
-(
-tok’
- []
-by‹
-è(
-¡ršg
-, 
-”rÜ
-) {
-
-166 
-v¬
- 
-u£ºame
- 
-¡ršg
-
-
-167 
-”r
- :ğ
-hªdË
-.
-	`Qu”yRow
-("SELECT‡.u£ºamFROM‡ccouÁ ¨JOIN sessiÚ  ON‡.uuid = s.uuid WHERE s.tok’ = ?", 
-tok’
-).
-	`Sÿn
-(&
-u£ºame
-)
-
-168 
-”r
- !ğ
-n
- {
-
-169  "", 
-”r
-
-
-172  
-u£ºame
-, 
-n
-
-
-173 
-	}
-}
-
-175 
-func
- 
-	$CheckU£ºameExi¡s
-(
-u£ºame
- 
-¡ršg
-è(¡ršg, 
-”rÜ
-) {
-
-176 
-v¬
- 
-dbU£ºame
- 
-sql
-.
-NuÎSŒšg
-
-
-177 
-”r
- :ğ
-hªdË
-.
-	`Qu”yRow
-("SELECT u£ºamFROM‡ccouÁ WHERE u£ºamğ?", 
-u£ºame
-).
-	`Sÿn
-(&
-dbU£ºame
-)
-
-178 
-”r
- !ğ
-n
- {
-
-179  "", 
-”r
-
-
-181 !
-dbU£ºame
-.
-V®id
- {
-
-182  "", 
-n
-
-
-185  
-dbU£ºame
-.
-SŒšg
-, 
-n
-
-
-186 
-	}
-}
-
-188 
-func
- 
-	$F‘chLa¡LoggedInD©eByU£ºame
-(
-u£ºame
- 
-¡ršg
-è(¡ršg, 
-”rÜ
-) {
-
-189 
-v¬
- 
-Ï¡LoggedIn
- 
-sql
-.
-NuÎSŒšg
-
-
-190 
-”r
- :ğ
-hªdË
-.
-	`Qu”yRow
-("SELECT†a¡LoggedIÀFROM‡ccouÁ WHERE u£ºamğ?", 
-u£ºame
-).
-	`Sÿn
-(&
-Ï¡LoggedIn
-)
-
-191 
-”r
- !ğ
-n
- {
-
-192  "", 
-”r
-
-
-194 !
-Ï¡LoggedIn
-.
-V®id
- {
-
-195  "", 
-n
-
-
-198  
-Ï¡LoggedIn
-.
-SŒšg
-, 
-n
-
-
-199 
-	}
-}
-
-201 
-ty³
- 
-AdmšS—rchRe¥Ú£
- struct {
-
-202 
-U£ºame
- 
-	m¡ršg
- `
-	mjsÚ
-:"username"`
-
-203 
-DiscÜdId
- 
-¡ršg
- `
-jsÚ
-:"discordId"`
-
-204 
-GoogËId
- 
-¡ršg
- `
-jsÚ
-:"googleId"`
-
-205 
-La¡Aùiv™y
- 
-¡ršg
- `
-jsÚ
-:"lastLoggedIn"`
-
-206 
-Regi¡”ed
- 
-¡ršg
- `
-jsÚ
-:"registered"`
-
-209 
-func
- 
-	$F‘chAdmšD‘asByU£ºame
-(
-dbU£ºame
- 
-¡ršg
-è(
-AdmšS—rchRe¥Ú£
-, 
-”rÜ
-) {
-
-210 
-v¬
- 
-u£ºame
-, 
-discÜdId
-, 
-googËId
-, 
-Ï¡Aùiv™y
-, 
-»gi¡”ed
- 
-sql
-.
-NuÎSŒšg
-
-
-211 
-v¬
- 
-admšRe¥Ú£
- 
-AdmšS—rchRe¥Ú£
-
-
-213 
-”r
- :ğ
-hªdË
-.
-	`Qu”yRow
-("SELECT u£ºame, discÜdId, googËId,†a¡Aùiv™y,„egi¡”ed from‡ccouÁ WHERE u£ºamğ?", 
-dbU£ºame
-).
-	`Sÿn
-(&
-u£ºame
-, &
-discÜdId
-, &
-googËId
-, &
-Ï¡Aùiv™y
-, &
-»gi¡”ed
-)
-
-214 
-”r
- !ğ
-n
- {
-
-215  
-admšRe¥Ú£
-, 
-”r
-
-
-218 
-admšRe¥Ú£
- = 
-AdmšS—rchRe¥Ú£
-{
-
-219 
-U£ºame
-: 
-u£ºame
-.
-SŒšg
-,
-
-220 
-DiscÜdId
-: 
-discÜdId
-.
-SŒšg
-,
-
-221 
-GoogËId
-: 
-googËId
-.
-SŒšg
-,
-
-222 
-La¡Aùiv™y
-: 
-Ï¡Aùiv™y
-.
-SŒšg
-,
-
-223 
-Regi¡”ed
-: 
-»gi¡”ed
-.
-SŒšg
-,
-
-226  
-admšRe¥Ú£
-, 
-n
-
-
-227 
-	}
-}
-
-229 
-func
- 
-	$Upd©eAccouÁPasswÜd
-(
-uuid
-, 
-key
-, 
-§É
- []
-by‹
-è
-”rÜ
- {
-
-230 
-_
-, 
-”r
- :ğ
-hªdË
-.
-	`Exec
-("UPDATE‡ccouÁ SET (hash, s®tèVALUES (?, ?èWHERE uuid = ?", 
-key
-, 
-§É
-, 
-uuid
 )
 
 231 
@@ -10794,8 +10384,12 @@ n
 238 
 func
  
-	$Upd©eAccouÁLa¡Aùiv™y
+	$AddGoogËIdByUUID
 (
+googËId
+ 
+¡ršg
+, 
 uuid
  []
 by‹
@@ -10811,7 +10405,9 @@ _
 hªdË
 .
 	`Exec
-("UPDATE‡ccouÁ SET†a¡Aùiv™y = UTC_TIMESTAMP(èWHERE uuid = ?", 
+("UPDATE‡ccouÁ SET googËId = ? WHERE uuid = ?", 
+googËId
+, 
 uuid
 )
 
@@ -10836,6 +10432,898 @@ n
 247 
 func
  
+	$AddDiscÜdIdByUUID
+(
+discÜdId
+ 
+¡ršg
+, 
+uuid
+ []
+by‹
+è
+”rÜ
+ {
+
+248 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET discÜdId = ? WHERE uuid = ?", 
+discÜdId
+, 
+uuid
+)
+
+249 
+”r
+ !ğ
+n
+ {
+
+250  
+”r
+
+
+253  
+n
+
+
+254 
+	}
+}
+
+256 
+func
+ 
+	$F‘chU£ºameByDiscÜdId
+(
+discÜdId
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+257 
+v¬
+ 
+u£ºame
+ 
+¡ršg
+
+
+258 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT u£ºamFROM‡ccouÁ WHERE discÜdId = ?", 
+discÜdId
+).
+	`Sÿn
+(&
+u£ºame
+)
+
+259 
+”r
+ !ğ
+n
+ {
+
+260  "", 
+”r
+
+
+263  
+u£ºame
+, 
+n
+
+
+264 
+	}
+}
+
+266 
+func
+ 
+	$F‘chU£ºameByGoogËId
+(
+googËId
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+267 
+v¬
+ 
+u£ºame
+ 
+¡ršg
+
+
+268 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT u£ºamFROM‡ccouÁ WHERE googËId = ?", 
+googËId
+).
+	`Sÿn
+(&
+u£ºame
+)
+
+269 
+”r
+ !ğ
+n
+ {
+
+270  "", 
+”r
+
+
+273  
+u£ºame
+, 
+n
+
+
+274 
+	}
+}
+
+276 
+func
+ 
+	$F‘chDiscÜdIdByU£ºame
+(
+u£ºame
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+277 
+v¬
+ 
+discÜdId
+ 
+sql
+.
+NuÎSŒšg
+
+
+278 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT discÜdId FROM‡ccouÁ WHERE u£ºamğ?", 
+u£ºame
+).
+	`Sÿn
+(&
+discÜdId
+)
+
+279 
+”r
+ !ğ
+n
+ {
+
+280  "", 
+”r
+
+
+283 !
+discÜdId
+.
+V®id
+ {
+
+284  "", 
+n
+
+
+287  
+discÜdId
+.
+SŒšg
+, 
+n
+
+
+288 
+	}
+}
+
+290 
+func
+ 
+	$F‘chGoogËIdByU£ºame
+(
+u£ºame
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+291 
+v¬
+ 
+googËId
+ 
+sql
+.
+NuÎSŒšg
+
+
+292 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT googËId FROM‡ccouÁ WHERE u£ºamğ?", 
+u£ºame
+).
+	`Sÿn
+(&
+googËId
+)
+
+293 
+”r
+ !ğ
+n
+ {
+
+294  "", 
+”r
+
+
+297 !
+googËId
+.
+V®id
+ {
+
+298  "", 
+n
+
+
+301  
+googËId
+.
+SŒšg
+, 
+n
+
+
+302 
+	}
+}
+
+304 
+func
+ 
+	$F‘chDiscÜdIdByUUID
+(
+uuid
+ []
+by‹
+è(
+¡ršg
+, 
+”rÜ
+) {
+
+305 
+v¬
+ 
+discÜdId
+ 
+sql
+.
+NuÎSŒšg
+
+
+306 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT discÜdId FROM‡ccouÁ WHERE uuid = ?", 
+uuid
+).
+	`Sÿn
+(&
+discÜdId
+)
+
+307 
+”r
+ !ğ
+n
+ {
+
+308  "", 
+”r
+
+
+311 !
+discÜdId
+.
+V®id
+ {
+
+312  "", 
+n
+
+
+315  
+discÜdId
+.
+SŒšg
+, 
+n
+
+
+316 
+	}
+}
+
+318 
+func
+ 
+	$F‘chGoogËIdByUUID
+(
+uuid
+ []
+by‹
+è(
+¡ršg
+, 
+”rÜ
+) {
+
+319 
+v¬
+ 
+googËId
+ 
+sql
+.
+NuÎSŒšg
+
+
+320 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT googËId FROM‡ccouÁ WHERE uuid = ?", 
+uuid
+).
+	`Sÿn
+(&
+googËId
+)
+
+321 
+”r
+ !ğ
+n
+ {
+
+322  "", 
+”r
+
+
+325 !
+googËId
+.
+V®id
+ {
+
+326  "", 
+n
+
+
+329  
+googËId
+.
+SŒšg
+, 
+n
+
+
+330 
+	}
+}
+
+332 
+func
+ 
+	$F‘chU£ºameBySessiÚTok’
+(
+tok’
+ []
+by‹
+è(
+¡ršg
+, 
+”rÜ
+) {
+
+333 
+v¬
+ 
+u£ºame
+ 
+¡ršg
+
+
+334 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT‡.u£ºamFROM‡ccouÁ ¨JOIN sessiÚ  ON‡.uuid = s.uuid WHERE s.tok’ = ?", 
+tok’
+).
+	`Sÿn
+(&
+u£ºame
+)
+
+335 
+”r
+ !ğ
+n
+ {
+
+336  "", 
+”r
+
+
+339  
+u£ºame
+, 
+n
+
+
+340 
+	}
+}
+
+342 
+func
+ 
+	$CheckU£ºameExi¡s
+(
+u£ºame
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+343 
+v¬
+ 
+dbU£ºame
+ 
+sql
+.
+NuÎSŒšg
+
+
+344 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT u£ºamFROM‡ccouÁ WHERE u£ºamğ?", 
+u£ºame
+).
+	`Sÿn
+(&
+dbU£ºame
+)
+
+345 
+”r
+ !ğ
+n
+ {
+
+346  "", 
+”r
+
+
+348 !
+dbU£ºame
+.
+V®id
+ {
+
+349  "", 
+n
+
+
+352  
+dbU£ºame
+.
+SŒšg
+, 
+n
+
+
+353 
+	}
+}
+
+355 
+func
+ 
+	$F‘chLa¡LoggedInD©eByU£ºame
+(
+u£ºame
+ 
+¡ršg
+è(¡ršg, 
+”rÜ
+) {
+
+356 
+v¬
+ 
+Ï¡LoggedIn
+ 
+sql
+.
+NuÎSŒšg
+
+
+357 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT†a¡LoggedIÀFROM‡ccouÁ WHERE u£ºamğ?", 
+u£ºame
+).
+	`Sÿn
+(&
+Ï¡LoggedIn
+)
+
+358 
+”r
+ !ğ
+n
+ {
+
+359  "", 
+”r
+
+
+361 !
+Ï¡LoggedIn
+.
+V®id
+ {
+
+362  "", 
+n
+
+
+365  
+Ï¡LoggedIn
+.
+SŒšg
+, 
+n
+
+
+366 
+	}
+}
+
+368 
+ty³
+ 
+AdmšS—rchRe¥Ú£
+ struct {
+
+369 
+U£ºame
+ 
+	m¡ršg
+ `
+	mjsÚ
+:"username"`
+
+370 
+DiscÜdId
+ 
+¡ršg
+ `
+jsÚ
+:"discordId"`
+
+371 
+GoogËId
+ 
+¡ršg
+ `
+jsÚ
+:"googleId"`
+
+372 
+La¡Aùiv™y
+ 
+¡ršg
+ `
+jsÚ
+:"lastLoggedIn"`
+
+373 
+Regi¡”ed
+ 
+¡ršg
+ `
+jsÚ
+:"registered"`
+
+376 
+func
+ 
+	$F‘chAdmšD‘asByU£ºame
+(
+dbU£ºame
+ 
+¡ršg
+è(
+AdmšS—rchRe¥Ú£
+, 
+”rÜ
+) {
+
+377 
+v¬
+ 
+u£ºame
+, 
+discÜdId
+, 
+googËId
+, 
+Ï¡Aùiv™y
+, 
+»gi¡”ed
+ 
+sql
+.
+NuÎSŒšg
+
+
+378 
+v¬
+ 
+admšRe¥Ú£
+ 
+AdmšS—rchRe¥Ú£
+
+
+380 
+”r
+ :ğ
+hªdË
+.
+	`Qu”yRow
+("SELECT u£ºame, discÜdId, googËId,†a¡Aùiv™y,„egi¡”ed from‡ccouÁ WHERE u£ºamğ?", 
+dbU£ºame
+).
+	`Sÿn
+(&
+u£ºame
+, &
+discÜdId
+, &
+googËId
+, &
+Ï¡Aùiv™y
+, &
+»gi¡”ed
+)
+
+381 
+”r
+ !ğ
+n
+ {
+
+382  
+admšRe¥Ú£
+, 
+”r
+
+
+385 
+admšRe¥Ú£
+ = 
+AdmšS—rchRe¥Ú£
+{
+
+386 
+U£ºame
+: 
+u£ºame
+.
+SŒšg
+,
+
+387 
+DiscÜdId
+: 
+discÜdId
+.
+SŒšg
+,
+
+388 
+GoogËId
+: 
+googËId
+.
+SŒšg
+,
+
+389 
+La¡Aùiv™y
+: 
+Ï¡Aùiv™y
+.
+SŒšg
+,
+
+390 
+Regi¡”ed
+: 
+»gi¡”ed
+.
+SŒšg
+,
+
+393  
+admšRe¥Ú£
+, 
+n
+
+
+394 
+	}
+}
+
+396 
+func
+ 
+	$Upd©eAccouÁPasswÜd
+(
+uuid
+, 
+key
+, 
+§É
+ []
+by‹
+è
+”rÜ
+ {
+
+397 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET (hash, s®tèVALUES (?, ?èWHERE uuid = ?", 
+key
+, 
+§É
+, 
+uuid
+)
+
+398 
+”r
+ !ğ
+n
+ {
+
+399  
+”r
+
+
+402  
+n
+
+
+403 
+	}
+}
+
+405 
+func
+ 
+	$Upd©eAccouÁLa¡Aùiv™y
+(
+uuid
+ []
+by‹
+è
+”rÜ
+ {
+
+406 
+_
+, 
+”r
+ :ğ
+hªdË
+.
+	`Exec
+("UPDATE‡ccouÁ SET†a¡Aùiv™y = UTC_TIMESTAMP(èWHERE uuid = ?", 
+uuid
+)
+
+407 
+”r
+ !ğ
+n
+ {
+
+408  
+”r
+
+
+411  
+n
+
+
+412 
+	}
+}
+
+414 
+func
+ 
 	$Upd©eAccouÁSts
 (
 uuid
@@ -10857,7 +11345,7 @@ m­
 ”rÜ
  {
 
-248 
+415 
 v¬
  
 cŞumns
@@ -10865,7 +11353,7 @@ cŞumns
 ¡ršg
 {"playTime", "battles", "classicSessionsPlayed", "sessionsWon", "highestEndlessWave", "highestLevel", "pokemonSeen", "pokemonDefeated", "pokemonCaught", "pokemonHatched", "eggsPulled", "regularVouchers", "plusVouchers", "premiumVouchers", "goldenVouchers"}
 
-250 
+417 
 v¬
  
 ¡©CŞs
@@ -10873,7 +11361,7 @@ v¬
 ¡ršg
 
 
-251 
+418 
 v¬
  
 ¡©V®ues
@@ -10881,7 +11369,7 @@ v¬
 š‹rçû
 {}
 
-253 
+420 
 m
 , 
 ok
@@ -10895,11 +11383,11 @@ m­
 š‹rçû
 {})
 
-254 !
+421 !
 ok
  {
 
-255  
+422  
 fmt
 .
 	`E¼Üf
@@ -10907,7 +11395,7 @@ fmt
 ¡©s
 )
 
-258 
+425 
 k
 , 
 v
@@ -10917,7 +11405,7 @@ v
 m
  {
 
-259 
+426 
 v®ue
 , 
 ok
@@ -10927,11 +11415,11 @@ v
 æßt64
 )
 
-260 !
+427 !
 ok
  {
 
-261  
+428  
 fmt
 .
 	`E¼Üf
@@ -10939,7 +11427,7 @@ fmt
 v
 )
 
-264 
+431 
 ¦iûs
 .
 	`CÚšs
@@ -10949,7 +11437,7 @@ cŞumns
 k
 ) {
 
-265 
+432 
 ¡©CŞs
  = 
 	`­³nd
@@ -10957,7 +11445,7 @@ k
 k
 )
 
-266 
+433 
 ¡©V®ues
  = 
 	`­³nd
@@ -10965,7 +11453,7 @@ k
 v®ue
 )
 
-270 
+437 
 k
 , 
 v
@@ -10975,7 +11463,7 @@ v
 vouch”CouÁs
  {
 
-271 
+438 
 v¬
  
 cŞumn
@@ -10983,27 +11471,27 @@ cŞumn
 ¡ršg
 
 
-272 
+439 
 k
  {
 
-274 
+441 
 cŞumn
  = "regularVouchers"
 
-276 
+443 
 cŞumn
  = "plusVouchers"
 
-278 
+445 
 cŞumn
  = "premiumVouchers"
 
-280 
+447 
 cŞumn
  = "goldenVouchers"
 
-284 
+451 
 ¡©CŞs
  = 
 	`­³nd
@@ -11011,7 +11499,7 @@ cŞumn
 cŞumn
 )
 
-285 
+452 
 ¡©V®ues
  = 
 	`­³nd
@@ -11019,7 +11507,7 @@ cŞumn
 v
 )
 
-288 
+455 
 v¬
  
 ¡©Args
@@ -11027,7 +11515,7 @@ v¬
 š‹rçû
 {}
 
-289 
+456 
 ¡©Args
  = 
 	`­³nd
@@ -11035,11 +11523,11 @@ v¬
 uuid
 )
 
-290 
+457 
 ¿nge
  2 {
 
-291 
+458 
 ¡©Args
  = 
 	`­³nd
@@ -11047,11 +11535,11 @@ uuid
 ¡©V®ues
 ...)
 
-294 
+461 
 qu”y
  := "INSERT INTO‡ccountStats (uuid"
 
-296 
+463 
 _
 , 
 cŞ
@@ -11061,17 +11549,17 @@ cŞ
 ¡©CŞs
  {
 
-297 
+464 
 qu”y
  +ğ", " + 
 cŞ
 
 
-300 
+467 
 qu”y
  += ") VALUES (?"
 
-302 
+469 
 ¿nge
  
 	`Ën
@@ -11079,15 +11567,15 @@ qu”y
 ¡©CŞs
 ) {
 
-303 
+470 
 qu”y
  += ", ?"
 
-306 
+473 
 qu”y
  += ") ON DUPLICATE KEY UPDATE "
 
-308 
+475 
 i
 , 
 cŞ
@@ -11097,21 +11585,21 @@ cŞ
 ¡©CŞs
  {
 
-309 
+476 
 i
  > 0 {
 
-310 
+477 
 qu”y
  += ", "
 
-313 
+480 
 qu”y
  +ğ
 cŞ
  + " = ?"
 
-316 
+483 
 _
 , 
 ”r
@@ -11125,25 +11613,25 @@ qu”y
 ¡©Args
 ...)
 
-317 
+484 
 ”r
  !ğ
 n
  {
 
-318  
+485  
 ”r
 
 
-321  
+488  
 n
 
 
-322 
+489 
 	}
 }
 
-324 
+491 
 func
  
 	$S‘AccouÁBªÃd
@@ -11159,7 +11647,7 @@ boŞ
 ”rÜ
  {
 
-325 
+492 
 _
 , 
 ”r
@@ -11173,25 +11661,25 @@ bªÃd
 uuid
 )
 
-326 
+493 
 ”r
  !ğ
 n
  {
 
-327  
+494  
 ”r
 
 
-330  
+497  
 n
 
 
-331 
+498 
 	}
 }
 
-333 
+500 
 func
  
 F‘chAccouÁKeyS®tFromU£ºame
@@ -11205,7 +11693,7 @@ u£ºame
 	g”rÜ
 ) {
 
-334 
+501 
 v¬
  
 	gkey
@@ -11215,7 +11703,7 @@ v¬
 by‹
 
 
-335 
+502 
 	g”r
  :ğ
 hªdË
@@ -11231,19 +11719,19 @@ key
 §É
 )
 
-336 
+503 
 	g”r
  !ğ
 n
  {
 
-337  
+504  
 n
 ,‚, 
 ”r
 
 
-340  
+507  
 key
 , 
 	g§É
@@ -11251,7 +11739,7 @@ key
 	gn
 
 
-343 
+510 
 func
  
 	$F‘chT¿š”Ids
@@ -11269,7 +11757,7 @@ by‹
 ”rÜ
 ) {
 
-344 
+511 
 ”r
  = 
 hªdË
@@ -11285,17 +11773,17 @@ uuid
 £ü‘Id
 )
 
-345 
+512 
 ”r
  !ğ
 n
  {
 
-346  0, 0, 
+513  0, 0, 
 ”r
 
 
-349  
+516  
 Œaš”Id
 , 
 £ü‘Id
@@ -11303,11 +11791,11 @@ n
 n
 
 
-350 
+517 
 	}
 }
 
-352 
+519 
 func
  
 	$Upd©eT¿š”Ids
@@ -11323,7 +11811,7 @@ by‹
 ”rÜ
  {
 
-353 
+520 
 _
 , 
 ”r
@@ -11339,25 +11827,25 @@ hªdË
 uuid
 )
 
-354 
+521 
 ”r
  !ğ
 n
  {
 
-355  
+522  
 ”r
 
 
-358  
+525  
 n
 
 
-359 
+526 
 	}
 }
 
-361 
+528 
 func
  
 	$IsAùiveSessiÚ
@@ -11375,7 +11863,7 @@ boŞ
 ”rÜ
 ) {
 
-362 
+529 
 v¬
  
 id
@@ -11383,7 +11871,7 @@ id
 ¡ršg
 
 
-363 
+530 
 ”r
  :ğ
 hªdË
@@ -11397,13 +11885,13 @@ uuid
 id
 )
 
-364 
+531 
 ”r
  !ğ
 n
  {
 
-365 
+532 
 ”rÜs
 .
 	`Is
@@ -11415,7 +11903,7 @@ sql
 E¼NoRows
 ) {
 
-366 
+533 
 ”r
  = 
 	`Upd©eAùiveSessiÚ
@@ -11425,31 +11913,31 @@ uuid
 £ssiÚId
 )
 
-367 
+534 
 ”r
  !ğ
 n
  {
 
-368  
+535  
 çl£
 , 
 ”r
 
 
-371  
+538  
 Œue
 , 
 n
 
 
-374  
+541  
 çl£
 , 
 ”r
 
 
-377  
+544  
 id
  =ğ"" || id =ğ
 £ssiÚId
@@ -11457,11 +11945,11 @@ id
 n
 
 
-378 
+545 
 	}
 }
 
-380 
+547 
 func
  
 	$Upd©eAùiveSessiÚ
@@ -11477,7 +11965,7 @@ by‹
 ”rÜ
  {
 
-381 
+548 
 _
 , 
 ”r
@@ -11491,25 +11979,25 @@ uuid
 ş›ÁSessiÚId
 , clientSessionId)
 
-382 
+549 
 ”r
  !ğ
 n
  {
 
-383  
+550  
 ”r
 
 
-386  
+553  
 n
 
 
-387 
+554 
 	}
 }
 
-389 
+556 
 func
  
 F‘chUUIDFromTok’
@@ -11523,47 +12011,179 @@ by‹
 	g”rÜ
 ) {
 
-390 
+557 
+	gùx
+ :ğ
+ÿche
+.
+Ctx
+
+
+558 
+tok’SŒ
+ :ğ
+ba£64
+.
+StdEncodšg
+.
+EncodeToSŒšg
+(
+tok’
+)
+
+559 
+ÿcheKey
+ :ğ
+fmt
+.
+S´štf
+(
+£ssiÚUUIDKeyFmt
+, 
+tok’SŒ
+)
+
+560 
+	glog
+.
+Prštf
+("cache before")
+
+562 
+	gu
+, 
+	g”r
+ :ğ
+ÿche
+.
+Rdb
+.
+G‘
+(
+ùx
+, 
+ÿcheKey
+).
+ResuÉ
+();ƒ¼ =ğ
+n
+ {
+
+564 
+log
+.
+Prštf
+("cache hitttttt")
+
+565  []
+by‹
+(
+u
+), 
+n
+
+
+566 } 
+”r
+ !ğ
+n
+ &&ƒ¼ !ğ
+»dis
+.
+N
+ {
+
+568 
+log
+.
+Prštf
+("redisƒrror")
+
+569  
+n
+, 
+fmt
+.
+E¼Üf
+("»di GETƒ¼Ü: %w", 
+”r
+)
+
+573 
+log
+.
+Prštf
+("cache misssssss")
+
+575 
 v¬
  
-	guuid
+uuid
  []
 by‹
 
 
-391 
-	g”r
+576 
+”r
  :ğ
 hªdË
 .
 Qu”yRow
-("SELECT uuid FROM sessiÚ WHEREok’ = ?", 
+(
+
+577 "SELECT uuid FROM sessiÚ WHEREok’ = ?", 
 tok’
-).
+,
+
+578 ).
 Sÿn
 (&
 uuid
 )
 
-392 
+579 
+	glog
+.
+Prštf
+("query complete")
+
+580 
 	g”r
  !ğ
 n
  {
 
-393  
+581  
 n
 , 
 ”r
 
 
-396  
+585 
+ÿche
+.
+Rdb
+.
+S‘
+(
+ùx
+, 
+ÿcheKey
+, 
+¡ršg
+(
 uuid
+), 
+£ssiÚTTL
+)
+
+586  
+	guuid
 , 
 	gn
 
 
-399 
+602 
 func
  
 	$RemoveSessiÚFromTok’
@@ -11575,7 +12195,7 @@ by‹
 ”rÜ
  {
 
-400 
+603 
 _
 , 
 ”r
@@ -11587,25 +12207,25 @@ hªdË
 tok’
 )
 
-401 
+604 
 ”r
  !ğ
 n
  {
 
-402  
+605  
 ”r
 
 
-405  
+608  
 n
 
 
-406 
+609 
 	}
 }
 
-408 
+611 
 func
  
 	$F‘chU£ºameFromUUID
@@ -11619,7 +12239,7 @@ by‹
 ”rÜ
 ) {
 
-409 
+612 
 v¬
  
 u£ºame
@@ -11627,7 +12247,7 @@ u£ºame
 ¡ršg
 
 
-410 
+613 
 ”r
  :ğ
 hªdË
@@ -11641,27 +12261,27 @@ uuid
 u£ºame
 )
 
-411 
+614 
 ”r
  !ğ
 n
  {
 
-412  "", 
+615  "", 
 ”r
 
 
-415  
+618  
 u£ºame
 , 
 n
 
 
-416 
+619 
 	}
 }
 
-418 
+621 
 func
  
 F‘chUUIDFromU£ºame
@@ -11675,7 +12295,7 @@ u£ºame
 	g”rÜ
 ) {
 
-419 
+622 
 v¬
  
 	guuid
@@ -11683,7 +12303,7 @@ v¬
 by‹
 
 
-420 
+623 
 	g”r
  :ğ
 hªdË
@@ -11697,25 +12317,25 @@ Sÿn
 uuid
 )
 
-421 
+624 
 	g”r
  !ğ
 n
  {
 
-422  
+625  
 n
 , 
 ”r
 
 
-425  
+628  
 uuid
 , 
 	gn
 
 
-428 
+631 
 func
  
 	$RemoveDiscÜdIdByUUID
@@ -11727,7 +12347,7 @@ by‹
 ”rÜ
  {
 
-429 
+632 
 _
 , 
 ”r
@@ -11739,25 +12359,25 @@ hªdË
 uuid
 )
 
-430 
+633 
 ”r
  !ğ
 n
  {
 
-431  
+634  
 ”r
 
 
-434  
+637  
 n
 
 
-435 
+638 
 	}
 }
 
-437 
+640 
 func
  
 	$RemoveGoogËIdByUUID
@@ -11769,7 +12389,7 @@ by‹
 ”rÜ
  {
 
-438 
+641 
 _
 , 
 ”r
@@ -11781,25 +12401,25 @@ hªdË
 uuid
 )
 
-439 
+642 
 ”r
  !ğ
 n
  {
 
-440  
+643  
 ”r
 
 
-443  
+646  
 n
 
 
-444 
+647 
 	}
 }
 
-446 
+649 
 func
  
 	$RemoveGoogËIdByU£ºame
@@ -11811,7 +12431,7 @@ u£ºame
 ”rÜ
  {
 
-447 
+650 
 _
 , 
 ”r
@@ -11823,25 +12443,25 @@ hªdË
 u£ºame
 )
 
-448 
+651 
 ”r
  !ğ
 n
  {
 
-449  
+652  
 ”r
 
 
-452  
+655  
 n
 
 
-453 
+656 
 	}
 }
 
-455 
+658 
 func
  
 	$RemoveDiscÜdIdByU£ºame
@@ -11853,7 +12473,7 @@ u£ºame
 ”rÜ
  {
 
-456 
+659 
 _
 , 
 ”r
@@ -11865,25 +12485,25 @@ hªdË
 u£ºame
 )
 
-457 
+660 
 ”r
  !ğ
 n
  {
 
-458  
+661  
 ”r
 
 
-461  
+664  
 n
 
 
-462 
+665 
 	}
 }
 
-464 
+667 
 func
  
 	$RemoveDiscÜdIdByDiscÜdId
@@ -11895,7 +12515,7 @@ discÜdId
 ”rÜ
  {
 
-465 
+668 
 _
 , 
 ”r
@@ -11907,25 +12527,25 @@ hªdË
 discÜdId
 )
 
-466 
+669 
 ”r
  !ğ
 n
  {
 
-467  
+670  
 ”r
 
 
-470  
+673  
 n
 
 
-471 
+674 
 	}
 }
 
-473 
+676 
 func
  
 	$RemoveGoogËIdByDiscÜdId
@@ -11937,7 +12557,7 @@ discÜdId
 ”rÜ
  {
 
-474 
+677 
 _
 , 
 ”r
@@ -11949,21 +12569,21 @@ hªdË
 discÜdId
 )
 
-475 
+678 
 ”r
  !ğ
 n
  {
 
-476  
+679  
 ”r
 
 
-479  
+682  
 n
 
 
-480 
+683 
 	}
 }
 

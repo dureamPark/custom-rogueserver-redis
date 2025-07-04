@@ -20,17 +20,118 @@ package db
 import (
 	"database/sql"
 	"encoding/base64"
+
+	//"encoding/base64"
 	"errors"
 	"fmt"
-	"log"
-	"slices"
-	"time"
 
-	redis "github.com/go-redis/redis/v9"
+	//"log"
+	"slices"
+
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/defs"
+	//"github.com/pagefaultgames/rogueserver/metrics"
+	//redis "github.com/redis/go-redis/v9"
 )
+
+// DB에서 uuid로 accounts 정보를 모두 가져오는 함수
+func GetAccountFromDB(uuid []byte) (defs.AccountDBRow, error) {
+	var account defs.AccountDBRow
+
+	query := `
+		SELECT uuid, username, hash, salt, registered, lastLoggedIn, 
+		       lastActivity, banned, trainerId, secretId, discordId, googleId 
+		FROM accounts 
+		WHERE uuid = ?
+	`
+	// MariaDB/MySQL 드라이버는 '?'를 파라미터 플레이스홀더로 사용
+	// uuidBytes는 []byte 타입이므로 DB의 binary(16)과 직접 비교 가능
+
+	row := handle.QueryRow(query, uuid)
+	err := row.Scan(
+		&account.UUID,
+		&account.Username,
+		&account.Hash,
+		&account.Salt,
+		&account.Registered,
+		&account.LastLoggedIn,
+		&account.LastActivity,
+		&account.Banned,
+		&account.TrainerID,
+		&account.SecretID,
+		&account.DiscordID,
+		&account.GoogleID,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// 결과가 없는 경우는 에러로 처리 (호출하는 쪽에서 이 에러를 구분하여 처리 가능)
+			return account, fmt.Errorf("UUID '%s'에 해당하는 계정을 찾을 수 없음: %w", uuid, err)
+		}
+		// 그 외 DB 스캔 오류 등
+		return account, fmt.Errorf("DB에서 계정 조회 중 오류 (UUID: %s): %w", uuid, err)
+	}
+
+	return account, nil
+}
+
+// GetAccountStatsFromDB 함수는 DB에서 특정 UUID에 해당하는 accountStats 데이터를 가져옵니다.
+// uuidBytes는 []byte 타입의 UUID입니다.
+func GetAccountStatsFromDB(uuidBytes []byte) (defs.AccountStatsData, error) { // defs.AccountStatsData
+	var stats defs.AccountStatsData // defs.AccountStatsData
+
+	// uuidBytes가 nil이거나 길이가 맞는지 기본 검사 (선택적)
+	if uuidBytes == nil || len(uuidBytes) != 16 {
+		return stats, fmt.Errorf("잘못된 UUID 바이트 배열입니다. nil이거나 길이가 16이 아닙니다.")
+	}
+
+	query := `
+		SELECT 
+			uuid, playTime, battles, classicSessionsPlayed, sessionsWon, 
+			highestEndlessWave, highestLevel, pokemonSeen, pokemonDefeated, 
+			pokemonCaught, pokemonHatched, eggsPulled, regularVouchers, 
+			plusVouchers, premiumVouchers, goldenVouchers 
+		FROM accountStats 
+		WHERE uuid = ?
+	`
+	// DB 드라이버는 '?'를 파라미터 플레이스홀더로 사용
+	// uuidBytes는 []byte 타입이므로 DB의 binary(16)과 직접 비교 가능
+
+	row := handle.QueryRow(query, uuidBytes)
+	err := row.Scan(
+		&stats.UUID, // []byte로 스캔
+		&stats.PlayTime,
+		&stats.Battles,
+		&stats.ClassicSessionsPlayed,
+		&stats.SessionsWon,
+		&stats.HighestEndlessWave,
+		&stats.HighestLevel,
+		&stats.PokemonSeen,
+		&stats.PokemonDefeated,
+		&stats.PokemonCaught,
+		&stats.PokemonHatched,
+		&stats.EggsPulled,
+		&stats.RegularVouchers,
+		&stats.PlusVouchers,
+		&stats.PremiumVouchers,
+		&stats.GoldenVouchers,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// 결과가 없는 경우. accountStats 테이블은 기본값이 0인 NOT NULL 필드로 구성되어 있으므로,
+			// 레코드가 없다면 '새 사용자' 또는 '통계 없음'으로 간주하고
+			// 모든 필드가 0인 AccountStatsData (제로 값 구조체)를 반환할 수 있습니다.
+			// 또는 특정 에러를 반환하여 호출자가 구분하도록 할 수 있습니다.
+			// 여기서는 에러를 반환합니다.
+			return stats, fmt.Errorf("UUID '%s'에 해당하는 통계 데이터를 찾을 수 없음: %w", base64.StdEncoding.EncodeToString(uuidBytes), err)
+		}
+		// 그 외 DB 스캔 오류 등
+		return stats, fmt.Errorf("DB에서 통계 데이터 조회 중 오류 (UUID: %s): %w", base64.StdEncoding.EncodeToString(uuidBytes), err)
+	}
+
+	return stats, nil
+}
 
 func AddAccountRecord(uuid []byte, username string, key, salt []byte) error {
 	_, err := handle.Exec("INSERT INTO accounts (uuid, username, hash, salt, registered) VALUES (?, ?, ?, ?, UTC_TIMESTAMP())", uuid, username, key, salt)
@@ -41,60 +142,128 @@ func AddAccountRecord(uuid []byte, username string, key, salt []byte) error {
 	return nil
 }
 
+/*
 func AddAccountSession(username string, token []byte) error {
-	cacheKey := fmt.Sprintf("session:token:%s", username)
-	s, err := cache.Rdb.Get(cache.Ctx, cacheKey).Result()
-	if err == nil {
-		log.Printf("[CACHE HIT] key=%s", cacheKey)
-	} else if err == redis.Nil {
-		log.Printf("[CACHE MISS] key=%s", cacheKey)
-	} else {
-		log.Printf("[CACHE ERROR] key=%s err=%v", cacheKey, err)
-	}
-	// 1) 캐시 조회
-	if err == nil {
-		// hit: base64 → []byte 변환 후 token 슬라이스에 덮어쓰기
-		if decoded, err := base64.StdEncoding.DecodeString(s); err == nil && len(decoded) == len(token) {
-			copy(token, decoded)
-			return nil
-		}
-		// 디코드 실패하면 그냥 아래 DB 로직으로 넘어감
-	} else if !errors.Is(err, redis.Nil) {
-		// redis.Nil 이외의 실제 오류
-		return fmt.Errorf("redis GET error: %w", err)
-	}
+    ctx := cache.Ctx
 
-	// 2) DB 삽입: sessions 테이블
-	if _, err := handle.Exec("INSERT INTO sessions (uuid, token, expire) SELECT a.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEK) FROM accounts a WHERE a.username = ?", token, username); err != nil {
+    // 1) Redis에 session:token{username} 저장
+    tokenStr := base64.StdEncoding.EncodeToString(token)
+    userKey := fmt.Sprintf("session:token:%s", username)
+    if err := cache.Rdb.Set(ctx, userKey, tokenStr, sessionTTL).Err(); err != nil {
+        return fmt.Errorf("redis SET token error: %w", err)
+    }
+
+    // 2) Redis에 session:uuid{token} 저장 (인증용 맵핑)
+    var uuid []byte
+    if err := handle.QueryRow("SELECT uuid FROM accounts WHERE username = ?", username).Scan(&uuid); err != nil {
+        return fmt.Errorf("fetch uuid: %w", err)
+    }
+    uuidKey := fmt.Sprintf("session:uuid:%s", tokenStr)
+    if err := cache.Rdb.Set(ctx, uuidKey, string(uuid), sessionTTL).Err(); err != nil {
+        return fmt.Errorf("redis SET uuid error: %w", err)
+    }
+
+    // 3) Dirty Set에 username 추가 → 나중에 워커가 꺼내서 DB에 반영
+    if err := cache.Rdb.SAdd(ctx, "dirty:sessions", username).Err(); err != nil {
+        return fmt.Errorf("redis SAdd dirty error: %w", err)
+    }
+
+    return nil
+}
+*/
+
+// func AddAccountSession(username string, token []byte) error { //로그인 시 username에 token 저장해주는 함수.
+// 	ctx := cache.Ctx
+
+// 	// 캐시 조회 과정
+// 	cacheKey := fmt.Sprintf(sessionTokenKeyFmt, username) //key:value=username:token
+// 	s, err := cache.Rdb.Get(ctx, cacheKey).Result()       //cache hit or cache miss
+
+// 	log.Printf("cache getttt")
+
+// 	if err == nil {
+// 		//cache hit인 경우.
+// 		metrics.CacheHits.Inc() //prometheus에서 cache miss 확인하기 위한 준비 중..
+// 		log.Printf("[CACHE HIT]   key=%s", cacheKey)
+// 		//redis 에 저장할 때 문제가 발생하지 않도록 인코딩 및 디코딩을 진행하여 사용.
+// 		if decoded, decErr := base64.StdEncoding.DecodeString(s); decErr == nil && len(decoded) == len(token) {
+// 			log.Printf("token copy")
+// 			copy(token, decoded)
+// 			return nil
+// 		}
+// 		// 디코드 실패 시 DB 로직으로 넘어감
+// 	} else if err != redis.Nil {
+// 		// ── CACHE ERROR ──
+// 		log.Printf("redis error")
+// 		return fmt.Errorf("redis GET error: %w", err)
+// 	}
+
+// 	// err == redis.Nil → CACHE MISS인 경우.
+// 	log.Printf("[CACHE MISS]  key=%s", cacheKey)
+
+// 	metrics.CacheMisses.Inc() //cache miss 확인하기 위한 준비 중..
+
+// 	// DB data 추가 sessions 테이블->해당 과정은 write-back 구조와 맞지 않음.
+// 	//주석 처리해두고 추후에 write-back에 맞게 구조 수정할 예정.
+// 	/*
+// 	   log.Printf("DB insert before")
+// 	   if _, err := handle.Exec(`INSERT INTO sessions (uuid, token, expire) SELECT a.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEK) FROM accounts a WHERE a.username = ?`, token, username,); err != nil {
+// 	       log.Printf("DB insert error: %v", err)
+// 	       return err
+// 	   }
+
+// 	   // 3) DB 업데이트: lastLoggedIn **업데이트부분은 일단 pass**
+// 	   log.Printf("DB update before")
+// 	   if _, err := handle.Exec(`UPDATE accounts SET lastLoggedIn = UTC_TIMESTAMP() WHERE username = ?`, username,); err != nil {
+// 	       log.Printf("DB update error: %v", err)
+// 	       return err
+// 	   }
+// 	*/
+
+// 	//캐시에 저장하는 부분 구현.
+// 	log.Printf("cache save before")
+// 	tokenStr := base64.StdEncoding.EncodeToString(token)
+
+// 	//1.username → token, username과 token, TTL을 cache로 설정.
+// 	if err := cache.Rdb.Set(ctx, cacheKey, tokenStr, sessionTTL).Err(); err != nil {
+// 		return fmt.Errorf("redis SET token error: %w", err)
+// 	}
+// 	log.Printf("username -> token")
+
+// 	metrics.CacheHits.Inc()
+
+// 	//2.token → uuid 역매핑
+// 	// DB에서 uuid를 다시 조회해서 저장 -> uuid설정이 없으면 로그인 이후 페이지로 이동이
+// 	//안 되는 문제가 있음. 해당 문제 원인 파악 중..
+// 	var uuid []byte
+// 	if err := handle.QueryRow(
+// 		"SELECT uuid FROM accounts WHERE username = ?", username).Scan(&uuid); err != nil {
+// 		return fmt.Errorf("fetch uuid for cache: %w", err)
+// 	}
+// 	uuidKey := fmt.Sprintf(sessionUUIDKeyFmt, tokenStr)
+// 	if err := cache.Rdb.Set(ctx, uuidKey, string(uuid), sessionTTL).Err(); err != nil {
+// 		return fmt.Errorf("redis SET uuid error: %w", err)
+// 	}
+
+// 	log.Printf("return nil")
+// 	return nil
+// }
+
+//아래가 원본 함수.
+
+func AddAccountSession(username string, token []byte) error {
+	_, err := handle.Exec("INSERT INTO sessions (uuid, token, expire) SELECT a.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEK) FROM accounts a WHERE a.username = ?", token, username)
+	if err != nil {
 		return err
 	}
-	// 3) DB 업데이트: lastLoggedIn
-	if _, err := handle.Exec("UPDATE accounts SET lastLoggedIn = UTC_TIMESTAMP() WHERE username = ?", username); err != nil {
-		return err
-	}
 
-	// 4) 캐시에 저장 (base64, TTL=1주일)
-	encoded := base64.StdEncoding.EncodeToString(token)
-	if err := cache.Rdb.Set(cache.Ctx, cacheKey, encoded, 7*24*time.Hour).Err(); err != nil {
-		return fmt.Errorf("redis SET error: %w", err)
+	_, err = handle.Exec("UPDATE accounts SET lastLoggedIn = UTC_TIMESTAMP() WHERE username = ?", username)
+	if err != nil {
+		return err
 	}
 
 	return nil
 }
-
-// func AddAccountSession(username string, token []byte) error {
-// 	_, err := handle.Exec("INSERT INTO sessions (uuid, token, expire) SELECT a.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEK) FROM accounts a WHERE a.username = ?", token, username)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	_, err = handle.Exec("UPDATE accounts SET lastLoggedIn = UTC_TIMESTAMP() WHERE username = ?", username)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
 
 func AddDiscordIdByUsername(discordId string, username string) error {
 	_, err := handle.Exec("UPDATE accounts SET discordId = ? WHERE username = ?", discordId, username)
@@ -432,6 +601,44 @@ func UpdateActiveSession(uuid []byte, clientSessionId string) error {
 	return nil
 }
 
+// func FetchUUIDFromToken(token []byte) ([]byte, error) { //uuid를 미리 cache에 설정하지 않으면
+// 	//문제가 발생하는 것으로 추정되던 곳
+// 	//token을 가지고 있는 uuid가 누구인지 찾는 함수.
+// 	ctx := cache.Ctx
+// 	tokenStr := base64.StdEncoding.EncodeToString(token)
+// 	cacheKey := fmt.Sprintf(sessionUUIDKeyFmt, tokenStr)
+
+// 	log.Printf("cache before")
+
+// 	// 1.cache 조회
+// 	if u, err := cache.Rdb.Get(ctx, cacheKey).Result(); err == nil {
+// 		// cache hit
+// 		log.Printf("cache hit")
+// 		return []byte(u), nil
+// 	} else if err != nil && err != redis.Nil {
+// 		// 실제 Redis 에러
+// 		log.Printf("redis error")
+// 		return nil, fmt.Errorf("redis GET error: %w", err)
+// 	}
+
+// 	// err == redis.Nil 일 때만 아래로 (cache miss)
+// 	log.Printf("cache miss")
+
+// 	// 2.DB 조회
+// 	var uuid []byte
+// 	err := handle.QueryRow("SELECT uuid FROM sessions WHERE token = ?", token).Scan(&uuid)
+
+// 	log.Printf("query complete")
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	// 3.Redis에 캐시 설정. 다음 인증부터는 무조건적으로 hit 발생하도록.
+// 	cache.Rdb.Set(ctx, cacheKey, string(uuid), sessionTTL)
+// 	return uuid, nil
+// }
+
+// 위 함수의 기존 함수.
 func FetchUUIDFromToken(token []byte) ([]byte, error) {
 	var uuid []byte
 	//user info DB에서 조회. 따라서 cache setting 필요.

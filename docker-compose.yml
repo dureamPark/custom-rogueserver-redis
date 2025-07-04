@@ -34,7 +34,7 @@ services:
           memory: 2G
 
   redis:
-    image: redis:7
+    image: redis/redis-stack-server:latest
     container_name: pokerogue-redis
     restart: unless-stopped
     healthcheck:

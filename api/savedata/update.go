@@ -21,13 +21,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/defs"
 )
 
 // /savedata/update - update save data
 func Update(uuid []byte, slot int, save any) error {
-	err := db.UpdateAccountLastActivity(uuid)
+	err := cache.UpdateAccountLastActivity(uuid)
 	if err != nil {
 		log.Print("failed to update account last activity")
 	}
@@ -38,18 +38,20 @@ func Update(uuid []byte, slot int, save any) error {
 			return fmt.Errorf("invalid system data")
 		}
 
-		err = db.UpdateAccountStats(uuid, save.GameStats, save.VoucherCounts)
+		err = cache.UpdateAccountStats(uuid, save.GameStats, save.VoucherCounts)
+		//err = db.UpdateAccountStats(uuid, save.GameStats, save.VoucherCounts)
 		if err != nil {
 			return fmt.Errorf("failed to update account stats: %s", err)
 		}
-
-		return db.StoreSystemSaveData(uuid, save)
+		//return db.StoreSystemSaveData(uuid, save)
+		return cache.StoreSystemSaveData(uuid, save)
 
 	case defs.SessionSaveData: // Session
 		if slot < 0 || slot >= defs.SessionSlotCount {
 			return fmt.Errorf("slot id %d out of range", slot)
 		}
-		return db.StoreSessionSaveData(uuid, save, slot)
+		//return db.StoreSessionSaveData(uuid, save, slot)
+		return cache.StoreSessionSaveData(uuid, save, slot)
 
 	default:
 		return fmt.Errorf("invalid data type")
