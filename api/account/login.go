@@ -24,6 +24,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
@@ -118,7 +119,7 @@ func GenerateTokenForUsername(username string) (string, error) {
 	accountStatsData, err := db.GetAccountStatsFromDB(uuid)
 	if err != nil {
 		log.Printf("GetAccountStatsFromDB 에서 에러발생: %s", err)
-		return "", nil
+		return base64.StdEncoding.EncodeToString(token), nil
 	} else {
 		// accountStats 정보 cache로 가져오기
 		cache.CacheAccountStatsInRedis(accountStatsData)
