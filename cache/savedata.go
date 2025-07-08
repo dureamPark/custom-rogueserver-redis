@@ -32,23 +32,11 @@ func ReadSessionSaveData(uuid []byte, slot int) (defs.SessionSaveData, error) { 
 		return saveData, err
 	}
 
-	// 3. JSON 데이터를 SessionSaveData 구조체로 언마샬링
-	// var saveDataArr []defs.SessionSaveData
-	// err = json.Unmarshal([]byte(jsonData), &saveDataArr)
-	// if err != nil {
-	// 	log.Printf("세션 데이터 JSON 언마샬링 오류 (키: %s): %s", redisKey, err)
-	// 	return saveData, err
-	// }
-
-	// 💡 배열로 감싸진 결과를 처리
-	var saveDataArr []defs.SessionSaveData
+	// json 데이터 처리
+	var saveDataArr defs.SessionSaveData
 	if err := json.Unmarshal([]byte(jsonData), &saveDataArr); err != nil {
 		log.Printf("세션 데이터 JSON 언마샬링 오류 (키: %s): %s", redisKey, err)
-		return saveData, err
-	}
-
-	if len(saveDataArr) > 0 {
-		saveData = saveDataArr[0]
+		return saveData, redis.Nil
 	}
 
 	return saveData, nil
