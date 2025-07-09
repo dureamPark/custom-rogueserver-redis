@@ -40,15 +40,9 @@ func ReadSessionSaveData(uuid []byte, slot int) (defs.SessionSaveData, error) { 
 	// 	return saveData, err
 	// }
 
-	// 💡 배열로 감싸진 결과를 처리
-	var saveDataArr []defs.SessionSaveData
-	if err := json.Unmarshal([]byte(jsonData), &saveDataArr); err != nil {
+	if err := json.Unmarshal([]byte(jsonData), &saveData); err != nil {
 		log.Printf("세션 데이터 JSON 언마샬링 오류 (키: %s): %s", redisKey, err)
-		return saveData, err
-	}
-
-	if len(saveDataArr) > 0 {
-		saveData = saveDataArr[0]
+		//return saveData, err
 	}
 
 	return saveData, nil
@@ -106,6 +100,35 @@ func DeleteSessionSaveData(uuid []byte, slot int) error {
 	}
 
 	return nil
+}
+
+func ReadSystemSaveData(uuid []byte)(defs.SystemSaveData, error){
+	var systemData defs.SystemSaveData
+
+	encodedUUID := base64.StdEncoding.EncodeToString(uuid)
+	redisKey := "session:" + encodedUUID
+
+	jsonPath := fmt.Sprintf(`$.systemSaveData`)
+
+	// Redis에서 JSON 데이터 가져오기
+	jsonData, err := Rdb.JSONGet(Ctx, redisKey, jsonPath).Result()
+	if err == redis.Nil {
+		// 키가 존재하지 않는 경우, 빈 SessionSaveData와 함께 특정 에러 반환
+		// 호출하는 쪽에서 이 에러를 식별하여 "새 게임" 또는 "슬롯 비어있음" 등으로 처리 가능
+		log.Printf("시스템 데이터를 찾을 수 없음 (키: %s): %s", redisKey, err)
+		return systemData, err // err 대신 redis.Nil을 직접 전달하거나 커스텀 에러 사용
+	} else if err != nil {
+		// 그 외 Redis 오류
+		log.Printf("Redis에서 시스템 데이터 조회 오류 (키: %s): %s", redisKey, err)
+		return systemData, err
+	}
+
+	if err := json.Unmarshal([]byte(jsonData), &systemData); err != nil {
+		log.Printf("시스템 데이터 JSON 언마샬링 오류 (키: %s): %s", redisKey, err)
+		//return systemData, err
+	}
+
+	return systemData, nil
 }
 
 // StoreSessionSaveData 함수는 주어진 SessionSaveData를 Redis에 저장합니다.
