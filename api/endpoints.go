@@ -354,7 +354,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 	// cache로 변경
 	//existingPlaytime, err := db.RetrievePlaytime(uuid)
 	existingPlaytime, err := cache.RetrievePlaytime(uuid)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	if err != nil && errors.Is(err, redis.Nil) {
 		httpError(w, r, fmt.Errorf("failed to retrieve playtime: %s", err), http.StatusInternalServerError)
 		return
 	} else {

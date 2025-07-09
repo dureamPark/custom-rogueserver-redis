@@ -70,10 +70,10 @@ func CacheAccountInRedis(dbRow defs.AccountDBRow) error {
 
 // CacheAccountStatsInRedis 함수는 AccountStatsData를 Redis에 캐시합니다.
 // dbStats는 DB에서 읽어온 AccountStatsData 구조체입니다.
-func CacheAccountStatsInRedis(dbStats defs.AccountStatsData) error {
+func CacheAccountStatsInRedis(uuid []byte, dbStats defs.AccountStatsData) error {
 
 	// Redis 키 생성
-	redisKey := "session:" + base64.StdEncoding.EncodeToString(dbStats.UUID)
+	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 
 	// AccountStatsData를 AccountStatsRedisData로 변환 (UUID 제외)
 	redisData := defs.AccountStatsRedisData{

@@ -20,23 +20,39 @@ package savedata
 import (
 	"fmt"
 	"os"
+	"log"
+	"encoding/base64"
+	"errors"
 
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/cache"
+	"github.com/redis/go-redis/v9"
 )
 
 func GetSystem(uuid []byte) (defs.SystemSaveData, error) {
 	var system defs.SystemSaveData
 	var err error
 
-	if os.Getenv("S3_SYSTEM_BUCKET_NAME") != "" { // use S3
-		system, err = db.GetSystemSaveFromS3(uuid)
-	} else { // use database
-		//log.Println("use database GetSystem");
-		system, err = db.ReadSystemSaveData(uuid)
-	}
-	if err != nil {
-		return system, err
+	encodedUUID := base64.StdEncoding.EncodeToString(uuid)
+
+	system, err = cache.ReadSystemSaveData(uuid)
+
+	if errors.Is(err, redis.Nil) {
+		// 캐시에 저장된 세션 정보가 없으면
+		log.Printf("시스템 정보가 캐시에 없습니다.(key : %s) : %s", encodedUUID, err)
+
+		if os.Getenv("S3_SYSTEM_BUCKET_NAME") != "" { // use S3
+			system, err = db.GetSystemSaveFromS3(uuid)
+		} else { // use database
+			//log.Println("use database GetSystem");
+			system, err = db.ReadSystemSaveData(uuid)
+		}
+		log.Printf("시스템 정보를 DB에서 찾습니다.")
+
+		if err != nil {
+			return system, err
+		}
 	}
 
 	return system, nil
