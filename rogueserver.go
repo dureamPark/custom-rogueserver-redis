@@ -28,8 +28,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/pagefaultgames/rogueserver/api"
 	"github.com/pagefaultgames/rogueserver/api/account"
-	"github.com/pagefaultgames/rogueserver/db"
+
 	"github.com/pagefaultgames/rogueserver/cache"
+	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/pagefaultgames/rogueserver/worker"
 )
 
 func main() {
@@ -75,7 +77,7 @@ func main() {
 	// register gob types
 	gob.Register([]interface{}{})
 	gob.Register(map[string]interface{}{})
-	
+
 	//redis setting
 	if err := cache.Init(); err != nil {
 		log.Fatalf("failed to connect redis: %v", err)
@@ -115,6 +117,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create http server or server errored: %s", err)
 	}
+
+	// start background workers
+	worker.StartWriteBackWorker(db.handle, cache.Rdb)
+
 }
 
 func createListener(proto, addr string) (net.Listener, error) {

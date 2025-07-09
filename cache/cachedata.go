@@ -33,7 +33,7 @@ func IsValidCacheData(uuid []byte) error {
 		jsonData := string(jsonDataBytes)
 
 		// Redis에 저장
-		err = Rdb.JSONSet(Ctx, redisKey, "$", jsonData).Err()
+		err = SetJSON(Ctx, redisKey, "$", jsonData)
 		log.Printf("캐시에서 키 '%s'를 찾을 수 없음", redisKey)
 		return err
 	}
@@ -45,7 +45,7 @@ func IsValidCacheData(uuid []byte) error {
 func StoreCacheData(uuid []byte, userData defs.UserCacheData) error {
 
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
-	err := Rdb.JSONSet(Ctx, redisKey, "$", userData).Err()
+	err := SetJSON(Ctx, redisKey, "$", userData)
 
 	if err != nil {
 		return err

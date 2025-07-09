@@ -58,7 +58,7 @@ func CacheAccountInRedis(dbRow defs.AccountDBRow) error {
 	}
 
 	// Redis에 저장
-	err = Rdb.JSONSet(Ctx, redisKey, "$.account", jsonData).Err()
+	err = SetJSON(Ctx, redisKey, "$.account", jsonData)
 	if err != nil {
 		log.Printf("Redis에 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
 		return err
@@ -102,7 +102,7 @@ func CacheAccountStatsInRedis(dbStats defs.AccountStatsData) error {
 	}
 
 	// Redis에 JSON 데이터 저장
-	err = Rdb.JSONSet(Ctx, redisKey, "$.accountStats", jsonData).Err()
+	err = SetJSON(Ctx, redisKey, "$.accountStats", jsonData)
 
 	if err != nil {
 		log.Printf("Redis에 통계 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
@@ -121,7 +121,7 @@ func UpdateActiveSession(uuid []byte, sessionId string) error {
 	if sessionId == "" {
 		return fmt.Errorf("sessionId is empty")
 	}
-	return Rdb.JSONSet(Ctx, redisKey, "$.activeClientSession", fmt.Sprintf("\"%s\"", sessionId)).Err()
+	return SetJSON(Ctx, redisKey, "$.activeClientSession", fmt.Sprintf("\"%s\"", sessionId))
 }
 
 // 현재 session이 활성화되어 있는지 확인, 비활성화 시 새롭게 활성화
@@ -148,7 +148,7 @@ func IsActiveSession(uuid []byte, sessionId string) (bool, error) {
 // StoreSessionToken stores a token-uuid pair in Redis with TTL.
 func StoreSessionToken(uuid []byte, token []byte) error {
 	key := "token:" + base64.StdEncoding.EncodeToString(token)
-	return Rdb.Set(Ctx, key, uuid, sessionTokenTTL).Err()
+	return Set(Ctx, key, uuid, sessionTokenTTL)
 }
 
 // FetchSessionToken retrieves the uuid for a given token from Redis.
@@ -262,7 +262,7 @@ func UpdateAccountLastActivity(uuid []byte) error {
 	// JSON.SET key path value
 	// path는 "$.lastActivity"
 	// value는 준비된 시간 문자열 (또는 숫자 타임스탬프)
-	err := Rdb.JSONSet(Ctx, redisKey, "$.account.lastActivity", currentTimeStr).Err()
+	err := SetJSON(Ctx, redisKey, "$.account.lastActivity", currentTimeStr)
 	if err != nil {
 		log.Printf("Redis JSON.SET lastActivity 오류 (키: %s): %s", redisKey, err)
 		return err

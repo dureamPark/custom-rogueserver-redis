@@ -117,13 +117,14 @@ func GenerateTokenForUsername(username string) (string, error) {
 
 	// db에서 로그인 유저 통계 정보 가져와서 cache에 저장
 	accountStatsData, err := db.GetAccountStatsFromDB(uuid)
+	
+	// accountStats 정보 cache로 가져오기, 없어도 일단 가져와서 초기화 해두기
+	cache.CacheAccountStatsInRedis(accountStatsData)
+	
 	if err != nil {
 		log.Printf("GetAccountStatsFromDB 에서 에러발생: %s", err)
 		return base64.StdEncoding.EncodeToString(token), nil
-	} else {
-		// accountStats 정보 cache로 가져오기
-		cache.CacheAccountStatsInRedis(accountStatsData)
-	}
+	} 
 	// 유저 아이디와 토큰값으로 세션 정보 저장 -> DB에 굳이 할 필요가 없어짐
 	// err = db.AddAccountSession(username, token)
 	// if err != nil {

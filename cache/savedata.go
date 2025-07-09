@@ -59,7 +59,7 @@ func StoreSessionSaveData(uuid []byte, data defs.SessionSaveData, slot int) erro
 	}
 
 	// Redis에 JSON 데이터 저장
-	err = Rdb.JSONSet(Ctx, redisKey, jsonPath, jsonData).Err()
+	err = SetJSON(Ctx, redisKey, jsonPath, jsonData)
 	if err != nil {
 		log.Printf("Redis에 세션 데이터 저장 오류 (키: %s): %s", redisKey, err)
 		return err
@@ -109,7 +109,7 @@ func StoreSystemSaveData(uuid []byte, data defs.SystemSaveData) error { // defs.
 	}
 
 	// Redis에 JSON 데이터 저장
-	err = Rdb.JSONSet(Ctx, redisKey, "$.systemSaveData", jsonData).Err()
+	err = SetJSON(Ctx, redisKey, "$.systemSaveData", jsonData)
 	if err != nil {
 		log.Printf("Redis에 세션 데이터 저장 오류 (키: %s): %s", redisKey, err)
 		return err
