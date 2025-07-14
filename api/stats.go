@@ -18,10 +18,10 @@
 package api
 
 import (
-	"log"
 	"time"
 
 	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/robfig/cron/v3"
 )
 
@@ -36,7 +36,7 @@ func scheduleStatRefresh() error {
 	_, err := scheduler.AddFunc("@every 30s", func() {
 		err := updateStats()
 		if err != nil {
-			log.Printf("failed to update stats: %s", err)
+			logger.Error("failed to update stats: %s", err)
 		}
 	})
 	if err != nil {

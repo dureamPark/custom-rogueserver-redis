@@ -20,18 +20,12 @@ package db
 import (
 	"database/sql"
 	"encoding/base64"
-
-	//"encoding/base64"
 	"errors"
 	"fmt"
-
-	//"log"
 	"slices"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/pagefaultgames/rogueserver/defs"
-	//"github.com/pagefaultgames/rogueserver/metrics"
-	//redis "github.com/redis/go-redis/v9"
 )
 
 // DB에서 uuid로 accounts 정보를 모두 가져오는 함수
@@ -179,56 +173,56 @@ func AddAccountSession(username string, token []byte) error {
 // 	cacheKey := fmt.Sprintf(sessionTokenKeyFmt, username) //key:value=username:token
 // 	s, err := cache.Rdb.Get(ctx, cacheKey).Result()       //cache hit or cache miss
 
-// 	log.Printf("cache getttt")
+// logger.Info("cache getttt")
 
 // 	if err == nil {
 // 		//cache hit인 경우.
 // 		metrics.CacheHits.Inc() //prometheus에서 cache miss 확인하기 위한 준비 중..
-// 		log.Printf("[CACHE HIT]   key=%s", cacheKey)
+// logger.Info("[CACHE HIT]   key=%s", cacheKey)
 // 		//redis 에 저장할 때 문제가 발생하지 않도록 인코딩 및 디코딩을 진행하여 사용.
 // 		if decoded, decErr := base64.StdEncoding.DecodeString(s); decErr == nil && len(decoded) == len(token) {
-// 			log.Printf("token copy")
+// logger.Info("token copy")
 // 			copy(token, decoded)
 // 			return nil
 // 		}
 // 		// 디코드 실패 시 DB 로직으로 넘어감
 // 	} else if err != redis.Nil {
 // 		// ── CACHE ERROR ──
-// 		log.Printf("redis error")
+// logger.Error("redis error")
 // 		return fmt.Errorf("redis GET error: %w", err)
 // 	}
 
 // 	// err == redis.Nil → CACHE MISS인 경우.
-// 	log.Printf("[CACHE MISS]  key=%s", cacheKey)
+// logger.Info("[CACHE MISS]  key=%s", cacheKey)
 
 // 	metrics.CacheMisses.Inc() //cache miss 확인하기 위한 준비 중..
 
 // 	// DB data 추가 sessions 테이블->해당 과정은 write-back 구조와 맞지 않음.
 // 	//주석 처리해두고 추후에 write-back에 맞게 구조 수정할 예정.
 // 	/*
-// 	   log.Printf("DB insert before")
+// logger.Info("DB insert before")
 // 	   if _, err := handle.Exec(`INSERT INTO sessions (uuid, token, expire) SELECT a.uuid, ?, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 WEEK) FROM accounts a WHERE a.username = ?`, token, username,); err != nil {
-// 	       log.Printf("DB insert error: %v", err)
+// logger.Error("DB insert error: %v", err)
 // 	       return err
 // 	   }
 
 // 	   // 3) DB 업데이트: lastLoggedIn **업데이트부분은 일단 pass**
-// 	   log.Printf("DB update before")
+// logger.Info("DB update before")
 // 	   if _, err := handle.Exec(`UPDATE accounts SET lastLoggedIn = UTC_TIMESTAMP() WHERE username = ?`, username,); err != nil {
-// 	       log.Printf("DB update error: %v", err)
+// logger.Error("DB update error: %v", err)
 // 	       return err
 // 	   }
 // 	*/
 
 // 	//캐시에 저장하는 부분 구현.
-// 	log.Printf("cache save before")
+// logger.Info("cache save before")
 // 	tokenStr := base64.StdEncoding.EncodeToString(token)
 
 // 	//1.username → token, username과 token, TTL을 cache로 설정.
 // 	if err := cache.Rdb.Set(ctx, cacheKey, tokenStr, sessionTTL).Err(); err != nil {
 // 		return fmt.Errorf("redis SET token error: %w", err)
 // 	}
-// 	log.Printf("username -> token")
+// logger.Info("username -> token")
 
 // 	metrics.CacheHits.Inc()
 
@@ -245,7 +239,7 @@ func AddAccountSession(username string, token []byte) error {
 // 		return fmt.Errorf("redis SET uuid error: %w", err)
 // 	}
 
-// 	log.Printf("return nil")
+// logger.Info("return nil")
 // 	return nil
 // }
 
@@ -608,27 +602,27 @@ func UpdateActiveSession(uuid []byte, clientSessionId string) error {
 // 	tokenStr := base64.StdEncoding.EncodeToString(token)
 // 	cacheKey := fmt.Sprintf(sessionUUIDKeyFmt, tokenStr)
 
-// 	log.Printf("cache before")
+// logger.Info("cache before")
 
 // 	// 1.cache 조회
 // 	if u, err := cache.Rdb.Get(ctx, cacheKey).Result(); err == nil {
 // 		// cache hit
-// 		log.Printf("cache hit")
+// logger.Info("cache hit")
 // 		return []byte(u), nil
 // 	} else if err != nil && err != redis.Nil {
 // 		// 실제 Redis 에러
-// 		log.Printf("redis error")
+// logger.Error("redis error")
 // 		return nil, fmt.Errorf("redis GET error: %w", err)
 // 	}
 
 // 	// err == redis.Nil 일 때만 아래로 (cache miss)
-// 	log.Printf("cache miss")
+// logger.Info("cache miss")
 
 // 	// 2.DB 조회
 // 	var uuid []byte
 // 	err := handle.QueryRow("SELECT uuid FROM sessions WHERE token = ?", token).Scan(&uuid)
 
-// 	log.Printf("query complete")
+// logger.Info("query complete")
 // 	if err != nil {
 // 		return nil, err
 // 	}

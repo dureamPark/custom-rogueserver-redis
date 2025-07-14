@@ -19,7 +19,7 @@ package main
 
 import (
 	"encoding/gob"
-	"log"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 	"net"
 	"net/http"
 	"os"
@@ -80,39 +80,43 @@ func main() {
 
 	//redis setting
 	if err := cache.Init(); err != nil {
-		log.Fatalf("failed to connect redis: %v", err)
+		logger.Error("failed to connect redis: %v", err)
+	os.Exit(1)
 	}
-	log.Println("Redis connected~~")
+	logger.Info("Redis connected~~")
 
 	// get database connection
-	log.Println("db init")
+	logger.Info("db init")
 	err := db.Init(dbuser, dbpass, dbproto, dbaddr, dbname)
 	if err != nil {
-		log.Fatalf("failed to initialize database: %s", err)
+		logger.Error("failed to initialize database: %s", err)
+	os.Exit(1)
 	}
 
 	// create listener
-	log.Println("create listener")
+	logger.Info("create listener")
 	listener, err := createListener(proto, addr)
 	if err != nil {
-		log.Fatalf("failed to create net listener: %s", err)
+		logger.Error("failed to create net listener: %s", err)
+	os.Exit(1)
 	}
 
 	mux := http.NewServeMux()
 
 	// init api
-	log.Println("init api")
+	logger.Info("init api")
 	if err := api.Init(mux); err != nil {
-		log.Fatal(err)
+		logger.Error("%v", err)
+	os.Exit(1)
 	}
 
 	// start background workers
-	log.Println("Worker Start")
+	logger.Info("Worker Start")
 	handle := db.GetHandle()
 	worker.StartWriteBackWorker(handle, cache.Rdb)
 
 	// start web server
-	log.Println("WebServer")
+	logger.Info("WebServer")
 	handler := prodHandler(mux, gameurl)
 	if debug {
 		handler = debugHandler(mux)
@@ -124,7 +128,8 @@ func main() {
 		err = http.ServeTLS(listener, handler, tlscert, tlskey)
 	}
 	if err != nil {
-		log.Fatalf("failed to create http server or server errored: %s", err)
+		logger.Error("failed to create http server or server errored: %s", err)
+	os.Exit(1)
 	}
 
 }

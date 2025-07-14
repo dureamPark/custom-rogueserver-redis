@@ -23,6 +23,7 @@ import (
 
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 )
 
 type ClearResponse struct {
@@ -56,20 +57,20 @@ func Clear(uuid []byte, slot int, seed string, save defs.SessionSaveData) (Clear
 
 		err = db.AddOrUpdateAccountDailyRun(uuid, save.Score, waveCompleted)
 		if err != nil {
-			log.Printf("failed to add or update daily run record: %s", err)
+			logger.Error("failed to add or update daily run record: %s", err)
 		}
 	}
 
 	if sessionCompleted {
 		response.Success, err = db.TryAddSeedCompletion(uuid, save.Seed, int(save.GameMode))
 		if err != nil {
-			log.Printf("failed to mark seed as completed: %s", err)
+			logger.Error("failed to mark seed as completed: %s", err)
 		}
 	}
 
 	err = db.DeleteSessionSaveData(uuid, slot)
 	if err != nil {
-		log.Printf("failed to delete session save data: %s", err)
+		logger.Error("failed to delete session save data: %s", err)
 	}
 
 	return response, nil

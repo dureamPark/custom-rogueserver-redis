@@ -24,10 +24,10 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -119,10 +119,10 @@ func GenerateTokenForUsername(username string) (string, error) {
 
 	// db에서 로그인 유저 통계 정보 가져와서 cache에 저장
 	accountStatsData, err := db.GetAccountStatsFromDB(uuid)
-	log.Printf("Login account StatsData : %s", accountStatsData)
+	logger.Info("Login account StatsData : %s", accountStatsData)
 
 	if err != nil {
-		log.Printf("GetAccountStatsFromDB 에서 에러발생: %s", err)
+		logger.Error("GetAccountStatsFromDB 에서 에러발생: %s", err)
 		// 없는 경우는 회원가입 후 처음 로그인 상황 초기화해줘야 됨.
 		cache.InitAccountStatsInRedis(uuid)
 		return base64.StdEncoding.EncodeToString(token), nil

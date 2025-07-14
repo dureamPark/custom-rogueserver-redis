@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/robfig/cron/v3"
 )
 
@@ -66,16 +67,16 @@ func Init() error {
 		log.Print(err)
 	}
 
-	log.Printf("Daily Run Seed: %s", seed)
+	logger.Info("Daily Run Seed: %s", seed)
 
 	_, err = scheduler.AddFunc("@daily", func() {
 		time.Sleep(time.Second)
 
 		seed, err = db.TryAddDailyRun(Seed())
 		if err != nil {
-			log.Printf("error while recording new daily: %s", err)
+			logger.Error("error while recording new daily: %s", err)
 		} else {
-			log.Printf("Daily Run Seed: %s", seed)
+			logger.Info("Daily Run Seed: %s", seed)
 		}
 	})
 	if err != nil {

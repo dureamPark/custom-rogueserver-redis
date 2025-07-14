@@ -4,8 +4,9 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strconv"
+
+	"github.com/pagefaultgames/rogueserver/util/logger"
 
 	"github.com/pagefaultgames/rogueserver/defs"
 	"github.com/redis/go-redis/v9"
@@ -24,11 +25,11 @@ func ReadSessionSaveData(uuid []byte, slot int) (defs.SessionSaveData, error) { 
 	if err == redis.Nil {
 		// 키가 존재하지 않는 경우, 빈 SessionSaveData와 함께 특정 에러 반환
 		// 호출하는 쪽에서 이 에러를 식별하여 "새 게임" 또는 "슬롯 비어있음" 등으로 처리 가능
-		log.Printf("세션 데이터를 찾을 수 없음 (키: %s): %s", redisKey, err)
+		logger.Info("세션 데이터를 찾을 수 없음 (키: %s): %s", redisKey, err)
 		return saveData, err // err 대신 redis.Nil을 직접 전달하거나 커스텀 에러 사용
 	} else if err != nil {
 		// 그 외 Redis 오류
-		log.Printf("Redis에서 세션 데이터 조회 오류 (키: %s): %s", redisKey, err)
+		logger.Error("Redis에서 세션 데이터 조회 오류 (키: %s): %s", redisKey, err)
 		return saveData, err
 	}
 
@@ -39,7 +40,7 @@ func ReadSessionSaveData(uuid []byte, slot int) (defs.SessionSaveData, error) { 
 	// json 데이터 처리
 	var saveDataArr []defs.SessionSaveData // defs.SessionSaveData
 	if err := json.Unmarshal([]byte(jsonData), &saveDataArr); err != nil {
-		log.Printf("세션 데이터 JSON 언마샬링 오류 (키: %s): %s", redisKey, err)
+		logger.Error("세션 데이터 JSON 언마샬링 오류 (키: %s): %s", redisKey, err)
 		return saveData, redis.Nil
 	}
 
@@ -70,11 +71,11 @@ func StoreSessionSaveData(uuid []byte, data defs.SessionSaveData, slot int) erro
 	// Redis에 JSON 데이터 저장
 	err := SetJSON(Ctx, redisKey, jsonPath, data)
 	if err != nil {
-		log.Printf("Redis에 세션 데이터 저장 오류 (키: %s): %s", redisKey, err)
+		logger.Error("Redis에 세션 데이터 저장 오류 (키: %s): %s", redisKey, err)
 		return err
 	}
 
-	log.Printf("세션 데이터 저장 성공 (키: %s)", redisKey)
+	logger.Info("세션 데이터 저장 성공 (키: %s)", redisKey)
 	return nil
 }
 
@@ -97,9 +98,9 @@ func DeleteSessionSaveData(uuid []byte, slot int) error {
 		// 키가 존재하지 않아 아무것도 삭제되지 않은 경우.
 		// 이를 에러로 처리할지, 아니면 성공으로 간주할지는 정책에 따라 다름.
 		// 여기서는 일단 로그만 남기고 성공으로 처리.
-		log.Printf("삭제할 세션 데이터가 Redis에 존재하지 않았습니다 (키: %s)", redisKey)
+		logger.Info("삭제할 세션 데이터가 Redis에 존재하지 않았습니다 (키: %s)", redisKey)
 	} else {
-		log.Printf("세션 데이터 삭제 성공 (키: %s, 삭제된 키 개수: %d)", redisKey, result)
+		logger.Info("세션 데이터 삭제 성공 (키: %s, 삭제된 키 개수: %d)", redisKey, result)
 	}
 
 	return nil
@@ -118,11 +119,11 @@ func ReadSystemSaveData(uuid []byte) (defs.SystemSaveData, error) {
 	if err == redis.Nil {
 		// 키가 존재하지 않는 경우, 빈 SessionSaveData와 함께 특정 에러 반환
 		// 호출하는 쪽에서 이 에러를 식별하여 "새 게임" 또는 "슬롯 비어있음" 등으로 처리 가능
-		log.Printf("시스템 데이터를 찾을 수 없음 (키: %s): %s", redisKey, err)
+		logger.Info("시스템 데이터를 찾을 수 없음 (키: %s): %s", redisKey, err)
 		return systemData, err // err 대신 redis.Nil을 직접 전달하거나 커스텀 에러 사용
 	} else if err != nil {
 		// 그 외 Redis 오류
-		log.Printf("Redis에서 시스템 데이터 조회 오류 (키: %s): %s", redisKey, err)
+		logger.Error("Redis에서 시스템 데이터 조회 오류 (키: %s): %s", redisKey, err)
 		return systemData, err
 	}
 
@@ -131,16 +132,16 @@ func ReadSystemSaveData(uuid []byte) (defs.SystemSaveData, error) {
 	}
 
 	// json 데이터 처리
-	var systemDataArr []defs.SystemSaveData
+	//var systemDataArr []defs.SystemSaveData
 	if err := json.Unmarshal([]byte(jsonData), &systemData); err != nil {
-		log.Printf("시스템 데이터 JSON 언마샬링 오류 (키: %s): %s", redisKey, err)
+		logger.Error("시스템 데이터 JSON 언마샬링 오류 (키: %s, jsonData : %s): %s", redisKey, jsonData, err)
 		return systemData, redis.Nil
 	}
 
 	// redis에서 가져온 데이터가 배열로 처리되서..?
-	if len(systemDataArr) > 0 {
-		systemData = systemDataArr[0]
-	}
+	// if len(systemDataArr) > 0 {
+	// 	systemData = systemDataArr[0]
+	// }
 
 	return systemData, nil
 }
@@ -160,11 +161,11 @@ func StoreSystemSaveData(uuid []byte, data defs.SystemSaveData) error { // defs.
 	// Redis에 JSON 데이터 저장
 	err := SetJSON(Ctx, redisKey, "$.systemSaveData", data)
 	if err != nil {
-		log.Printf("Redis에 세션 데이터 저장 오류 (키: %s): %s", redisKey, err)
+		logger.Error("Redis에 세션 데이터 저장 오류 (키: %s): %s", redisKey, err)
 		return err
 	}
 
-	log.Printf("세션 데이터 저장 성공 (키: %s)", redisKey)
+	logger.Info("세션 데이터 저장 성공 (키: %s)", redisKey)
 	return nil
 }
 
@@ -176,17 +177,17 @@ func RetrievePlaytime(uuid []byte) (int, error) {
 
 	rawResult, err := Rdb.JSONGet(Ctx, redisKey, ".accountStats.playTime").Result()
 	if err != nil {
-		log.Printf("Redis JSON.GET playTime 오류 (키: %s): %s", redisKey, err)
+		logger.Error("Redis JSON.GET playTime 오류 (키: %s): %s", redisKey, err)
 		return 0, err
 	}
 
 	var playTime int
 	playTime, err = strconv.Atoi(rawResult)
 	if err != nil {
-		log.Printf("%s | playTime 값이 예상된 숫자 타입(float64 또는 int64)이 아님 (키: %s, 실제타입: %T, 값: %v)", err, redisKey, rawResult, rawResult)
+		logger.Error("%s | playTime 값이 예상된 숫자 타입(float64 또는 int64)이 아님 (키: %s, 실제타입: %T, 값: %v)", err, redisKey, rawResult, rawResult)
 		return 0, err
 	}
 
-	log.Printf("키 %s에서 PlayTime %d를 성공적으로 가져왔습니다.", redisKey, playTime)
+	logger.Info("키 %s에서 PlayTime %d를 성공적으로 가져왔습니다.", redisKey, playTime)
 	return playTime, nil
 }

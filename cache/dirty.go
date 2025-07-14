@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"log"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 )
 
 // DirtyKeysSet is the name of the Redis set that holds keys pending a write-back.
@@ -10,8 +10,8 @@ const DirtyKeysSet = "dirty_keys"
 // MarkAsDirty flags one or more keys as needing a write-back to the database.
 // It adds the provided keys to the dirty set in Redis.
 func MarkAsDirty(keys ...string) error {
-	
-	log.Printf("MarkAsDirty")
+
+	logger.Info("MarkAsDirty")
 	if len(keys) == 0 {
 		return nil
 	}
@@ -23,7 +23,7 @@ func MarkAsDirty(keys ...string) error {
 		members[i] = k
 	}
 
-	log.Printf("Marking %d keys as dirty: %v", len(members), members)
+	logger.Info("Marking %d keys as dirty: %v", len(members), members)
 
 	return Rdb.SAdd(Ctx, DirtyKeysSet, members...).Err()
 }

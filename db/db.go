@@ -20,7 +20,9 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"log"
+	"os"
+
+	"github.com/pagefaultgames/rogueserver/util/logger"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -44,18 +46,21 @@ func Init(username, password, protocol, address, database string) error {
 
 	tx, err := handle.Begin()
 	if err != nil {
-		log.Fatal(err)
+		logger.Error("%v", err)
+		os.Exit(1)
 	}
 
 	err = setupDb(tx)
 	if err != nil {
 		tx.Rollback()
-		log.Fatal(err)
+		logger.Error("%v", err)
+		os.Exit(1)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		log.Fatal(err)
+		logger.Error("%v", err)
+		os.Exit(1)
 	}
 
 	return nil
@@ -128,5 +133,5 @@ func setupDb(tx *sql.Tx) error {
 }
 
 func GetHandle() *sql.DB {
-    return handle
+	return handle
 }

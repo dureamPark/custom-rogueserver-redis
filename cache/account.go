@@ -4,10 +4,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"slices"
 	"strings"
 	"time"
+
+	"github.com/pagefaultgames/rogueserver/util/logger"
 
 	"github.com/pagefaultgames/rogueserver/defs"
 	"github.com/redis/go-redis/v9"
@@ -39,7 +40,7 @@ func InitAccountStatsInRedis(uuid []byte) error {
 	// Redis 저장용 데이터를 JSON으로 마샬링
 	jsonData, err := json.Marshal(redisData)
 	if err != nil {
-		log.Printf("통계 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
+		logger.Error("통계 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
 		return err
 	}
 
@@ -47,11 +48,11 @@ func InitAccountStatsInRedis(uuid []byte) error {
 	err = SetJSON(Ctx, redisKey, "$.accountStats", jsonData)
 
 	if err != nil {
-		log.Printf("Redis에 통계 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
+		logger.Error("Redis에 통계 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
 		return err
 	}
 
-	log.Printf("계정 통계 데이터가 Redis에 성공적으로 캐시되었습니다. Key: %s, Expiration: %s\n", redisKey, sessionDataTTL)
+	logger.Info("계정 통계 데이터가 Redis에 성공적으로 캐시되었습니다. Key: %s, Expiration: %s", redisKey, sessionDataTTL)
 	return nil
 }
 
@@ -95,18 +96,18 @@ func CacheAccountInRedis(dbRow defs.AccountDBRow) error {
 	// JSON으로 마샬링
 	jsonData, err := json.Marshal(redisData)
 	if err != nil {
-		log.Printf("Redis 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
+		logger.Error("Redis 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
 		return err
 	}
 
 	// Redis에 저장
 	err = SetJSON(Ctx, redisKey, "$.account", jsonData)
 	if err != nil {
-		log.Printf("Redis에 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
+		logger.Error("Redis에 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
 		return err
 	}
 
-	log.Printf("계정 정보가 Redis에 성공적으로 캐시되었습니다. Key: %s, Expiration: %s\n", redisKey, sessionDataTTL)
+	logger.Info("계정 정보가 Redis에 성공적으로 캐시되었습니다. Key: %s, Expiration: %s\n", redisKey, sessionDataTTL)
 	return nil
 }
 
@@ -139,7 +140,7 @@ func CacheAccountStatsInRedis(uuid []byte, dbStats defs.AccountStatsData) error 
 	// Redis 저장용 데이터를 JSON으로 마샬링
 	jsonData, err := json.Marshal(redisData)
 	if err != nil {
-		log.Printf("통계 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
+		logger.Error("통계 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
 		return err
 	}
 
@@ -147,18 +148,18 @@ func CacheAccountStatsInRedis(uuid []byte, dbStats defs.AccountStatsData) error 
 	err = SetJSON(Ctx, redisKey, "$.accountStats", jsonData)
 
 	if err != nil {
-		log.Printf("Redis에 통계 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
+		logger.Error("Redis에 통계 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
 		return err
 	}
 
-	log.Printf("계정 통계 데이터가 Redis에 성공적으로 캐시되었습니다. Key: %s, Expiration: %s\n", redisKey, sessionDataTTL)
+	logger.Info("계정 통계 데이터가 Redis에 성공적으로 캐시되었습니다. Key: %s, Expiration: %s", redisKey, sessionDataTTL)
 	return nil
 }
 
 // session 활성화
 func UpdateActiveSession(uuid []byte, sessionId string) error {
 
-	log.Printf("UpdateActiveSession uuid : %s, sessionId : %s", base64.StdEncoding.EncodeToString(uuid), sessionId)
+	logger.Info("UpdateActiveSession uuid : %s, sessionId : %s", base64.StdEncoding.EncodeToString(uuid), sessionId)
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 	if sessionId == "" {
 		return fmt.Errorf("sessionId is empty")
@@ -176,14 +177,14 @@ func IsActiveSession(uuid []byte, sessionId string) (bool, error) {
 		// 초기화를 빈 문자열로 ""로 해서 확인하기
 		err = UpdateActiveSession(uuid, sessionId)
 		if err != nil {
-			log.Printf("fail to Set Active Session in redis")
+			logger.Error("fail to Set Active Session in redis")
 			return false, err
 		}
 		return true, nil
 	}
 
 	id = strings.Trim(id, "\"") // 쌍따옴표 제거
-	log.Printf("id : %s, session id : %s", id, sessionId)
+	logger.Info("id : %s, session id : %s", id, sessionId)
 	return id == "" || id == sessionId, nil
 }
 
@@ -206,7 +207,7 @@ func RemoveSessionFromToken(token []byte) error {
 }
 
 func FetchTrainerIds(uuid []byte) (int, int, error) {
-	log.Println("FetchTrainerIds")
+	logger.Info("FetchTrainerIds")
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 
 	// JSON.MGET을 사용하여 여러 경로의 값을 한 번에 가져올 수 있음
@@ -265,7 +266,7 @@ func UpdateTrainerIds(trainerId, secretId int, uuid []byte) error {
 	// 4. 파이프라인 실행
 	cmders, err := pipe.Exec(Ctx)
 	if err != nil {
-		log.Printf("Redis 파이프라인 실행 오류 (키: %s): %s", redisKey, err)
+		logger.Error("Redis 파이프라인 실행 오류 (키: %s): %s", redisKey, err)
 		return err
 	}
 
@@ -278,13 +279,13 @@ func UpdateTrainerIds(trainerId, secretId int, uuid []byte) error {
 			}
 			// 파이프라인 내의 특정 명령 실패 시 롤백 전략이 필요할 수 있으나,
 			// 여기서는 일단 에러를 반환합니다.
-			log.Printf("Redis 파이프라인 내 '%s' 업데이트 실패 (키: %s): %s", fieldName, redisKey, cmd.Err())
+			logger.Error("Redis 파이프라인 내 '%s' 업데이트 실패 (키: %s): %s", fieldName, redisKey, cmd.Err())
 			return err
 		}
 		// log.Printf("Debug: Command %d result: %v", i, cmd.String())
 	}
 
-	log.Printf("키 %s의 trainerId가 %d로, secretId가 %d로 업데이트되었습니다.", redisKey, trainerId, secretId)
+	logger.Info("키 %s의 trainerId가 %d로, secretId가 %d로 업데이트되었습니다.", redisKey, trainerId, secretId)
 	return nil
 }
 
@@ -306,14 +307,14 @@ func UpdateAccountLastActivity(uuid []byte) error {
 	// value는 준비된 시간 문자열 (또는 숫자 타임스탬프)
 	err := SetJSON(Ctx, redisKey, "$.account.lastActivity", currentTimeStr)
 	if err != nil {
-		log.Printf("Redis JSON.SET lastActivity 오류 (키: %s): %s", redisKey, err)
+		logger.Error("Redis JSON.SET lastActivity 오류 (키: %s): %s", redisKey, err)
 		return err
 	}
 
 	// JSON.SET 결과 확인 (선택적)
 	// log.Printf("JSON.SET 결과: %v", cmdResult)
 
-	log.Printf("키 %s의 lastActivity가 '%s'로 업데이트되었습니다 (Redis).", redisKey, currentTimeStr)
+	logger.Info("키 %s의 lastActivity가 '%s'로 업데이트되었습니다 (Redis).", redisKey, currentTimeStr)
 	return nil
 }
 
@@ -338,14 +339,14 @@ func UpdateAccountStats(uuid []byte, stats defs.GameStats, voucherCounts map[str
 
 	for key, val := range m {
 		if !slices.Contains(validStatColumns, key) {
-			//log.Printf("경고: GameStats에 유효하지 않은 키 '%s'가 포함되어 무시합니다.", key)
+			//logger.Warn("경고: GameStats에 유효하지 않은 키 '%s'가 포함되어 무시합니다.", key)
 			continue
 		}
 
 		// DB 스키마는 int(11)이었으므로, float64로 온 값을 int로 변환
 		floatVal, ok := val.(float64)
 		if !ok {
-			log.Printf("경고: GameStats의 키 '%s'의 값이 float64가 아닙니다 (타입: %T). 무시합니다.", key, val)
+			logger.Warn("경고: GameStats의 키 '%s'의 값이 float64가 아닙니다 (타입: %T). 무시합니다.", key, val)
 			continue
 		}
 		intValue := int(floatVal) // 소수점 버림
@@ -367,7 +368,7 @@ func UpdateAccountStats(uuid []byte, stats defs.GameStats, voucherCounts map[str
 	for key, count := range voucherCounts {
 		columnName, ok := voucherColumnMap[key]
 		if !ok {
-			log.Printf("경고: voucherCounts에 유효하지 않은 키 '%s'가 포함되어 무시합니다.", key)
+			logger.Warn("경고: voucherCounts에 유효하지 않은 키 '%s'가 포함되어 무시합니다.", key)
 			continue
 		}
 		jsonPath := "$.accountStats." + columnName
@@ -378,25 +379,25 @@ func UpdateAccountStats(uuid []byte, stats defs.GameStats, voucherCounts map[str
 
 	// 4. 파이프라인 실행 (실제로 업데이트할 내용이 있을 때만)
 	if updateCount == 0 {
-		log.Printf("업데이트할 통계 또는 바우처 정보가 없습니다 (키: %s).", redisKey)
+		logger.Info("업데이트할 통계 또는 바우처 정보가 없습니다 (키: %s).", redisKey)
 		return nil // 아무것도 안하고 성공
 	}
 
 	cmders, err := pipe.Exec(Ctx)
 	if err != nil {
-		log.Printf("Redis 파이프라인 실행 오류 (키: %s): %s", redisKey, err)
+		logger.Error("Redis 파이프라인 실행 오류 (키: %s): %s", redisKey, err)
 		return err
 	}
 
 	// 각 명령어의 성공 여부 확인 (선택적)
 	for i, cmd := range cmders {
 		if cmd.Err() != nil {
-			log.Printf("Redis 파이프라인 내 %d번째 업데이트 실패 (키: %s): %s", i+1, redisKey, cmd.Err())
+			logger.Error("Redis 파이프라인 내 %d번째 업데이트 실패 (키: %s): %s", i+1, redisKey, cmd.Err())
 			// 어떤 필드 업데이트가 실패했는지 특정하기 어려울 수 있음 (파이프라인 순서 기반 추정)
 			return err
 		}
 	}
 
-	log.Printf("키 %s의 계정 통계가 성공적으로 업데이트되었습니다 (업데이트된 필드 수: %d).", redisKey, updateCount)
+	logger.Info("키 %s의 계정 통계가 성공적으로 업데이트되었습니다 (업데이트된 필드 수: %d).", redisKey, updateCount)
 	return nil
 }

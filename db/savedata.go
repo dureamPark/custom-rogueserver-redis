@@ -23,7 +23,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 	"os"
 
 	"github.com/klauspost/compress/zstd"
@@ -62,13 +62,13 @@ func ReadSeedCompleted(uuid []byte, seed string) (bool, error) {
 }
 
 func ReadSystemSaveData(uuid []byte) (defs.SystemSaveData, error) {
-	//log.Println("ReadSystemSaveData ", uuid);
+	//logger.Info("ReadSystemSaveData %s", uuid);
 	var system defs.SystemSaveData
 
 	var data []byte
 	err := handle.QueryRow("SELECT data FROM systemSaveData WHERE uuid = ?", uuid).Scan(&data)
 	if err != nil {
-		log.Println("Not Find Data")
+		logger.Info("Not Find Data")
 		return system, err
 	}
 
@@ -88,7 +88,7 @@ func ReadSystemSaveData(uuid []byte) (defs.SystemSaveData, error) {
 }
 
 func StoreSystemSaveData(uuid []byte, data defs.SystemSaveData) error {
-	log.Println("StoreSystemSaveData ", uuid, data)
+	logger.Info("StoreSystemSaveData %s %v", uuid, data)
 
 	buf := new(bytes.Buffer)
 
@@ -101,22 +101,22 @@ func StoreSystemSaveData(uuid []byte, data defs.SystemSaveData) error {
 
 	err = gob.NewEncoder(zw).Encode(data)
 	if err != nil {
-		log.Println("Encoding Error:", err)
+		logger.Error("Encoding Error: %v", err)
 		return err
 	}
 
 	zw.Flush()
-	log.Println("✅ Data flushed to buffer!")
+	logger.Info("✅ Data flushed to buffer!")
 
 	err = zw.Close()
 	if err != nil {
-		log.Println("❌ Failed to close ZSTD writer:", err)
+		logger.Error("❌ Failed to close ZSTD writer: %v", err)
 	} else {
-		log.Println("✅ ZSTD writer closed successfully")
+		logger.Info("✅ ZSTD writer closed successfully")
 	}
 
-	log.Println("Compressed Data Length:", len(buf.Bytes()))
-	log.Println("Compressed Data Content:", buf.Bytes())
+	logger.Info("Compressed Data Length: %d", len(buf.Bytes()))
+	logger.Info("Compressed Data Content: %v", buf.Bytes())
 	fmt.Println("Origin Data:", data)
 
 	_, err = handle.Exec("REPLACE INTO systemSaveData (uuid, data, timestamp) VALUES (?, ?, UTC_TIMESTAMP())", uuid, buf.Bytes())
@@ -168,7 +168,7 @@ func DeleteSystemSaveData(uuid []byte) error {
 }
 
 func ReadSessionSaveData(uuid []byte, slot int) (defs.SessionSaveData, error) {
-	log.Println("ReadSessionSaveData", uuid, slot)
+	logger.Info("ReadSessionSaveData %s %d", uuid, slot)
 	var session defs.SessionSaveData
 
 	var data []byte
@@ -194,7 +194,7 @@ func ReadSessionSaveData(uuid []byte, slot int) (defs.SessionSaveData, error) {
 
 func GetLatestSessionSaveDataSlot(uuid []byte) (int, error) {
 	var slot int
-	log.Printf("getlatestsessionsavedataslot")
+	logger.Info("getlatestsessionsavedataslot")
 	err := handle.QueryRow("SELECT slot FROM sessionSaveData WHERE uuid = ? ORDER BY timestamp DESC, slot ASC LIMIT 1", uuid).Scan(&slot)
 	if err != nil {
 		return -1, err
@@ -204,7 +204,7 @@ func GetLatestSessionSaveDataSlot(uuid []byte) (int, error) {
 }
 
 func StoreSessionSaveData(uuid []byte, data defs.SessionSaveData, slot int) error {
-	log.Println("StoreSessionSaveData", uuid, data, slot)
+	logger.Info("StoreSessionSaveData %s %v %d", uuid, data, slot)
 	buf := new(bytes.Buffer)
 
 	zw, err := zstd.NewWriter(buf)

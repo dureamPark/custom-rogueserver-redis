@@ -5,15 +5,12 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-
-	//"encoding/json"
-	"log"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 	"time"
 
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
 	"github.com/redis/go-redis/v9"
-	//"github.com/pagefaultgames/rogueserver/defs"
 )
 
 const (
@@ -36,7 +33,7 @@ func NewWriteBackWorker(redisClient *redis.Client, db *sql.DB) *WriteBackWorker 
 }
 
 func StartWriteBackWorker(db *sql.DB, redisClient *redis.Client) {
-	log.Println("Starting write-back worker...")
+	logger.Info("Starting write-back worker...")
 
 	worker := NewWriteBackWorker(redisClient, db)
 
@@ -56,14 +53,14 @@ func StartWriteBackWorker(db *sql.DB, redisClient *redis.Client) {
 
 // Run starts the worker's main loop in a goroutine.
 func (w *WriteBackWorker) Run(ctx context.Context) {
-	log.Println("Starting write-back worker...")
+	logger.Info("Starting write-back worker...")
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("Stopping write-back worker...")
+			logger.Info("Stopping write-back worker...")
 			return
 		case <-ticker.C:
 			w.flushDirtyData(ctx)
@@ -72,7 +69,7 @@ func (w *WriteBackWorker) Run(ctx context.Context) {
 }
 
 func (w *WriteBackWorker) flushDirtyData(ctx context.Context) {
-	log.Printf("flush Dirty Data")
+	logger.Info("flush Dirty Data")
 
 	// dirty key 확인하고 db에 업데이트해주기
 
@@ -82,7 +79,7 @@ func (w *WriteBackWorker) flushDirtyData(ctx context.Context) {
 	if err != nil {
 		// key가 없거나 데이터가 없는 경우
 		if err != redis.Nil {
-			log.Printf("Error popping dirty keys from Redis: %v", err)
+			logger.Error("Error popping dirty keys from Redis: %v", err)
 		}
 		return
 	}
@@ -92,20 +89,20 @@ func (w *WriteBackWorker) flushDirtyData(ctx context.Context) {
 		return
 	}
 
-	log.Printf("Processing %d dirty keys...", len(keys))
+	logger.Info("Processing %d dirty keys...", len(keys))
 
 	// dirtyKeys에 해당하는 값들 가져오기
 	for _, key := range keys {
 		keyBytes := []byte(key)
-		log.Printf(key)
+		logger.Info(key)
 		// uuid 가져오기
 		parts := bytes.SplitN(keyBytes, []byte(":"), 2)
 		var uuid []byte
 		if len(parts) == 2 {
 			uuid = parts[1]
-			log.Printf("추출된 UUID : %s", uuid)
+			logger.Info("추출된 UUID : %s", uuid)
 		} else {
-			log.Printf("잘못된 키 형식 입니다.")
+			logger.Error("잘못된 키 형식 입니다.")
 			continue
 		}
 
@@ -113,7 +110,7 @@ func (w *WriteBackWorker) flushDirtyData(ctx context.Context) {
 		// bytes() -> unmarshal -> struct
 		jsonStr, err := w.redisClient.JSONGet(ctx, key, "$").Result()
 		if err != nil {
-			log.Printf("Error getting JSON data for key %s: %v", key, err)
+			logger.Error("Error getting JSON data for key %s: %v", key, err)
 			continue
 		}
 
@@ -121,19 +118,19 @@ func (w *WriteBackWorker) flushDirtyData(ctx context.Context) {
 
 		var dirtyData defs.UserCacheData
 		if err := json.Unmarshal(data, &dirtyData); err != nil {
-			log.Printf("Error unmarshaling savedata for key %s: %v", key, err)
+			logger.Error("Error unmarshaling savedata for key %s: %v", key, err)
 			continue
 		}
 
 		// AccountStats
 		err = db.UpdateAccountStats(uuid, dirtyData.SystemSaveData.GameStats, dirtyData.SystemSaveData.VoucherCounts)
 		if err != nil {
-			log.Printf("WriteBack - UpdateAccountStats Error : %s", err)
+			logger.Error("WriteBack - UpdateAccountStats Error : %s", err)
 		}
 
 		err = db.StoreSystemSaveData(uuid, *dirtyData.SystemSaveData)
 		if err != nil {
-			log.Printf("WriteBack - StoreSystemSaveData Error : %s", err)
+			logger.Error("WriteBack - StoreSystemSaveData Error : %s", err)
 		}
 
 		// sessiondata
@@ -141,11 +138,11 @@ func (w *WriteBackWorker) flushDirtyData(ctx context.Context) {
 		for _, sessionData := range dirtyData.SessionSaveData {
 			err = db.StoreSessionSaveData(uuid, sessionData, index)
 			if err != nil {
-				log.Printf("WriteBack - StoreSessionSaveData Error : %s", err)
+				logger.Error("WriteBack - StoreSessionSaveData Error : %s", err)
 			}
 			index++
 		}
 
-		log.Printf("Successfully wrote key %s to database.", key)
+		logger.Info("Successfully wrote key %s to database.", key)
 	}
 }

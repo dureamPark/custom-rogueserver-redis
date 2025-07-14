@@ -21,12 +21,12 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -40,7 +40,7 @@ func GetSystem(uuid []byte) (defs.SystemSaveData, error) {
 
 	if errors.Is(err, redis.Nil) {
 		// 캐시에 저장된 세션 정보가 없으면
-		log.Printf("시스템 정보가 캐시에 없습니다.(key : %s) : %s", encodedUUID, err)
+		logger.Error("시스템 정보가 캐시에 없습니다.(key : %s) : %s", encodedUUID, err)
 
 		if os.Getenv("S3_SYSTEM_BUCKET_NAME") != "" { // use S3
 			system, err = db.GetSystemSaveFromS3(uuid)
@@ -48,7 +48,7 @@ func GetSystem(uuid []byte) (defs.SystemSaveData, error) {
 			//log.Println("use database GetSystem");
 			system, err = db.ReadSystemSaveData(uuid)
 		}
-		log.Printf("시스템 정보를 DB에서 찾습니다.")
+		logger.Info("시스템 정보를 DB에서 찾습니다.")
 
 		if err != nil {
 			return system, err

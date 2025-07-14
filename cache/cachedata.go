@@ -2,9 +2,9 @@ package cache
 
 import (
 	"encoding/base64"
-	"log"
 
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 )
 
 // uuid로 한 유저의 cachedata가 있는지 확인
@@ -32,7 +32,9 @@ func IsValidCacheData(uuid []byte) error {
 
 		// Redis에 저장
 		err = SetJSON(Ctx, redisKey, "$", initialData)
-		log.Printf("캐시에서 키 '%s'를 찾을 수 없음", redisKey)
+		if err != nil {
+			logger.Error("캐시에서 키 '%s'를 찾을 수 없음", redisKey)
+		}
 		return err
 	}
 

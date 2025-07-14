@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"log"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -51,7 +51,7 @@ func getEnv(k, def string) string {
 // ----------------------------
 // stores key-value data function
 func Set(ctx context.Context, key string, value interface{}, ttl time.Duration) error {	
-	log.Printf("Set")
+	logger.Info("Set")
 	err := Rdb.Set(ctx, key, value, ttl).Err()
 
 	MarkAsDirty(key) // Mark the key as dirty for write-back
@@ -61,7 +61,7 @@ func Set(ctx context.Context, key string, value interface{}, ttl time.Duration) 
 
 // stores key-value json data function
 func SetJSON(ctx context.Context, key string, path string, jsonData interface{}) error {
-	log.Printf("Set JSON")
+	logger.Info("Set JSON")
 	err := Rdb.JSONSet(ctx, key, path, jsonData).Err()
 	
 	MarkAsDirty(key) // Mark the key as dirty for write-back

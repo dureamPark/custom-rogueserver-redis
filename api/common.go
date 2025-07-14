@@ -22,13 +22,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/pagefaultgames/rogueserver/api/account"
 	"github.com/pagefaultgames/rogueserver/api/daily"
 	"github.com/pagefaultgames/rogueserver/cache"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/redis/go-redis/v9"
 	//"github.com/pagefaultgames/rogueserver/db"
 )
@@ -122,7 +122,7 @@ func tokenAndUuidFromRequest(r *http.Request) ([]byte, []byte, error) {
 	}
 
 	// 2) Redis 캐시 조회 (token→uuid)
-	log.Printf("token : %s\n", base64.StdEncoding.EncodeToString(token))
+	logger.Info("token : %s\n", base64.StdEncoding.EncodeToString(token))
 	uuid, err := cache.FetchSessionToken(token)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
@@ -180,7 +180,7 @@ func tokenAndUuidFromRequest(r *http.Request) ([]byte, []byte, error) {
 }*/
 
 func httpError(w http.ResponseWriter, r *http.Request, err error, code int) {
-	log.Printf("%s: %s\n", r.URL.Path, err)
+	logger.Error("%s: %s\n", r.URL.Path, err)
 	http.Error(w, err.Error(), code)
 }
 
