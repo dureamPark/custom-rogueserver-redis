@@ -28,10 +28,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/pagefaultgames/rogueserver/api"
 	"github.com/pagefaultgames/rogueserver/api/account"
+	"github.com/pagefaultgames/rogueserver/worker"
 
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
-	"github.com/pagefaultgames/rogueserver/worker"
 )
 
 func main() {
@@ -82,15 +82,17 @@ func main() {
 	if err := cache.Init(); err != nil {
 		log.Fatalf("failed to connect redis: %v", err)
 	}
-	log.Println("Redis connected")
+	log.Println("Redis connected~~")
 
 	// get database connection
+	log.Println("db init")
 	err := db.Init(dbuser, dbpass, dbproto, dbaddr, dbname)
 	if err != nil {
 		log.Fatalf("failed to initialize database: %s", err)
 	}
 
 	// create listener
+	log.Println("create listener")
 	listener, err := createListener(proto, addr)
 	if err != nil {
 		log.Fatalf("failed to create net listener: %s", err)
@@ -99,11 +101,18 @@ func main() {
 	mux := http.NewServeMux()
 
 	// init api
+	log.Println("init api")
 	if err := api.Init(mux); err != nil {
 		log.Fatal(err)
 	}
 
+	// start background workers
+	log.Println("Worker Start")
+	handle := db.GetHandle()
+	worker.StartWriteBackWorker(handle, cache.Rdb)
+
 	// start web server
+	log.Println("WebServer")
 	handler := prodHandler(mux, gameurl)
 	if debug {
 		handler = debugHandler(mux)
@@ -117,9 +126,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create http server or server errored: %s", err)
 	}
-
-	// start background workers
-	worker.StartWriteBackWorker(db.handle, cache.Rdb)
 
 }
 

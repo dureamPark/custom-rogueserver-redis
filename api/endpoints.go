@@ -358,9 +358,13 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 		httpError(w, r, fmt.Errorf("failed to retrieve playtime: %s", err), http.StatusInternalServerError)
 		return
 	} else {
+		if data.System.GameStats == nil {
+			httpError(w, r, fmt.Errorf("GameStats is nil"), http.StatusBadRequest)
+			return
+		}
 		playtime, ok := data.System.GameStats.(map[string]interface{})["playTime"].(float64)
 		if !ok {
-			httpError(w, r, fmt.Errorf("no playtime found"), http.StatusBadRequest)
+			httpError(w, r, fmt.Errorf("no playtime found or invalid type"), http.StatusBadRequest)
 			return
 		}
 

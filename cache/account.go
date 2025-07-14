@@ -13,6 +13,48 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+func InitAccountStatsInRedis(uuid []byte) error {
+	// Redis 키 생성
+	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
+
+	// 기본 AccountStatsRedisData 생성
+	redisData := defs.AccountStatsRedisData{
+		PlayTime:              0,
+		Battles:               0,
+		ClassicSessionsPlayed: 0,
+		SessionsWon:           0,
+		HighestEndlessWave:    0,
+		HighestLevel:          0,
+		PokemonSeen:           0,
+		PokemonDefeated:       0,
+		PokemonCaught:         0,
+		PokemonHatched:        0,
+		EggsPulled:            0,
+		RegularVouchers:       0,
+		PlusVouchers:          0,
+		PremiumVouchers:       0,
+		GoldenVouchers:        0,
+	}
+
+	// Redis 저장용 데이터를 JSON으로 마샬링
+	jsonData, err := json.Marshal(redisData)
+	if err != nil {
+		log.Printf("통계 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
+		return err
+	}
+
+	// Redis에 JSON 데이터 저장
+	err = SetJSON(Ctx, redisKey, "$.accountStats", jsonData)
+
+	if err != nil {
+		log.Printf("Redis에 통계 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
+		return err
+	}
+
+	log.Printf("계정 통계 데이터가 Redis에 성공적으로 캐시되었습니다. Key: %s, Expiration: %s\n", redisKey, sessionDataTTL)
+	return nil
+}
+
 // DB에서 가져온 AccountDBRow를 Redis 캐시에 저장하는 함수
 func CacheAccountInRedis(dbRow defs.AccountDBRow) error {
 

@@ -18,15 +18,15 @@
 package savedata
 
 import (
-	"fmt"
-	"os"
-	"log"
 	"encoding/base64"
 	"errors"
+	"fmt"
+	"log"
+	"os"
 
+	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
-	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/redis/go-redis/v9"
 )
 

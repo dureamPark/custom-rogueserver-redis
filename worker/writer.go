@@ -1,15 +1,18 @@
 package worker
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
+	"encoding/json"
+
 	//"encoding/json"
 	"log"
-	//"strings"
 	"time"
 
+	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/pagefaultgames/rogueserver/defs"
 	"github.com/redis/go-redis/v9"
-	//"github.com/pagefaultgames/rogueserver/db"
 	//"github.com/pagefaultgames/rogueserver/defs"
 )
 
@@ -34,7 +37,7 @@ func NewWriteBackWorker(redisClient *redis.Client, db *sql.DB) *WriteBackWorker 
 
 func StartWriteBackWorker(db *sql.DB, redisClient *redis.Client) {
 	log.Println("Starting write-back worker...")
-	
+
 	worker := NewWriteBackWorker(redisClient, db)
 
 	// Start the worker in a separate goroutine
@@ -69,73 +72,80 @@ func (w *WriteBackWorker) Run(ctx context.Context) {
 }
 
 func (w *WriteBackWorker) flushDirtyData(ctx context.Context) {
-	// keys, err := w.redisClient.SPopN(ctx, dirtyKeysSet, batchSize).Result()
-	// if err != nil {
-	// 	if err != redis.Nil {
-	// 		log.Printf("Error popping dirty keys from Redis: %v", err)
-	// 	}
-	// 	return
-	// }
+	log.Printf("flush Dirty Data")
 
-	// if len(keys) == 0 {
-	// 	return
-	// }
+	// dirty key 확인하고 db에 업데이트해주기
 
-	// log.Printf("Processing %d dirty keys...", len(keys))
+	// dirtyKeysSet에 있는 key들 batchSize만큼 가져오기
+	keys, err := w.redisClient.SPopN(ctx, dirtyKeysSet, batchSize).Result()
 
-	// for _, key := range keys {
-	// 	data, err := w.redisClient.Get(ctx, key).Bytes()
-	// 	// if err != nil {
-	// 	// 	log.Printf("Error getting data for key %s: %v", key, err)
-	// 	// 	continue
-	// 	// }
+	if err != nil {
+		// key가 없거나 데이터가 없는 경우
+		if err != redis.Nil {
+			log.Printf("Error popping dirty keys from Redis: %v", err)
+		}
+		return
+	}
 
-	// 	// // Parse the key to determine data type
-	// 	// parts := strings.SplitN(key, ":", 2)
-	// 	// if len(parts) != 2 {
-	// 	// 	log.Printf("Invalid key format, skipping: %s", key)
-	// 	// 	continue
-	// 	// }
-	// 	// dataType := parts[0]
+	// 변경된 데이터가 없는 경우 = dirtyKeys가 없는 경우
+	if len(keys) == 0 {
+		return
+	}
 
-	// 	// var writeErr error
-	// 	// // Route to the correct handler based on data type
-	// 	// switch dataType {
-	// 	// case "savedata":
-	// 	// 	var saveData defs.SaveData
-	// 	// 	if err := json.Unmarshal(data, &saveData); err != nil {
-	// 	// 		log.Printf("Error unmarshaling savedata for key %s: %v", key, err)
-	// 	// 		continue
-	// 	// 	}
-	// 	// 	writeErr = db.UpdateSaveData(ctx, w.db, &saveData)
+	log.Printf("Processing %d dirty keys...", len(keys))
 
-	// 	// case "account":
-	// 	// 	var accountData defs.Account
-	// 	// 	if err := json.Unmarshal(data, &accountData); err != nil {
-	// 	// 		log.Printf("Error unmarshaling account data for key %s: %v", key, err)
-	// 	// 		continue
-	// 	// 	}
-	// 	// 	// Assuming you have a function like this in your db package
-	// 	// 	writeErr = db.UpdateAccount(ctx, w.db, &accountData)
-		
-	// 	// // Add other cases for other data types here
-	// 	// // case "guild":
-	// 	// // ...
+	// dirtyKeys에 해당하는 값들 가져오기
+	for _, key := range keys {
+		keyBytes := []byte(key)
+		log.Printf(key)
+		// uuid 가져오기
+		parts := bytes.SplitN(keyBytes, []byte(":"), 2)
+		var uuid []byte
+		if len(parts) == 2 {
+			uuid = parts[1]
+			log.Printf("추출된 UUID : %s", uuid)
+		} else {
+			log.Printf("잘못된 키 형식 입니다.")
+			continue
+		}
 
-	// 	// default:
-	// 	// 	log.Printf("Unknown data type '%s' for key: %s", dataType, key)
-	// 	// 	continue
-	// 	// }
+		// 현재는 하나의 세션과 id로 묶여있으니까 그냥 JSON으로 가져오면 됨.
+		// bytes() -> unmarshal -> struct
+		jsonStr, err := w.redisClient.JSONGet(ctx, key, "$").Result()
+		if err != nil {
+			log.Printf("Error getting JSON data for key %s: %v", key, err)
+			continue
+		}
 
-	// 	// Common error handling for DB write operations
-	// 	if writeErr != nil {
-	// 		log.Printf("Error writing data for key %s to DB: %v", key, writeErr)
-	// 		// If DB write fails, add the key back to the dirty set to retry.
-	// 		// if err := w.redisClient.SAdd(ctx, dirtyKeysSet, key).Err(); err != nil {
-	// 		// 	log.Printf("CRITICAL: Failed to add key %s back to dirty set after DB error: %v", key, err)
-	// 		// }
-	// 		// continue
-	// 	}
-	// 	log.Printf("Successfully wrote key %s to database.", key)
-	// }
+		data := []byte(jsonStr)
+
+		var dirtyData defs.UserCacheData
+		if err := json.Unmarshal(data, &dirtyData); err != nil {
+			log.Printf("Error unmarshaling savedata for key %s: %v", key, err)
+			continue
+		}
+
+		// AccountStats
+		err = db.UpdateAccountStats(uuid, dirtyData.SystemSaveData.GameStats, dirtyData.SystemSaveData.VoucherCounts)
+		if err != nil {
+			log.Printf("WriteBack - UpdateAccountStats Error : %s", err)
+		}
+
+		err = db.StoreSystemSaveData(uuid, *dirtyData.SystemSaveData)
+		if err != nil {
+			log.Printf("WriteBack - StoreSystemSaveData Error : %s", err)
+		}
+
+		// sessiondata
+		index := 0
+		for _, sessionData := range dirtyData.SessionSaveData {
+			err = db.StoreSessionSaveData(uuid, sessionData, index)
+			if err != nil {
+				log.Printf("WriteBack - StoreSessionSaveData Error : %s", err)
+			}
+			index++
+		}
+
+		log.Printf("Successfully wrote key %s to database.", key)
+	}
 }

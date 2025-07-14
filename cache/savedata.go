@@ -32,11 +32,20 @@ func ReadSessionSaveData(uuid []byte, slot int) (defs.SessionSaveData, error) { 
 		return saveData, err
 	}
 
+	if jsonData == "[null]" || jsonData == "null" || jsonData == "[]" {
+		return saveData, redis.Nil // 빈 구조체 반환, 에러 없음
+	}
+
 	// json 데이터 처리
-	var saveDataArr defs.SessionSaveData
+	var saveDataArr []defs.SessionSaveData // defs.SessionSaveData
 	if err := json.Unmarshal([]byte(jsonData), &saveDataArr); err != nil {
 		log.Printf("세션 데이터 JSON 언마샬링 오류 (키: %s): %s", redisKey, err)
 		return saveData, redis.Nil
+	}
+
+	// redis에서 가져온 데이터가 배열로 처리되서..?
+	if len(saveDataArr) > 0 {
+		saveData = saveDataArr[0]
 	}
 
 	return saveData, nil
@@ -52,14 +61,14 @@ func StoreSessionSaveData(uuid []byte, data defs.SessionSaveData, slot int) erro
 	jsonPath := fmt.Sprintf(`$.sessionSaveData["%s"]`, strconv.Itoa(slot))
 
 	// SessionSaveData 구조체를 JSON으로 마샬링
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		log.Printf("세션 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
-		return err
-	}
+	// jsonData, err := json.Marshal(data)
+	// if err != nil {
+	// 	log.Printf("세션 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
+	// 	return err
+	// }
 
 	// Redis에 JSON 데이터 저장
-	err = SetJSON(Ctx, redisKey, jsonPath, jsonData)
+	err := SetJSON(Ctx, redisKey, jsonPath, data)
 	if err != nil {
 		log.Printf("Redis에 세션 데이터 저장 오류 (키: %s): %s", redisKey, err)
 		return err
@@ -96,7 +105,7 @@ func DeleteSessionSaveData(uuid []byte, slot int) error {
 	return nil
 }
 
-func ReadSystemSaveData(uuid []byte)(defs.SystemSaveData, error){
+func ReadSystemSaveData(uuid []byte) (defs.SystemSaveData, error) {
 	var systemData defs.SystemSaveData
 
 	encodedUUID := base64.StdEncoding.EncodeToString(uuid)
@@ -117,9 +126,20 @@ func ReadSystemSaveData(uuid []byte)(defs.SystemSaveData, error){
 		return systemData, err
 	}
 
+	if jsonData == "[null]" || jsonData == "null" || jsonData == "[]" {
+		return systemData, redis.Nil // 빈 구조체 반환, 에러 없음
+	}
+
+	// json 데이터 처리
+	var systemDataArr []defs.SystemSaveData
 	if err := json.Unmarshal([]byte(jsonData), &systemData); err != nil {
 		log.Printf("시스템 데이터 JSON 언마샬링 오류 (키: %s): %s", redisKey, err)
-		//return systemData, err
+		return systemData, redis.Nil
+	}
+
+	// redis에서 가져온 데이터가 배열로 처리되서..?
+	if len(systemDataArr) > 0 {
+		systemData = systemDataArr[0]
 	}
 
 	return systemData, nil
@@ -131,14 +151,14 @@ func StoreSystemSaveData(uuid []byte, data defs.SystemSaveData) error { // defs.
 
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 
-	// SessionSaveData 구조체를 JSON으로 마샬링
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		return fmt.Errorf("세션 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
-	}
+	// // SessionSaveData 구조체를 JSON으로 마샬링
+	// jsonData, err := json.Marshal(data)
+	// if err != nil {
+	// 	return fmt.Errorf("세션 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
+	// }
 
 	// Redis에 JSON 데이터 저장
-	err = SetJSON(Ctx, redisKey, "$.systemSaveData", jsonData)
+	err := SetJSON(Ctx, redisKey, "$.systemSaveData", data)
 	if err != nil {
 		log.Printf("Redis에 세션 데이터 저장 오류 (키: %s): %s", redisKey, err)
 		return err

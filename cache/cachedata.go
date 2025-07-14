@@ -2,8 +2,6 @@ package cache
 
 import (
 	"encoding/base64"
-	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/pagefaultgames/rogueserver/defs"
@@ -26,14 +24,14 @@ func IsValidCacheData(uuid []byte) error {
 		}
 
 		// JSON으로 마샬링
-		jsonDataBytes, err := json.Marshal(initialData)
-		if err != nil {
-			return fmt.Errorf("초기 UserCacheData JSON 마샬링 오류 (Key: %s): %s", redisKey, err)
-		}
-		jsonData := string(jsonDataBytes)
+		// jsonDataBytes, err := json.Marshal(initialData)
+		// if err != nil {
+		// 	return fmt.Errorf("초기 UserCacheData JSON 마샬링 오류 (Key: %s): %s", redisKey, err)
+		// }
+		// jsonData := string(jsonDataBytes)
 
 		// Redis에 저장
-		err = SetJSON(Ctx, redisKey, "$", jsonData)
+		err = SetJSON(Ctx, redisKey, "$", initialData)
 		log.Printf("캐시에서 키 '%s'를 찾을 수 없음", redisKey)
 		return err
 	}

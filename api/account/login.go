@@ -25,7 +25,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"log"
 
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
@@ -111,21 +110,27 @@ func GenerateTokenForUsername(username string) (string, error) {
 	accountData, err := db.GetAccountFromDB(uuid)
 
 	if err != nil {
+		// 없는 경우에는 회원이 아닌 거임.
 		return "", fmt.Errorf("%s", err)
+	} else {
+		// 정보가 있는 경우에만 account 정보 cache로 가져오기
+		cache.CacheAccountInRedis(accountData)
 	}
-	// account 정보 cache로 가져오기
-	cache.CacheAccountInRedis(accountData)
 
 	// db에서 로그인 유저 통계 정보 가져와서 cache에 저장
 	accountStatsData, err := db.GetAccountStatsFromDB(uuid)
 	log.Printf("Login account StatsData : %s", accountStatsData)
-	// accountStats 정보 cache로 가져오기
-	cache.CacheAccountStatsInRedis(uuid, accountStatsData)
-	
+
 	if err != nil {
 		log.Printf("GetAccountStatsFromDB 에서 에러발생: %s", err)
+		// 없는 경우는 회원가입 후 처음 로그인 상황 초기화해줘야 됨.
+		cache.InitAccountStatsInRedis(uuid)
 		return base64.StdEncoding.EncodeToString(token), nil
-	} 
+	} else {
+		// accountStats 정보가 db에 있는 경우에만 cache로 가져오기
+		cache.CacheAccountStatsInRedis(uuid, accountStatsData)
+	}
+
 	// 유저 아이디와 토큰값으로 세션 정보 저장 -> DB에 굳이 할 필요가 없어짐
 	// err = db.AddAccountSession(username, token)
 	// if err != nil {

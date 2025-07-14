@@ -25,7 +25,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var handle *sql.DB
+var (
+	handle *sql.DB
+)
 
 func Init(username, password, protocol, address, database string) error {
 	var err error
@@ -123,4 +125,8 @@ func setupDb(tx *sql.Tx) error {
 	}
 
 	return nil
+}
+
+func GetHandle() *sql.DB {
+    return handle
 }
