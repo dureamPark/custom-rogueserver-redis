@@ -1,15 +1,17 @@
 package worker
 
 import (
-	"bytes"
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"encoding/json"
-	"github.com/pagefaultgames/rogueserver/util/logger"
+	"strings"
 	"time"
 
-	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/util/logger"
+
+	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -93,49 +95,75 @@ func (w *WriteBackWorker) flushDirtyData(ctx context.Context) {
 
 	// dirtyKeys에 해당하는 값들 가져오기
 	for _, key := range keys {
-		keyBytes := []byte(key)
-		logger.Info(key)
-		// uuid 가져오기
-		parts := bytes.SplitN(keyBytes, []byte(":"), 2)
-		var uuid []byte
-		if len(parts) == 2 {
-			uuid = parts[1]
-			logger.Info("추출된 UUID : %s", uuid)
+
+		base64String := strings.TrimPrefix(key, "session:")
+		uuid, err := base64.StdEncoding.DecodeString(base64String)
+
+		// TODO.언마샬링할 때, Account에 있는 Time.time 자료형으로 인해 에러 발생
+		// 일단 필요한 데이터만 받아서 사용하는 식으로 구현해두고, 나중에 캐시바꾸고 여기도 바꾸기
+		// dataTypeArr := [3]string{"accountStats", "systemSaveData", "sessionSaveData"}
+
+		defaultPath := "$."
+		systemPath := defaultPath + "systemSaveData"
+		systemDataJSON, err := w.redisClient.JSONGet(ctx, key, systemPath).Result()
+		if err != nil {
+			logger.Error("Error JSONGET system savedata for key %s: %v", key, err)
+			continue
+		}
+
+		var systemData defs.SystemSaveData
+		var systemDataArr []defs.SystemSaveData
+		err = json.Unmarshal([]byte(systemDataJSON), &systemDataArr)
+		if err != nil {
+			logger.Error("Error unmarshaling system savedata for key %s: %v", key, err)
+			continue
+		}
+
+		if len(systemDataArr) > 0 {
+			systemData = systemDataArr[0]
 		} else {
-			logger.Error("잘못된 키 형식 입니다.")
 			continue
 		}
 
-		// 현재는 하나의 세션과 id로 묶여있으니까 그냥 JSON으로 가져오면 됨.
-		// bytes() -> unmarshal -> struct
-		jsonStr, err := w.redisClient.JSONGet(ctx, key, "$").Result()
-		if err != nil {
-			logger.Error("Error getting JSON data for key %s: %v", key, err)
-			continue
-		}
+		// AccountStat1s - systemData.VoucherCounts이 NULL이라 뜨네..
+		// err = db.UpdateAccountStats(uuid, systemData.GameStats, systemData.VoucherCounts)
+		// if err != nil {
+		// 	logger.Error("WriteBack - UpdateAccountStats Error : %s", err)
+		// 	continue
+		// }
 
-		data := []byte(jsonStr)
-
-		var dirtyData defs.UserCacheData
-		if err := json.Unmarshal(data, &dirtyData); err != nil {
-			logger.Error("Error unmarshaling savedata for key %s: %v", key, err)
-			continue
-		}
-
-		// AccountStats
-		err = db.UpdateAccountStats(uuid, dirtyData.SystemSaveData.GameStats, dirtyData.SystemSaveData.VoucherCounts)
-		if err != nil {
-			logger.Error("WriteBack - UpdateAccountStats Error : %s", err)
-		}
-
-		err = db.StoreSystemSaveData(uuid, *dirtyData.SystemSaveData)
+		// SystemData
+		err = db.StoreSystemSaveData(uuid, systemData)
 		if err != nil {
 			logger.Error("WriteBack - StoreSystemSaveData Error : %s", err)
+			continue
+		}
+
+		// Session
+		sessionPath := defaultPath + "sessionSaveData"
+		sessionDataJSON, err := w.redisClient.JSONGet(ctx, key, sessionPath).Result()
+		if err != nil {
+			logger.Error("Error JSONGET session savedata for key %s: %v", key, err)
+			continue
+		}
+
+		var sessionDataMap map[string]defs.SessionSaveData
+		var sessionDataArr []map[string]defs.SessionSaveData
+		err = json.Unmarshal([]byte(sessionDataJSON), &sessionDataArr)
+		if err != nil {
+			logger.Error("Error unmarshaling session savedata for key %s: %v", key, err)
+			continue
+		}
+
+		if len(sessionDataArr) > 0 {
+			sessionDataMap = sessionDataArr[0]
+		} else {
+			continue
 		}
 
 		// sessiondata
 		index := 0
-		for _, sessionData := range dirtyData.SessionSaveData {
+		for _, sessionData := range sessionDataMap {
 			err = db.StoreSessionSaveData(uuid, sessionData, index)
 			if err != nil {
 				logger.Error("WriteBack - StoreSessionSaveData Error : %s", err)

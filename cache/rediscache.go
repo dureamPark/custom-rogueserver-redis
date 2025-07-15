@@ -5,14 +5,15 @@ import (
 	"os"
 	"strconv"
 	"time"
+
 	"github.com/pagefaultgames/rogueserver/util/logger"
 
 	"github.com/redis/go-redis/v9"
 )
 
 var (
-	Ctx   = context.Background()
-	Rdb   *redis.Client
+	Ctx = context.Background()
+	Rdb *redis.Client
 )
 
 const sessionDataTTL = time.Hour * 24 * 7
@@ -44,17 +45,18 @@ func getEnv(k, def string) string {
 	return def
 }
 
-//-----------------------------
-// 
-// 	  Cache Write Functions
-// 
+// -----------------------------
+//
+//	Cache Write Functions
+//
 // ----------------------------
 // stores key-value data function
-func Set(ctx context.Context, key string, value interface{}, ttl time.Duration) error {	
+func Set(ctx context.Context, key string, value interface{}, ttl time.Duration) error {
 	logger.Info("Set")
 	err := Rdb.Set(ctx, key, value, ttl).Err()
 
-	MarkAsDirty(key) // Mark the key as dirty for write-back
+	// write-back worker에서 json만 처리하고 있어서 일단 주석 처리했음.
+	//MarkAsDirty(key) // Mark the key as dirty for write-back
 
 	return err
 }
@@ -63,8 +65,8 @@ func Set(ctx context.Context, key string, value interface{}, ttl time.Duration) 
 func SetJSON(ctx context.Context, key string, path string, jsonData interface{}) error {
 	logger.Info("Set JSON")
 	err := Rdb.JSONSet(ctx, key, path, jsonData).Err()
-	
+
 	MarkAsDirty(key) // Mark the key as dirty for write-back
-	
+
 	return err
 }

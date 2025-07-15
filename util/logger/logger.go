@@ -63,7 +63,7 @@ func Info(format string, args ...interface{}) {
 	mu.Lock()
 	defer mu.Unlock()
 	if currentLevel <= INFO {
-		//logger.Println(formatMessage(INFO, format, args...))
+		logger.Println(formatMessage(INFO, format, args...))
 	}
 }
 
