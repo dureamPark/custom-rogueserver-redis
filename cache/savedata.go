@@ -37,14 +37,13 @@ func ReadSessionSaveData(uuid []byte, slot int) (defs.SessionSaveData, error) { 
 		return saveData, redis.Nil // 빈 구조체 반환, 에러 없음
 	}
 
-	// json 데이터 처리
-	var saveDataArr []defs.SessionSaveData // defs.SessionSaveData
+	// json 데이터 처리: jsonData를 직접 saveData 구조체로 언마샬링
+	var saveDataArr []defs.SessionSaveData
 	if err := json.Unmarshal([]byte(jsonData), &saveDataArr); err != nil {
 		logger.Error("세션 데이터 JSON 언마샬링 오류 (키: %s): %s", redisKey, err)
-		return saveData, redis.Nil
+		return saveData, err
 	}
 
-	// redis에서 가져온 데이터가 배열로 처리되서..?
 	if len(saveDataArr) > 0 {
 		saveData = saveDataArr[0]
 	}
@@ -132,16 +131,16 @@ func ReadSystemSaveData(uuid []byte) (defs.SystemSaveData, error) {
 	}
 
 	// json 데이터 처리
-	//var systemDataArr []defs.SystemSaveData
-	if err := json.Unmarshal([]byte(jsonData), &systemData); err != nil {
-		logger.Error("시스템 데이터 JSON 언마샬링 오류 (키: %s, jsonData : %s): %s", redisKey, jsonData, err)
+	var systemDataArr []defs.SystemSaveData
+	if err := json.Unmarshal([]byte(jsonData), &systemDataArr); err != nil {
+		logger.Error("시스템 데이터 JSON 언마샬링 오류 (키: %s, jsonDatalen : %d): %s", redisKey, len(jsonData), err)
 		return systemData, redis.Nil
 	}
 
 	// redis에서 가져온 데이터가 배열로 처리되서..?
-	// if len(systemDataArr) > 0 {
-	// 	systemData = systemDataArr[0]
-	// }
+	if len(systemDataArr) > 0 {
+		systemData = systemDataArr[0]
+	}
 
 	return systemData, nil
 }

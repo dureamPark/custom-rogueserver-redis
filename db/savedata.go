@@ -22,9 +22,9 @@ import (
 	"context"
 	"encoding/gob"
 	"encoding/json"
-	"fmt"
-	"github.com/pagefaultgames/rogueserver/util/logger"
 	"os"
+
+	"github.com/pagefaultgames/rogueserver/util/logger"
 
 	"github.com/klauspost/compress/zstd"
 	"github.com/pagefaultgames/rogueserver/defs"
@@ -117,7 +117,6 @@ func StoreSystemSaveData(uuid []byte, data defs.SystemSaveData) error {
 
 	logger.Info("Compressed Data Length: %d", len(buf.Bytes()))
 	logger.Info("Compressed Data Content: %v", buf.Bytes())
-	fmt.Println("Origin Data:", data)
 
 	_, err = handle.Exec("REPLACE INTO systemSaveData (uuid, data, timestamp) VALUES (?, ?, UTC_TIMESTAMP())", uuid, buf.Bytes())
 	if err != nil {

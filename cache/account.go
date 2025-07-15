@@ -2,7 +2,6 @@ package cache
 
 import (
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"slices"
 	"strings"
@@ -38,14 +37,14 @@ func InitAccountStatsInRedis(uuid []byte) error {
 	}
 
 	// Redis 저장용 데이터를 JSON으로 마샬링
-	jsonData, err := json.Marshal(redisData)
-	if err != nil {
-		logger.Error("통계 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
-		return err
-	}
+	// jsonData, err := json.Marshal(redisData)
+	// if err != nil {
+	// 	logger.Error("통계 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
+	// 	return err
+	// }
 
 	// Redis에 JSON 데이터 저장
-	err = SetJSON(Ctx, redisKey, "$.accountStats", jsonData)
+	err := SetJSON(Ctx, redisKey, "$.accountStats", redisData)
 
 	if err != nil {
 		logger.Error("Redis에 통계 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
@@ -94,14 +93,15 @@ func CacheAccountInRedis(dbRow defs.AccountDBRow) error {
 	}
 
 	// JSON으로 마샬링
-	jsonData, err := json.Marshal(redisData)
-	if err != nil {
-		logger.Error("Redis 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
-		return err
-	}
+	// jsonData, err := json.Marshal(redisData)
+	// if err != nil {
+	// 	logger.Error("Redis 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
+	// 	return err
+	// }
 
+	//fmt.Printf("CacheAccountInRedis : %s", redisData)
 	// Redis에 저장
-	err = SetJSON(Ctx, redisKey, "$.account", jsonData)
+	err := SetJSON(Ctx, redisKey, "$.account", redisData)
 	if err != nil {
 		logger.Error("Redis에 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
 		return err
@@ -138,14 +138,14 @@ func CacheAccountStatsInRedis(uuid []byte, dbStats defs.AccountStatsData) error 
 	}
 
 	// Redis 저장용 데이터를 JSON으로 마샬링
-	jsonData, err := json.Marshal(redisData)
-	if err != nil {
-		logger.Error("통계 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
-		return err
-	}
+	// jsonData, err := json.Marshal(redisData)
+	// if err != nil {
+	// 	logger.Error("통계 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
+	// 	return err
+	// }
 
 	// Redis에 JSON 데이터 저장
-	err = SetJSON(Ctx, redisKey, "$.accountStats", jsonData)
+	err := SetJSON(Ctx, redisKey, "$.accountStats", redisData)
 
 	if err != nil {
 		logger.Error("Redis에 통계 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
