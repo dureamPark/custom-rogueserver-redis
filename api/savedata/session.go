@@ -20,7 +20,6 @@ package savedata
 import (
 	"encoding/base64"
 	"errors"
-	"log"
 
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
@@ -30,7 +29,6 @@ import (
 )
 
 func GetSession(uuid []byte, slot int) (defs.SessionSaveData, error) {
-	log.Println("GetSession")
 
 	encodedUUID := base64.StdEncoding.EncodeToString(uuid)
 

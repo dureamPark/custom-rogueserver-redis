@@ -23,6 +23,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"os"
+	"strings"
 
 	"github.com/pagefaultgames/rogueserver/util/logger"
 
@@ -88,7 +89,7 @@ func ReadSystemSaveData(uuid []byte) (defs.SystemSaveData, error) {
 }
 
 func StoreSystemSaveData(uuid []byte, data defs.SystemSaveData) error {
-	logger.Info("StoreSystemSaveData %s %v", uuid, data)
+	//logger.Info("StoreSystemSaveData %s %v", uuid, data)
 
 	buf := new(bytes.Buffer)
 
@@ -116,7 +117,7 @@ func StoreSystemSaveData(uuid []byte, data defs.SystemSaveData) error {
 	}
 
 	logger.Info("Compressed Data Length: %d", len(buf.Bytes()))
-	logger.Info("Compressed Data Content: %v", buf.Bytes())
+	//logger.Info("Compressed Data Content: %v", buf.Bytes())
 
 	_, err = handle.Exec("REPLACE INTO systemSaveData (uuid, data, timestamp) VALUES (?, ?, UTC_TIMESTAMP())", uuid, buf.Bytes())
 	if err != nil {
@@ -235,6 +236,129 @@ func DeleteSessionSaveData(uuid []byte, slot int) error {
 	}
 
 	return nil
+}
+
+// StoreSessionSaveDataBulk는 주어진 UUID에 대한 여러 세션 데이터를 DB에 일괄 업데이트합니다.
+// 함수 시그니처를 호출하는 쪽의 맥락에 맞게 재정의했습니다.
+// (예: bulk 처리를 위해 uuid 슬라이스와 sessionsDataMap 슬라이스를 받도록)
+func StoreSessionSaveDataBulk(ctx context.Context, uuids [][]byte, sessionsDataMapList []map[string]defs.SessionSaveData, slot int) error {
+	logger.Info("StoreSessionSaveDataBulk processing a batch...")
+
+	// 단일 트랜잭션 시작: 모든 업데이트가 성공하거나 모두 실패하도록 보장
+	tx, err := handle.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	// defer로 롤백을 호출하여, 에러 발생 시 자동 롤백되도록 함
+	defer tx.Rollback()
+
+	// 쿼리 파라미터들을 담을 슬라이스
+	var args []interface{}
+	// BULK INSERT의 VALUES 부분을 생성하기 위한 슬라이스
+	var valuePlaceholders []string
+
+	// 데이터들을 순회하며 파라미터와 플레이스홀더를 준비합니다.
+	for i, sessionsDataMap := range sessionsDataMapList {
+		uuid := uuids[i]
+
+		for data := range sessionsDataMap {
+			var buf bytes.Buffer
+			zw, err := zstd.NewWriter(&buf)
+			if err != nil {
+				return err
+			}
+
+			err = gob.NewEncoder(zw).Encode(data)
+			if err != nil {
+				zw.Close()
+				return err
+			}
+			zw.Close()
+
+			// UUID, sessionID, data, timestamp에 대한 플레이스홀더를 추가합니다.
+			// (?, ?, ?, UTC_TIMESTAMP())는 한 행에 대한 플레이스홀더입니다.
+			valuePlaceholders = append(valuePlaceholders, "(?, ?, ?, UTC_TIMESTAMP())")
+
+			// 쿼리 실행에 필요한 파라미터들을 순서대로 슬라이스에 추가합니다.
+			args = append(args, uuid, slot, buf.Bytes())
+		}
+	}
+
+	if len(args) == 0 {
+		return nil // 처리할 데이터가 없으면 종료
+	}
+
+	// 동적으로 VALUES 부분을 조합하여 하나의 쿼리를 생성합니다.
+	// REPLACE INTO는 기존 행을 삭제 후 재삽입하므로, INSERT ... ON DUPLICATE KEY UPDATE가 더 효율적입니다.
+	query := "REPLACE INTO sessionSaveData (uuid, slot, data, timestamp) VALUES " + strings.Join(valuePlaceholders, ", ")
+
+	// 하나의 트랜잭션으로 모든 데이터를 한 번에 실행합니다.
+	_, err = tx.ExecContext(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+
+	// 모든 작업이 성공했으므로 트랜잭션을 커밋합니다.
+	return tx.Commit()
+}
+
+func StoreSystemSaveDataBulk(ctx context.Context, uuids [][]byte, systemsDataList []defs.SystemSaveData) error {
+	logger.Info("StoreSystemSaveDataBulk processing a batch...")
+
+	// 단일 트랜잭션 시작: 모든 업데이트가 성공하거나 모두 실패하도록 보장
+	tx, err := handle.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	// defer로 롤백을 호출하여, 에러 발생 시 자동 롤백되도록 함
+	defer tx.Rollback()
+
+	// 쿼리 파라미터들을 담을 슬라이스
+	var args []interface{}
+	// BULK INSERT의 VALUES 부분을 생성하기 위한 슬라이스
+	var valuePlaceholders []string
+
+	// 데이터들을 순회하며 파라미터와 플레이스홀더를 준비합니다.
+	for i, data := range systemsDataList {
+		uuid := uuids[i]
+
+		// gob와 zstd를 사용하여 데이터를 직렬화 및 압축합니다.
+		var buf bytes.Buffer
+		zw, err := zstd.NewWriter(&buf)
+		if err != nil {
+			return err
+		}
+
+		err = gob.NewEncoder(zw).Encode(data)
+		if err != nil {
+			zw.Close()
+			return err
+		}
+		zw.Close()
+
+		// UUID, data, timestamp에 대한 플레이스홀더를 추가합니다.
+		// (?, ?, UTC_TIMESTAMP())는 한 행에 대한 플레이스홀더입니다.
+		valuePlaceholders = append(valuePlaceholders, "(?, ?, UTC_TIMESTAMP())")
+
+		// 쿼리 실행에 필요한 파라미터들을 순서대로 슬라이스에 추가합니다.
+		args = append(args, uuid, buf.Bytes())
+	}
+
+	if len(args) == 0 {
+		return nil // 처리할 데이터가 없으면 종료
+	}
+
+	// 동적으로 VALUES 부분을 조합하여 하나의 쿼리를 생성합니다.
+	query := "REPLACE INTO systemSaveData (uuid, data, timestamp) VALUES " + strings.Join(valuePlaceholders, ", ")
+
+	// 하나의 트랜잭션으로 모든 데이터를 한 번에 실행합니다.
+	_, err = tx.ExecContext(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+
+	// 모든 작업이 성공했으므로 트랜잭션을 커밋합니다.
+	return tx.Commit()
 }
 
 func RetrievePlaytime(uuid []byte) (int, error) {

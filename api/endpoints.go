@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/pagefaultgames/rogueserver/util/logger"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/pagefaultgames/rogueserver/api/account"
 	"github.com/pagefaultgames/rogueserver/api/daily"
@@ -36,7 +37,6 @@ import (
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
-	"github.com/redis/go-redis/v9"
 )
 
 /*
@@ -329,6 +329,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 	//storedTrainerId, storedSecretId, err := db.FetchTrainerIds(uuid)
 	storedTrainerId, storedSecretId, err := cache.FetchTrainerIds(uuid)
 	if err != nil {
+		logger.Error("%s", err)
 		if errors.Is(err, redis.Nil) {
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
@@ -387,7 +388,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	logger.Info("Update %s %d %v", uuid, data.SessionSlotId, data.Session)
+	//logger.Info("Update %s %d %v", uuid, data.SessionSlotId, data.Session)
 	err = savedata.Update(uuid, data.SessionSlotId, data.Session)
 	if err != nil {
 		logger.Error("%v", err)

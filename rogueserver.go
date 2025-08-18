@@ -19,11 +19,12 @@ package main
 
 import (
 	"encoding/gob"
-	"github.com/pagefaultgames/rogueserver/util/logger"
 	"net"
 	"net/http"
 	"os"
 	"strconv"
+
+	"github.com/pagefaultgames/rogueserver/util/logger"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/pagefaultgames/rogueserver/api"
@@ -81,7 +82,7 @@ func main() {
 	//redis setting
 	if err := cache.Init(); err != nil {
 		logger.Error("failed to connect redis: %v", err)
-	os.Exit(1)
+		os.Exit(1)
 	}
 	logger.Info("Redis connected~~")
 
@@ -90,7 +91,7 @@ func main() {
 	err := db.Init(dbuser, dbpass, dbproto, dbaddr, dbname)
 	if err != nil {
 		logger.Error("failed to initialize database: %s", err)
-	os.Exit(1)
+		os.Exit(1)
 	}
 
 	// create listener
@@ -98,7 +99,7 @@ func main() {
 	listener, err := createListener(proto, addr)
 	if err != nil {
 		logger.Error("failed to create net listener: %s", err)
-	os.Exit(1)
+		os.Exit(1)
 	}
 
 	mux := http.NewServeMux()
@@ -107,7 +108,7 @@ func main() {
 	logger.Info("init api")
 	if err := api.Init(mux); err != nil {
 		logger.Error("%v", err)
-	os.Exit(1)
+		os.Exit(1)
 	}
 
 	// start background workers
@@ -129,7 +130,7 @@ func main() {
 	}
 	if err != nil {
 		logger.Error("failed to create http server or server errored: %s", err)
-	os.Exit(1)
+		os.Exit(1)
 	}
 
 }

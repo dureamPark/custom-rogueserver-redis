@@ -33,7 +33,7 @@ func Init() error {
 	})
 
 	// 1초 내로 PING 응답 없으면 에러
-	ctx, cancel := context.WithTimeout(Ctx, time.Second)
+	ctx, cancel := context.WithTimeout(Ctx, time.Second*10)
 	defer cancel()
 	return Rdb.Ping(ctx).Err()
 }

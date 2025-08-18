@@ -2,6 +2,7 @@ package cache
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"slices"
 	"strings"
@@ -174,6 +175,7 @@ func IsActiveSession(uuid []byte, sessionId string) (bool, error) {
 	id, err := Rdb.JSONGet(Ctx, redisKey, ".activeClientSession").Result()
 
 	if err != nil {
+		logger.Error("fail to Set Active Session in redis")
 		// 초기화를 빈 문자열로 ""로 해서 확인하기
 		err = UpdateActiveSession(uuid, sessionId)
 		if err != nil {
@@ -212,7 +214,7 @@ func FetchTrainerIds(uuid []byte) (int, int, error) {
 
 	// JSON.MGET을 사용하여 여러 경로의 값을 한 번에 가져올 수 있음
 	// 결과는 []interface{} 형태의 슬라이스로 오며, 각 요소는 해당 경로의 값 또는 nil
-	vals, err := Rdb.JSONMGet(Ctx, redisKey, "$.account.trainerId", "$.account.secretId").Result()
+	result, err := Rdb.JSONGet(Ctx, redisKey, "$.account.trainerId", "$.account.secretId").Result()
 
 	if err == redis.Nil {
 		return 0, 0, fmt.Errorf("캐시에서 UUID '%s'에 해당하는 계정을 찾을 수 없음: %w", uuid, err)
@@ -220,27 +222,18 @@ func FetchTrainerIds(uuid []byte) (int, int, error) {
 		return 0, 0, fmt.Errorf("RedisJSON.MGET 오류 (키: %s): %w", redisKey, err)
 	}
 
-	var trainerID int
-	if vals[0] != nil {
-		// RedisJSON은 숫자를 float64로 반환하는 경우가 많으므로 타입 변환 필요
-		if tidFloat, ok := vals[0].(float64); ok {
-			tidVal := int(tidFloat)
-			trainerID = tidVal
-		} else if tidInt, ok := vals[0].(int64); ok { // 또는 int64
-			tidVal := int(tidInt)
-			trainerID = tidVal
-		}
+	var values []int
+	err = json.Unmarshal([]byte(result), &values)
+	if err != nil {
+		// 에러 처리
 	}
 
-	var secretID int
-	if vals[1] != nil {
-		if sidFloat, ok := vals[1].(float64); ok {
-			sidVal := int(sidFloat)
-			secretID = sidVal
-		} else if sidInt, ok := vals[1].(int64); ok {
-			sidVal := int(sidInt)
-			secretID = sidVal
-		}
+	trainerID := 0
+	secretID := 0
+
+	if len(values) >= 2 {
+		trainerID = values[0]
+		secretID = values[1]
 	}
 
 	return trainerID, secretID, nil

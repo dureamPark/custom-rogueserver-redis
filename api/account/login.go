@@ -90,7 +90,7 @@ func GenerateTokenForUsername(username string) (string, error) {
 	// token / uuid
 	err = cache.StoreSessionToken(uuid, token)
 	if err != nil {
-		return "", fmt.Errorf("failed to store token")
+		return "", fmt.Errorf("failed to store token : %s", err)
 	}
 
 	// 유저가 로그인한 것이기 때문에 Cache에 Userdata가 있는지 확인
@@ -121,10 +121,10 @@ func GenerateTokenForUsername(username string) (string, error) {
 	accountStatsData, err := db.GetAccountStatsFromDB(uuid)
 	logger.Info("Login account StatsData : %s", accountStatsData)
 
-	if err != nil {
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
 		logger.Error("GetAccountStatsFromDB 에서 에러발생: %s", err)
 		// 없는 경우는 회원가입 후 처음 로그인 상황 초기화해줘야 됨.
-		cache.InitAccountStatsInRedis(uuid)
+		//cache.InitAccountStatsInRedis(uuid)
 		return base64.StdEncoding.EncodeToString(token), nil
 	} else {
 		// accountStats 정보가 db에 있는 경우에만 cache로 가져오기
