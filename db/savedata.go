@@ -182,12 +182,14 @@ func ReadSessionSaveData(uuid []byte, slot int) (defs.SessionSaveData, error) {
 		return session, err
 	}
 
-	defer zr.Close()
+	//defer zr.Close()
 
 	err = gob.NewDecoder(zr).Decode(&session)
 	if err != nil {
 		return session, err
 	}
+
+	zr.Close()
 
 	return session, nil
 }
@@ -216,9 +218,11 @@ func StoreSessionSaveData(uuid []byte, data defs.SessionSaveData, slot int) erro
 
 	err = gob.NewEncoder(zw).Encode(data)
 	if err != nil {
+		logger.Error("Encoding Error: %v", err)
 		return err
 	}
 
+	zw.Flush()
 	zw.Close()
 
 	_, err = handle.Exec("REPLACE INTO sessionSaveData (uuid, slot, data, timestamp) VALUES (?, ?, ?, UTC_TIMESTAMP())", uuid, slot, buf.Bytes())
@@ -241,7 +245,7 @@ func DeleteSessionSaveData(uuid []byte, slot int) error {
 // StoreSessionSaveDataBulk는 주어진 UUID에 대한 여러 세션 데이터를 DB에 일괄 업데이트합니다.
 // 함수 시그니처를 호출하는 쪽의 맥락에 맞게 재정의했습니다.
 // (예: bulk 처리를 위해 uuid 슬라이스와 sessionsDataMap 슬라이스를 받도록)
-func StoreSessionSaveDataBulk(ctx context.Context, uuids [][]byte, sessionsDataMapList []map[string]defs.SessionSaveData, slot int) error {
+func StoreSessionSaveDataBulk(ctx context.Context, uuids [][]byte, sessionsDataMapList []defs.SessionSaveData, slot int) error {
 	logger.Info("StoreSessionSaveDataBulk processing a batch...")
 
 	// 단일 트랜잭션 시작: 모든 업데이트가 성공하거나 모두 실패하도록 보장
@@ -258,30 +262,28 @@ func StoreSessionSaveDataBulk(ctx context.Context, uuids [][]byte, sessionsDataM
 	var valuePlaceholders []string
 
 	// 데이터들을 순회하며 파라미터와 플레이스홀더를 준비합니다.
-	for i, sessionsDataMap := range sessionsDataMapList {
+	for i, sessionsData := range sessionsDataMapList {
 		uuid := uuids[i]
 
-		for data := range sessionsDataMap {
-			var buf bytes.Buffer
-			zw, err := zstd.NewWriter(&buf)
-			if err != nil {
-				return err
-			}
-
-			err = gob.NewEncoder(zw).Encode(data)
-			if err != nil {
-				zw.Close()
-				return err
-			}
-			zw.Close()
-
-			// UUID, sessionID, data, timestamp에 대한 플레이스홀더를 추가합니다.
-			// (?, ?, ?, UTC_TIMESTAMP())는 한 행에 대한 플레이스홀더입니다.
-			valuePlaceholders = append(valuePlaceholders, "(?, ?, ?, UTC_TIMESTAMP())")
-
-			// 쿼리 실행에 필요한 파라미터들을 순서대로 슬라이스에 추가합니다.
-			args = append(args, uuid, slot, buf.Bytes())
+		var buf bytes.Buffer
+		zw, err := zstd.NewWriter(&buf)
+		if err != nil {
+			return err
 		}
+
+		err = gob.NewEncoder(zw).Encode(sessionsData)
+		if err != nil {
+			zw.Close()
+			return err
+		}
+		zw.Close()
+
+		// UUID, sessionID, data, timestamp에 대한 플레이스홀더를 추가합니다.
+		// (?, ?, ?, UTC_TIMESTAMP())는 한 행에 대한 플레이스홀더입니다.
+		valuePlaceholders = append(valuePlaceholders, "(?, ?, ?, UTC_TIMESTAMP())")
+
+		// 쿼리 실행에 필요한 파라미터들을 순서대로 슬라이스에 추가합니다.
+		args = append(args, uuid, slot, buf.Bytes())
 	}
 
 	if len(args) == 0 {

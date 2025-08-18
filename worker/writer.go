@@ -101,7 +101,7 @@ func (w *WriteBackWorker) flushDirtyData(ctx context.Context) {
 
 	// Bulk 업데이트를 위해 데이터를 담을 슬라이스 정의
 	var systemDataList []defs.SystemSaveData
-	var sessionDataMapList []map[string]defs.SessionSaveData
+	var sessionDataMapList []defs.SessionSaveData
 	var uuidList [][]byte
 
 	// 3. 가져온 데이터를 순회하며 디코딩 및 슬라이스에 추가
@@ -131,14 +131,14 @@ func (w *WriteBackWorker) flushDirtyData(ctx context.Context) {
 		}
 
 		// sessionSaveData 디코딩
-		var sessionDataMap map[string]defs.SessionSaveData
+		var sessionData defs.SessionSaveData
 		if sessionDataJSONs[i] != nil {
-			err = json.Unmarshal([]byte(sessionDataJSONs[i].(string)), &sessionDataMap)
+			err = json.Unmarshal([]byte(sessionDataJSONs[i].(string)), &sessionData)
 			if err != nil {
 				logger.Error("Error unmarshaling session savedata for key %s: %s | %v", key, sessionDataJSONs[i], err)
 				continue
 			}
-			sessionDataMapList = append(sessionDataMapList, sessionDataMap)
+			sessionDataMapList = append(sessionDataMapList, sessionData)
 		} else {
 			// 데이터가 없는 경우 로깅 또는 건너뛰기
 			logger.Warn("Session data not found for key %s", key)

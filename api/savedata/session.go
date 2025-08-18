@@ -36,7 +36,7 @@ func GetSession(uuid []byte, slot int) (defs.SessionSaveData, error) {
 
 	if errors.Is(err, redis.Nil) {
 		// 캐시에 저장된 세션 정보가 없으면
-		logger.Error("세션 정보가 캐시에 없습니다.(key : %s) : %s", encodedUUID, err)
+		logger.Error("세션 정보가 캐시에 없습니다.(key : %s, slot : %d) : %s", encodedUUID, slot, err)
 		session, err = db.ReadSessionSaveData(uuid, slot)
 		logger.Info("세션 정보를 DB에서 찾습니다.")
 
@@ -47,7 +47,7 @@ func GetSession(uuid []byte, slot int) (defs.SessionSaveData, error) {
 	}
 
 	if err != nil {
-		logger.Error("Fail to Get Session (key : %s) : %s", encodedUUID, err)
+		logger.Error("Fail to Get Session (key : %s) : %s | session : %s", encodedUUID, err, session)
 		return session, err
 	}
 
