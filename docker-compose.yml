@@ -18,6 +18,8 @@ services:
       REDIS_DB:   "0"
     ports:
       - "8001:8001"
+      # pprof 포트를 호스트에 노출
+      - "6060:6060"
 
   # 시스템 메트릭 수집을 위한 Node Exporter 서비스
   node_exporter:

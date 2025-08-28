@@ -17,7 +17,7 @@ var (
 )
 
 const sessionDataTTL = time.Hour * 24 * 7
-const sessionTokenTTL = time.Hour * 24 * 7
+const sessionTokenTTL = time.Hour * 24
 
 func Init() error {
 	addr := getEnv("REDIS_ADDR", "redis:6379")

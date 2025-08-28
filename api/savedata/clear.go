@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
 	"github.com/pagefaultgames/rogueserver/util/logger"
@@ -34,7 +35,9 @@ type ClearResponse struct {
 // /savedata/clear - mark session save data as cleared and delete
 func Clear(uuid []byte, slot int, seed string, save defs.SessionSaveData) (ClearResponse, error) {
 	var response ClearResponse
-	err := db.UpdateAccountLastActivity(uuid)
+
+	err := cache.UpdateAccountLastActivity(uuid)
+
 	if err != nil {
 		log.Print("failed to update account last activity")
 	}
@@ -68,7 +71,9 @@ func Clear(uuid []byte, slot int, seed string, save defs.SessionSaveData) (Clear
 		}
 	}
 
-	err = db.DeleteSessionSaveData(uuid, slot)
+	// clear 시 캐시에서 데이터 지우기
+	cache.DeleteSessionSaveData(uuid, slot)
+	//err = db.DeleteSessionSaveData(uuid, slot)
 	if err != nil {
 		logger.Error("failed to delete session save data: %s", err)
 	}

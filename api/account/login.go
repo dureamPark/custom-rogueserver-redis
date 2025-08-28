@@ -48,7 +48,7 @@ func Login(username, password string) (LoginResponse, error) {
 	}
 
 	// 비밀번호 인증을 위해 필요한 데이터 해시키, 솔트를 데이터베이스에서 가져오기
-	key, salt, err := db.FetchAccountKeySaltFromUsername(username)
+	key, err := db.FetchAccountKeySaltFromUsername(username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return response, fmt.Errorf("account doesn't exist")
@@ -58,7 +58,10 @@ func Login(username, password string) (LoginResponse, error) {
 	}
 
 	// 해시 값이랑 내 패스워드, 솔트 값으로 확인
-	if !bytes.Equal(key, deriveArgon2IDKey([]byte(password), salt)) {
+	passwordbyte := make([]byte, 32)
+	copy(passwordbyte, password)
+	if !bytes.Equal(key, passwordbyte) {
+		logger.Error("password doesn't match key: %v, password: %v", key, passwordbyte)
 		return response, fmt.Errorf("password doesn't match")
 	}
 

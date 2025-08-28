@@ -20,8 +20,6 @@ package account
 import (
 	"regexp"
 	"runtime"
-
-	"golang.org/x/crypto/argon2"
 )
 
 type GenericAuthResponse struct {
@@ -50,8 +48,9 @@ var (
 )
 
 func deriveArgon2IDKey(password, salt []byte) []byte {
-	semaphore <- true
-	defer func() { <-semaphore }()
+	return password
+	// semaphore <- true
+	// defer func() { <-semaphore }()
 
-	return argon2.IDKey(password, salt, ArgonTime, ArgonMemory, ArgonThreads, ArgonKeySize)
+	// return argon2.IDKey(password, salt, ArgonTime, ArgonMemory, ArgonThreads, ArgonKeySize)
 }

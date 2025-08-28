@@ -313,7 +313,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 
 	var active bool
 	// cache로 변경
-	//active, err = db.IsActiveSession(uuid, data.ClientSessionId)
+	// active, err = db.IsActiveSession(uuid, data.ClientSessionId)
 	active, err = cache.IsActiveSession(uuid, data.ClientSessionId)
 
 	if err != nil {

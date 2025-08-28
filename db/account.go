@@ -539,14 +539,14 @@ func SetAccountBanned(uuid []byte, banned bool) error {
 	return nil
 }
 
-func FetchAccountKeySaltFromUsername(username string) ([]byte, []byte, error) {
+func FetchAccountKeySaltFromUsername(username string) ([]byte, error) {
 	var key, salt []byte
 	err := handle.QueryRow("SELECT hash, salt FROM accounts WHERE username = ?", username).Scan(&key, &salt)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return key, salt, nil
+	return key, nil
 }
 
 func FetchTrainerIds(uuid []byte) (trainerId, secretId int, err error) {

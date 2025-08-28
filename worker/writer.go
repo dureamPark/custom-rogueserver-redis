@@ -17,7 +17,7 @@ import (
 
 const (
 	dirtyKeysSet = "dirty_keys"
-	batchSize    = 10000 // Number of keys to process in one batch
+	batchSize    = 1000 // Number of keys to process in one batch
 )
 
 // WriteBackWorker periodically flushes dirty data from cache to the persistent database.
@@ -46,8 +46,8 @@ func StartWriteBackWorker(db *sql.DB, redisClient *redis.Client) {
 	// Ensure we stop the worker gracefully on shutdown
 	go func() {
 		// Wait for a signal to stop (e.g., SIGINT, SIGTERM)
-		// This is just an example; you should implement proper signal handling.
-		<-time.After(24 * time.Hour) // Replace with actual signal handling
+		// This is just an example; you sshould implement proper signal handling.
+		<-time.After(7 * 24 * time.Hour) // Replace with actual signal handling
 		cancel()
 	}()
 
@@ -56,7 +56,7 @@ func StartWriteBackWorker(db *sql.DB, redisClient *redis.Client) {
 // Run starts the worker's main loop in a goroutine.
 func (w *WriteBackWorker) Run(ctx context.Context) {
 	logger.Info("Starting write-back worker...")
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 
 	for {
@@ -103,6 +103,11 @@ func (w *WriteBackWorker) flushDirtyData(ctx context.Context) {
 	var systemDataList []defs.SystemSaveData
 	var sessionDataMapList []defs.SessionSaveData
 	var uuidList [][]byte
+
+	if len(systemDataJSONs) != len(keys) || len(sessionDataJSONs) != len(keys) {
+		logger.Error("keys != systemData || keys != sessionData : %v", err)
+		return
+	}
 
 	// 3. 가져온 데이터를 순회하며 디코딩 및 슬라이스에 추가
 	for i, key := range keys {

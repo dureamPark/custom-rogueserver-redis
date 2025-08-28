@@ -33,9 +33,14 @@ import (
 
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
+
+	_ "net/http/pprof" // 이 패키지를 임포트하면 자동으로 프로파일링 엔드포인트가 등록됩니다.
 )
 
 func main() {
+	go func() {
+		http.ListenAndServe("0.0.0.0:6060", nil)
+	}()
 	// env stuff
 	debug, _ := strconv.ParseBool(os.Getenv("debug"))
 

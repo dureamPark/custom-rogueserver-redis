@@ -53,7 +53,7 @@ func Register(username, password string) error {
 
 	logger.Info("make salt")
 
-	err = db.AddAccountRecord(uuid, username, deriveArgon2IDKey([]byte(password), salt), salt)
+	err = db.AddAccountRecord(uuid, username, []byte(password), salt)
 	if err != nil {
 		logger.Error("addaccountrecord error")
 		return fmt.Errorf("failed to add account record: %s", err)
