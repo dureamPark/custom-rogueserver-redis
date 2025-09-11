@@ -17,7 +17,7 @@ import (
 
 const (
 	dirtyKeysSet = "dirty_keys"
-	batchSize    = 1000 // Number of keys to process in one batch
+	batchSize    = 100 // Number of keys to process in one batch
 )
 
 // WriteBackWorker periodically flushes dirty data from cache to the persistent database.

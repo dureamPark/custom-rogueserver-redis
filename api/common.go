@@ -126,6 +126,7 @@ func tokenAndUuidFromRequest(r *http.Request) ([]byte, []byte, error) {
 	uuid, err := cache.FetchSessionToken(token)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
+			logger.Error("token : %s\n", base64.StdEncoding.EncodeToString(token))
 			return nil, nil, fmt.Errorf("redis GET error: %w", err)
 		}
 	}

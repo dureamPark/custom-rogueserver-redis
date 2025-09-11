@@ -25,11 +25,11 @@ import (
 	"strconv"
 
 	"github.com/pagefaultgames/rogueserver/util/logger"
+	"github.com/pagefaultgames/rogueserver/worker"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/pagefaultgames/rogueserver/api"
 	"github.com/pagefaultgames/rogueserver/api/account"
-	"github.com/pagefaultgames/rogueserver/worker"
 
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"

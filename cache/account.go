@@ -186,7 +186,10 @@ func IsActiveSession(uuid []byte, sessionId string) (bool, error) {
 	}
 
 	id = strings.Trim(id, "\"") // 쌍따옴표 제거
-	logger.Info("id : %s, session id : %s", id, sessionId)
+	// if(!(id == "" || id == sessionId)){
+	// 	logger.Error("id : %s, session id : %s", id, sessionId)
+
+	// }
 	return id == "" || id == sessionId, nil
 }
 
