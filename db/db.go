@@ -120,6 +120,13 @@ func setupDb(tx *sql.Tx) error {
 		// MIGRATION 005
 
 		`ALTER TABLE accounts DROP COLUMN IF EXISTS isInLocalDb`,
+
+		// =================================================================
+		// MIGRATION 006 - Stargate/Oracle 시스템을 위한 프로필 컬럼 추가
+		// =================================================================
+
+		// Profile_Avg_Score를 저장할 컬럼. 소수점 표현을 위해 DOUBLE 사용
+		`ALTER TABLE accounts ADD COLUMN IF NOT EXISTS profileAvgScore DOUBLE NOT NULL DEFAULT 0.0`,
 	}
 
 	for _, q := range queries {

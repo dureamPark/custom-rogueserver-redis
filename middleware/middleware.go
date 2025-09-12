@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -19,10 +18,12 @@ import (
 // ... ContextKey 정의 ...
 
 type StargateMiddleware struct {
-	redisClient  *redis.Client // ★ Redis 클라이언트를 직접 의존성으로 가짐
-	cacheHandler http.Handler
-	dbHandler    http.Handler
+	redisClient *redis.Client // ★ Redis 클라이언트를 직접 의존성으로 가짐
 }
+
+var (
+	Stargate *StargateMiddleware
+)
 
 type CombinedSaveData struct {
 	System          defs.SystemSaveData  `json:"system"`
@@ -31,12 +32,8 @@ type CombinedSaveData struct {
 	ClientSessionId string               `json:"clientSessionId"`
 }
 
-func NewStargateMiddleware(client *redis.Client, cache http.Handler, db http.Handler) *StargateMiddleware {
-	return &StargateMiddleware{
-		redisClient:  client,
-		cacheHandler: cache,
-		dbHandler:    db,
-	}
+func NewStargateMiddleware(client *redis.Client) {
+	Stargate.redisClient = client
 }
 
 func (s *StargateMiddleware) UpdateAll(w http.ResponseWriter, r *http.Request) {
@@ -50,19 +47,57 @@ func (s *StargateMiddleware) UpdateAll(w http.ResponseWriter, r *http.Request) {
 	// --- 데이터 접근 로직이 미들웨어에 직접 존재 ---
 	key := "user_tier:" + base64.StdEncoding.EncodeToString(uuid)
 	tier, err := s.redisClient.Get(r.Context(), key).Result()
-	if err != nil && err != redis.Nil {
-		log.Printf("[Stargate] CRITICAL: Failed to get user tier for %s: %v", uuid, err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
 
-	go func(uid string) {
-		activityKey := "user_activity_score:" + base64.StdEncoding.EncodeToString(uuid)
-		if err := s.redisClient.Incr(context.Background(), activityKey).Err(); err != nil {
-			log.Printf("[Stargate] ERROR: Failed to update activity for %s: %v", uid, err)
+	if err != nil && err != redis.Nil {
+		tier = "CACHE"
+		cache.SetUserTier(r.Context(), uuid, "CACHE")
+
+		// cache에 없으니까 db에서 가져와서 점수 계산 후 넣기
+		profileScore, err := GetProfileScore()
+
+		if err != nil {
+			return
 		}
-	}(string(uuid))
-	// ------------------------------------------
+
+		updateRealtimeScore_WithDecay(uuid, 0, profileScore, 0)
+
+		// // cache에 없으니까 db에서 가져와서 점수 계산 후 넣기
+		// profileScore, err := GetProfileScore()
+		// finalScore := calculateFinalScore(0, profileScore, 0)
+		// Stargate.redisClient.Set(r.Context(), key, fmt.Sprintf("%f", finalScore), redis.KeepTTL)
+
+		// --- tier가 설정되지 않은 경우 (세션 시작 등), 초기 배정 로직 실행 ---
+		//log.Printf("[Stargate] Tier not set for user %s. Performing initial assignment...", uuid)
+
+		// // 4. 초기 배정을 위해 프로필과 시스템 임계치 조회
+		// profileScore, err := cache.GetAccountProfileScore(r.Context(), uuid)
+		// if err != nil {
+		// 	log.Printf("[Stargate] ERROR: Failed to get profile for %s: %v", uuid, err)
+		// 	return
+		// }
+
+		// // Oracle이 미리 계산해 둔 시스템 커트라인 조회
+		// systemThreshold, _ := cache.GetSystemThreshold(r.Context()) // PolicyStorer에 추가 필요
+
+		// // 5. 초기 우선순위 점수 '계산' (메모리 상에서만)
+		// initialScore := calculateFinalScore(0, profileScore, 0)
+
+		// // 6. '결정' 및 '결과 저장'
+		// if initialScore >= systemThreshold {
+		// 	log.Printf("[Stargate] Assigning user %s to CACHE tier.", uuid)
+
+		// 	// 결정된 '상태'("CACHE")를 Redis에 저장
+		// 	cache.SetUserTier(r.Context(), uuid, "CACHE")
+		// } else {
+		// 	log.Printf("[Stargate] Assigning user %s to DB tier.", uuid)
+
+		// 	// 결정된 '상태'("DB")를 Redis에 저장
+		// 	cache.SetUserTier(r.Context(), uuid, "DB")
+		// }
+
+		// log.Printf("[Stargate] CRITICAL: Failed to get user tier for %s: %v", uuid, err)
+		// http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 
 	switch tier {
 	case "CACHE":

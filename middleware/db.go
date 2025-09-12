@@ -67,3 +67,7 @@ func UpdateSessionDB(uuid []byte, slot int, data defs.SessionSaveData) error {
 
 	return nil
 }
+
+func GetProfileScore() (float64, error) {
+	return 0, nil
+}

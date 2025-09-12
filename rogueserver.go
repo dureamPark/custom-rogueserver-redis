@@ -24,6 +24,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/pagefaultgames/rogueserver/middleware"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/pagefaultgames/rogueserver/worker"
 
@@ -106,6 +107,9 @@ func main() {
 		logger.Error("failed to create net listener: %s", err)
 		os.Exit(1)
 	}
+
+	// middleware Setting
+	middleware.NewStargateMiddleware(cache.Rdb)
 
 	mux := http.NewServeMux()
 

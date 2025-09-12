@@ -28,6 +28,7 @@ import (
 	"github.com/pagefaultgames/rogueserver/api/account"
 	"github.com/pagefaultgames/rogueserver/api/daily"
 	"github.com/pagefaultgames/rogueserver/cache"
+	"github.com/pagefaultgames/rogueserver/middleware"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/redis/go-redis/v9"
 	//"github.com/pagefaultgames/rogueserver/db"
@@ -65,7 +66,7 @@ func Init(mux *http.ServeMux) error {
 	mux.HandleFunc("/savedata/system/{action}", handleSystem)   //game loop 때문에 필요.
 
 	// new session
-	mux.HandleFunc("POST /savedata/updateall", handleUpdateAll) //game loop 때문에 필요.
+	mux.HandleFunc("POST /savedata/updateall", middleware.Stargate.UpdateAll) //game loop 때문에 필요.
 
 	// daily
 	mux.HandleFunc("GET /daily/seed", handleDailySeed)                         //Jmeter 실험에서 game loop에 없음. 제외.
