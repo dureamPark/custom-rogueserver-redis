@@ -28,6 +28,7 @@ import (
 	"github.com/pagefaultgames/rogueserver/api/account"
 	"github.com/pagefaultgames/rogueserver/api/daily"
 	"github.com/pagefaultgames/rogueserver/cache"
+	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/redis/go-redis/v9"
 	//"github.com/pagefaultgames/rogueserver/db"
@@ -38,7 +39,21 @@ const (
 	sessionTTL        = 7 * 24 * time.Hour
 )
 
-func Init(mux *http.ServeMux) error {
+// 전역 레포지토리 변수 선언
+var (
+	AccountRepo  repository.AccountRepository
+	DailyRepo    repository.DailyRepository
+	GameRepo     repository.GameRepository
+	SavedataRepo repository.SavedataRepository
+)
+
+// InitWithRepositories: 레포지토리 주입 및 API 핸들러 등록
+func InitWithRepositories(mux *http.ServeMux, repos repository.Repositories) error {
+	AccountRepo = repos.Account
+	DailyRepo = repos.Daily
+	GameRepo = repos.Game
+	SavedataRepo = repos.Savedata
+
 	err := scheduleStatRefresh()
 	if err != nil {
 		return err
@@ -50,27 +65,27 @@ func Init(mux *http.ServeMux) error {
 	}
 
 	// account
-	mux.HandleFunc("GET /account/info", handleAccountInfo)          //user info -> login 때문에 필요.
-	mux.HandleFunc("POST /account/register", handleAccountRegister) //register 제외. 실험 환경과 연관 없음.
-	mux.HandleFunc("POST /account/login", handleAccountLogin)       //login 때문에 필요.
-	mux.HandleFunc("POST /account/changepw", handleAccountChangePW) //changePW 제외. 실험 환경과 연관 없음.
-	mux.HandleFunc("GET /account/logout", handleAccountLogout)      //logout 때문에 필요.
+	mux.HandleFunc("GET /account/info", handleAccountInfo)
+	mux.HandleFunc("POST /account/register", handleAccountRegister)
+	mux.HandleFunc("POST /account/login", handleAccountLogin)
+	mux.HandleFunc("POST /account/changepw", handleAccountChangePW)
+	mux.HandleFunc("GET /account/logout", handleAccountLogout)
 
 	// game
-	mux.HandleFunc("GET /game/titlestats", handleGameTitleStats)                   //game loop 때문에 필요.
-	mux.HandleFunc("GET /game/classicsessioncount", handleGameClassicSessionCount) //game loop 때문에 필요.
+	mux.HandleFunc("GET /game/titlestats", handleGameTitleStats)
+	mux.HandleFunc("GET /game/classicsessioncount", handleGameClassicSessionCount)
 
 	// savedata
-	mux.HandleFunc("/savedata/session/{action}", handleSession) //game loop 때문에 필요.
-	mux.HandleFunc("/savedata/system/{action}", handleSystem)   //game loop 때문에 필요.
+	mux.HandleFunc("/savedata/session/{action}", handleSession)
+	mux.HandleFunc("/savedata/system/{action}", handleSystem)
 
 	// new session
-	mux.HandleFunc("POST /savedata/updateall", handleUpdateAll) //game loop 때문에 필요.
+	mux.HandleFunc("POST /savedata/updateall", handleUpdateAll)
 
 	// daily
-	mux.HandleFunc("GET /daily/seed", handleDailySeed)                         //Jmeter 실험에서 game loop에 없음. 제외.
-	mux.HandleFunc("GET /daily/rankings", handleDailyRankings)                 //daily run은 Jmeter 실험에서 제외.
-	mux.HandleFunc("GET /daily/rankingpagecount", handleDailyRankingPageCount) //daily run은 Jmeter 실험에서 제외.
+	mux.HandleFunc("GET /daily/seed", handleDailySeed)
+	mux.HandleFunc("GET /daily/rankings", handleDailyRankings)
+	mux.HandleFunc("GET /daily/rankingpagecount", handleDailyRankingPageCount)
 
 	// auth
 	mux.HandleFunc("/auth/{provider}/callback", handleProviderCallback)

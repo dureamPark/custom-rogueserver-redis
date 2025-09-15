@@ -24,6 +24,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/pagefaultgames/rogueserver/worker"
 
@@ -99,6 +100,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	// 레포지토리 생성
+	accountRepo := repository.NewAccountRepository(db.GetHandle())
+	dailyRepo := repository.NewDailyRepository(db.GetHandle())
+	gameRepo := repository.NewGameRepository(db.GetHandle())
+	savedataRepo := repository.NewSavedataRepository(db.GetHandle())
+
 	// create listener
 	logger.Info("create listener")
 	listener, err := createListener(proto, addr)
@@ -111,7 +118,12 @@ func main() {
 
 	// init api
 	logger.Info("init api")
-	if err := api.Init(mux); err != nil {
+	if err := api.InitWithRepositories(mux, repository.Repositories{
+		Account:  accountRepo,
+		Daily:    dailyRepo,
+		Game:     gameRepo,
+		Savedata: savedataRepo,
+	}); err != nil {
 		logger.Error("%v", err)
 		os.Exit(1)
 	}
