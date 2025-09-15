@@ -2,179 +2,166 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 
-	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
 )
 
-// accountRepository 구조체 선언 (DB 핸들 포함)
+// accountRepository 구조체 선언
 type accountRepository struct {
-	db *sql.DB
+	db    AccountRepository
+	cache AccountRepository
 }
 
-// 생성자 함수: DB 핸들 주입
-func NewAccountRepository(db *sql.DB) *accountRepository {
-	return &accountRepository{db: db}
+func NewAccountRepository(db AccountRepository, cache AccountRepository) *accountRepository {
+	return &accountRepository{db: db, cache: cache}
 }
 
 // 아래부터 인터페이스 구현 (context는 받지만 db 함수에는 넘기지 않음)
 
 func (r *accountRepository) GetAccount(ctx context.Context, uuid []byte) (defs.AccountDBRow, error) {
-	return db.GetAccountFromDB(uuid)
+	return r.db.GetAccount(ctx, uuid)
 }
 
 func (r *accountRepository) GetAccountStats(ctx context.Context, uuid []byte) (defs.AccountStatsData, error) {
-	return db.GetAccountStatsFromDB(uuid)
+	return r.db.GetAccountStats(ctx, uuid)
 }
 
 func (r *accountRepository) AddAccountRecord(ctx context.Context, uuid []byte, username string, key, salt []byte) error {
-	return db.AddAccountRecord(uuid, username, key, salt)
+	return r.db.AddAccountRecord(ctx, uuid, username, key, salt)
 }
 
 func (r *accountRepository) AddAccountSession(ctx context.Context, username string, token []byte) error {
-	return db.AddAccountSession(username, token)
+	return r.db.AddAccountSession(ctx, username, token)
 }
 
 func (r *accountRepository) AddDiscordIdByUsername(ctx context.Context, discordId string, username string) error {
-	return db.AddDiscordIdByUsername(discordId, username)
+	return r.db.AddDiscordIdByUsername(ctx, discordId, username)
 }
 
 func (r *accountRepository) AddGoogleIdByUsername(ctx context.Context, googleId string, username string) error {
-	return db.AddGoogleIdByUsername(googleId, username)
+	return r.db.AddGoogleIdByUsername(ctx, googleId, username)
 }
 
 func (r *accountRepository) AddGoogleIdByUUID(ctx context.Context, googleId string, uuid []byte) error {
-	return db.AddGoogleIdByUUID(googleId, uuid)
+	return r.db.AddGoogleIdByUUID(ctx, googleId, uuid)
 }
 
 func (r *accountRepository) AddDiscordIdByUUID(ctx context.Context, discordId string, uuid []byte) error {
-	return db.AddDiscordIdByUUID(discordId, uuid)
+	return r.db.AddDiscordIdByUUID(ctx, discordId, uuid)
 }
 
 func (r *accountRepository) FetchUsernameByDiscordId(ctx context.Context, discordId string) (string, error) {
-	return db.FetchUsernameByDiscordId(discordId)
+	return r.db.FetchUsernameByDiscordId(ctx, discordId)
 }
 
 func (r *accountRepository) FetchUsernameByGoogleId(ctx context.Context, googleId string) (string, error) {
-	return db.FetchUsernameByGoogleId(googleId)
+	return r.db.FetchUsernameByGoogleId(ctx, googleId)
 }
 
 func (r *accountRepository) FetchDiscordIdByUsername(ctx context.Context, username string) (string, error) {
-	return db.FetchDiscordIdByUsername(username)
+	return r.db.FetchDiscordIdByUsername(ctx, username)
 }
 
 func (r *accountRepository) FetchGoogleIdByUsername(ctx context.Context, username string) (string, error) {
-	return db.FetchGoogleIdByUsername(username)
+	return r.db.FetchGoogleIdByUsername(ctx, username)
 }
 
 func (r *accountRepository) FetchDiscordIdByUUID(ctx context.Context, uuid []byte) (string, error) {
-	return db.FetchDiscordIdByUUID(uuid)
+	return r.db.FetchDiscordIdByUUID(ctx, uuid)
 }
 
 func (r *accountRepository) FetchGoogleIdByUUID(ctx context.Context, uuid []byte) (string, error) {
-	return db.FetchGoogleIdByUUID(uuid)
+	return r.db.FetchGoogleIdByUUID(ctx, uuid)
 }
 
 func (r *accountRepository) FetchUsernameBySessionToken(ctx context.Context, token []byte) (string, error) {
-	return db.FetchUsernameBySessionToken(token)
+	return r.db.FetchUsernameBySessionToken(ctx, token)
 }
 
 func (r *accountRepository) CheckUsernameExists(ctx context.Context, username string) (string, error) {
-	return db.CheckUsernameExists(username)
+	return r.db.CheckUsernameExists(ctx, username)
 }
 
 func (r *accountRepository) FetchLastLoggedInDateByUsername(ctx context.Context, username string) (string, error) {
-	return db.FetchLastLoggedInDateByUsername(username)
+	return r.db.FetchLastLoggedInDateByUsername(ctx, username)
 }
 
 func (r *accountRepository) FetchAdminDetailsByUsername(ctx context.Context, dbUsername string) (AdminSearchResponse, error) {
-	dbResponse, err := db.FetchAdminDetailsByUsername(dbUsername)
-	if err != nil {
-		return AdminSearchResponse{}, err
-	}
-	// Convert db.AdminSearchResponse to repository.AdminSearchResponse
-	return AdminSearchResponse{
-		Username:     dbResponse.Username,
-		DiscordId:    dbResponse.DiscordId,
-		GoogleId:     dbResponse.GoogleId,
-		LastActivity: dbResponse.LastActivity,
-		Registered:   dbResponse.Registered,
-	}, nil
+	return r.db.FetchAdminDetailsByUsername(ctx, dbUsername)
 }
 
 func (r *accountRepository) UpdateAccountPassword(ctx context.Context, uuid, key, salt []byte) error {
-	return db.UpdateAccountPassword(uuid, key, salt)
+	return r.db.UpdateAccountPassword(ctx, uuid, key, salt)
 }
 
 func (r *accountRepository) UpdateAccountLastActivity(ctx context.Context, uuid []byte) error {
-	return db.UpdateAccountLastActivity(uuid)
+	return r.db.UpdateAccountLastActivity(ctx, uuid)
 }
 
 func (r *accountRepository) UpdateAccountStats(ctx context.Context, uuid []byte, stats defs.GameStats, voucherCounts map[string]int) error {
-	return db.UpdateAccountStats(uuid, stats, voucherCounts)
+	return r.db.UpdateAccountStats(ctx, uuid, stats, voucherCounts)
 }
 
 func (r *accountRepository) SetAccountBanned(ctx context.Context, uuid []byte, banned bool) error {
-	return db.SetAccountBanned(uuid, banned)
+	return r.db.SetAccountBanned(ctx, uuid, banned)
 }
 
 func (r *accountRepository) FetchAccountKeySaltFromUsername(ctx context.Context, username string) ([]byte, error) {
-	return db.FetchAccountKeySaltFromUsername(username)
+	return r.db.FetchAccountKeySaltFromUsername(ctx, username)
 }
 
 func (r *accountRepository) FetchTrainerIds(ctx context.Context, uuid []byte) (trainerId, secretId int, err error) {
-	return db.FetchTrainerIds(uuid)
+	return r.db.FetchTrainerIds(ctx, uuid)
 }
 
 func (r *accountRepository) UpdateTrainerIds(ctx context.Context, trainerId, secretId int, uuid []byte) error {
-	return db.UpdateTrainerIds(trainerId, secretId, uuid)
+	return r.db.UpdateTrainerIds(ctx, trainerId, secretId, uuid)
 }
 
 func (r *accountRepository) IsActiveSession(ctx context.Context, uuid []byte, sessionId string) (bool, error) {
-	return db.IsActiveSession(uuid, sessionId)
+	return r.db.IsActiveSession(ctx, uuid, sessionId)
 }
 
 func (r *accountRepository) UpdateActiveSession(ctx context.Context, uuid []byte, clientSessionId string) error {
-	return db.UpdateActiveSession(uuid, clientSessionId)
+	return r.db.UpdateActiveSession(ctx, uuid, clientSessionId)
 }
 
 func (r *accountRepository) FetchUUIDFromToken(ctx context.Context, token []byte) ([]byte, error) {
-	return db.FetchUUIDFromToken(token)
+	return r.db.FetchUUIDFromToken(ctx, token)
 }
 
 func (r *accountRepository) RemoveSessionFromToken(ctx context.Context, token []byte) error {
-	return db.RemoveSessionFromToken(token)
+	return r.db.RemoveSessionFromToken(ctx, token)
 }
 
 func (r *accountRepository) FetchUsernameFromUUID(ctx context.Context, uuid []byte) (string, error) {
-	return db.FetchUsernameFromUUID(uuid)
+	return r.db.FetchUsernameFromUUID(ctx, uuid)
 }
 
 func (r *accountRepository) FetchUUIDFromUsername(ctx context.Context, username string) ([]byte, error) {
-	return db.FetchUUIDFromUsername(username)
+	return r.db.FetchUUIDFromUsername(ctx, username)
 }
 
 func (r *accountRepository) RemoveDiscordIdByUUID(ctx context.Context, uuid []byte) error {
-	return db.RemoveDiscordIdByUUID(uuid)
+	return r.db.RemoveDiscordIdByUUID(ctx, uuid)
 }
 
 func (r *accountRepository) RemoveGoogleIdByUUID(ctx context.Context, uuid []byte) error {
-	return db.RemoveGoogleIdByUUID(uuid)
+	return r.db.RemoveGoogleIdByUUID(ctx, uuid)
 }
 
 func (r *accountRepository) RemoveGoogleIdByUsername(ctx context.Context, username string) error {
-	return db.RemoveGoogleIdByUsername(username)
+	return r.db.RemoveGoogleIdByUsername(ctx, username)
 }
 
 func (r *accountRepository) RemoveDiscordIdByUsername(ctx context.Context, username string) error {
-	return db.RemoveDiscordIdByUsername(username)
+	return r.db.RemoveDiscordIdByUsername(ctx, username)
 }
 
 func (r *accountRepository) RemoveDiscordIdByDiscordId(ctx context.Context, discordId string) error {
-	return db.RemoveDiscordIdByDiscordId(discordId)
+	return r.db.RemoveDiscordIdByDiscordId(ctx, discordId)
 }
 
 func (r *accountRepository) RemoveGoogleIdByDiscordId(ctx context.Context, discordId string) error {
-	return db.RemoveGoogleIdByDiscordId(discordId)
+	return r.db.RemoveGoogleIdByDiscordId(ctx, discordId)
 }

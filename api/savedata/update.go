@@ -18,6 +18,7 @@
 package savedata
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -26,8 +27,8 @@ import (
 )
 
 // /savedata/update - update save data
-func Update(uuid []byte, slot int, save any) error {
-	err := cache.UpdateAccountLastActivity(uuid)
+func Update(context context.Context, uuid []byte, slot int, save any) error {
+	err := cache.UpdateAccountLastActivity(context, uuid)
 	if err != nil {
 		log.Print("failed to update account last activity")
 	}
@@ -38,20 +39,20 @@ func Update(uuid []byte, slot int, save any) error {
 			return fmt.Errorf("invalid system data")
 		}
 
-		err = cache.UpdateAccountStats(uuid, save.GameStats, save.VoucherCounts)
+		err = cache.UpdateAccountStats(context, uuid, save.GameStats, save.VoucherCounts)
 		//err = db.UpdateAccountStats(uuid, save.GameStats, save.VoucherCounts)
 		if err != nil {
 			return fmt.Errorf("failed to update account stats: %s", err)
 		}
 		//return db.StoreSystemSaveData(uuid, save)
-		return cache.StoreSystemSaveData(uuid, save)
+		return cache.StoreSystemSaveData(context, uuid, save)
 
 	case defs.SessionSaveData: // Session
 		if slot < 0 || slot >= defs.SessionSlotCount {
 			return fmt.Errorf("slot id %d out of range", slot)
 		}
 		//return db.StoreSessionSaveData(uuid, save, slot)
-		return cache.StoreSessionSaveData(uuid, save, slot)
+		return cache.StoreSessionSaveData(context, uuid, save, slot)
 
 	default:
 		return fmt.Errorf("invalid data type")

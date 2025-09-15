@@ -18,6 +18,7 @@
 package account
 
 import (
+	"context"
 	"crypto/rand"
 	"fmt"
 
@@ -26,7 +27,7 @@ import (
 )
 
 // /account/register - register account
-func Register(username, password string) error {
+func Register(ctx context.Context, username, password string) error {
 	if !isValidUsername(username) {
 		return fmt.Errorf("invalid username")
 	}

@@ -101,7 +101,7 @@ func main() {
 	}
 
 	// 레포지토리 생성
-	accountRepo := repository.NewAccountRepository(db.GetHandle())
+	accountRepo := repository.NewAccountRepository(db.GetHandle(), cache.Rdb)
 	dailyRepo := repository.NewDailyRepository(db.GetHandle())
 	gameRepo := repository.NewGameRepository(db.GetHandle())
 	savedataRepo := repository.NewSavedataRepository(db.GetHandle())

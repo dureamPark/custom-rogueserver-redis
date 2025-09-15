@@ -19,6 +19,7 @@ package account
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
 	"database/sql"
 	"encoding/base64"
@@ -34,7 +35,7 @@ import (
 type LoginResponse GenericAuthResponse
 
 // /account/login - log into account
-func Login(username, password string) (LoginResponse, error) {
+func Login(ctx context.Context, username, password string) (LoginResponse, error) {
 	var response LoginResponse
 
 	// 아이디 형식 확인
@@ -66,7 +67,7 @@ func Login(username, password string) (LoginResponse, error) {
 	}
 
 	// 일치하는 경우 토큰 생성
-	response.Token, err = GenerateTokenForUsername(username)
+	response.Token, err = GenerateTokenForUsername(ctx, username)
 
 	if err != nil {
 		return response, fmt.Errorf("failed to generate token: %s", err)
@@ -76,7 +77,7 @@ func Login(username, password string) (LoginResponse, error) {
 	return response, nil
 }
 
-func GenerateTokenForUsername(username string) (string, error) {
+func GenerateTokenForUsername(ctx context.Context, username string) (string, error) {
 	token := make([]byte, TokenSize)
 	_, err := rand.Read(token)
 	if err != nil {
@@ -91,13 +92,13 @@ func GenerateTokenForUsername(username string) (string, error) {
 
 	// uuid와토큰으로 Cache 추가
 	// token / uuid
-	err = cache.StoreSessionToken(uuid, token)
+	err = cache.StoreSessionToken(ctx, uuid, token)
 	if err != nil {
 		return "", fmt.Errorf("failed to store token : %s", err)
 	}
 
 	// 유저가 로그인한 것이기 때문에 Cache에 Userdata가 있는지 확인
-	err = cache.IsValidCacheData(uuid)
+	err = cache.IsValidCacheData(ctx, uuid)
 
 	// 데이터가 없는 경우 넘어가기
 	if err != nil {
@@ -110,18 +111,18 @@ func GenerateTokenForUsername(username string) (string, error) {
 	// cache에 해당 uuid를 가진 데이터가 없는 경우
 	// db에서 로그인 유저 정보 가져와서 cache에 저장
 	// uuid / userData
-	accountData, err := db.GetAccountFromDB(uuid)
+	accountData, err := db.GetAccount(uuid)
 
 	if err != nil {
 		// 없는 경우에는 회원이 아닌 거임.
 		return "", fmt.Errorf("%s", err)
 	} else {
 		// 정보가 있는 경우에만 account 정보 cache로 가져오기
-		cache.CacheAccountInRedis(accountData)
+		cache.CacheAccountInRedis(ctx, accountData)
 	}
 
 	// db에서 로그인 유저 통계 정보 가져와서 cache에 저장
-	accountStatsData, err := db.GetAccountStatsFromDB(uuid)
+	accountStatsData, err := db.GetAccountStats(uuid)
 	logger.Info("Login account StatsData : %s", accountStatsData)
 
 	if err != nil && errors.Is(err, sql.ErrNoRows) {
@@ -131,7 +132,7 @@ func GenerateTokenForUsername(username string) (string, error) {
 		return base64.StdEncoding.EncodeToString(token), nil
 	} else {
 		// accountStats 정보가 db에 있는 경우에만 cache로 가져오기
-		cache.CacheAccountStatsInRedis(uuid, accountStatsData)
+		cache.CacheAccountStatsInRedis(ctx, uuid, accountStatsData)
 	}
 
 	// 유저 아이디와 토큰값으로 세션 정보 저장 -> DB에 굳이 할 필요가 없어짐

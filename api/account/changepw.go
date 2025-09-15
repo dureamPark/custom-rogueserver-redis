@@ -18,13 +18,14 @@
 package account
 
 import (
+	"context"
 	"crypto/rand"
 	"fmt"
 
 	"github.com/pagefaultgames/rogueserver/db"
 )
 
-func ChangePW(uuid []byte, password string) error {
+func ChangePW(ctx context.Context, uuid []byte, password string) error {
 	if len(password) < 6 {
 		return fmt.Errorf("invalid password")
 	}

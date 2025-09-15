@@ -18,6 +18,7 @@
 package savedata
 
 import (
+	"context"
 	"encoding/base64"
 	"errors"
 
@@ -28,11 +29,11 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func GetSession(uuid []byte, slot int) (defs.SessionSaveData, error) {
+func GetSession(context context.Context, uuid []byte, slot int) (defs.SessionSaveData, error) {
 
 	encodedUUID := base64.StdEncoding.EncodeToString(uuid)
 
-	session, err := cache.ReadSessionSaveData(uuid, slot)
+	session, err := cache.ReadSessionSaveData(context, uuid, slot)
 
 	if errors.Is(err, redis.Nil) {
 		// 캐시에 저장된 세션 정보가 없으면
@@ -42,7 +43,7 @@ func GetSession(uuid []byte, slot int) (defs.SessionSaveData, error) {
 
 		if err == nil {
 			// DB에서 세션 값을 가져왔을 때만
-			UpdateSession(uuid, slot, session)
+			UpdateSession(context, uuid, slot, session)
 		}
 	}
 
@@ -54,9 +55,9 @@ func GetSession(uuid []byte, slot int) (defs.SessionSaveData, error) {
 	return session, nil
 }
 
-func UpdateSession(uuid []byte, slot int, data defs.SessionSaveData) error {
+func UpdateSession(context context.Context, uuid []byte, slot int, data defs.SessionSaveData) error {
 	//err := db.StoreSessionSaveData(uuid, data, slot)
-	err := cache.StoreSessionSaveData(uuid, data, slot)
+	err := cache.StoreSessionSaveData(context, uuid, data, slot)
 	if err != nil {
 		return err
 	}
@@ -64,9 +65,9 @@ func UpdateSession(uuid []byte, slot int, data defs.SessionSaveData) error {
 	return nil
 }
 
-func DeleteSession(uuid []byte, slot int) error {
+func DeleteSession(context context.Context, uuid []byte, slot int) error {
 	//err := db.DeleteSessionSaveData(uuid, slot)
-	err := cache.DeleteSessionSaveData(uuid, slot)
+	err := cache.DeleteSessionSaveData(context, uuid, slot)
 	if err != nil {
 		return err
 	}

@@ -92,7 +92,7 @@ func handleAccountRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = account.Register(r.Form.Get("username"), r.Form.Get("password"))
+	err = account.Register(r.Context(), r.Form.Get("username"), r.Form.Get("password"))
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
@@ -108,7 +108,7 @@ func handleAccountLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := account.Login(r.Form.Get("username"), r.Form.Get("password"))
+	response, err := account.Login(r.Context(), r.Form.Get("username"), r.Form.Get("password"))
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
@@ -130,7 +130,7 @@ func handleAccountChangePW(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = account.ChangePW(uuid, r.Form.Get("password"))
+	err = account.ChangePW(r.Context(), uuid, r.Form.Get("password"))
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
@@ -146,7 +146,7 @@ func handleAccountLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = account.Logout(token)
+	err = account.Logout(r.Context(), token)
 	if err != nil {
 		// also possible for InternalServerError but that's unlikely unless the server blew up
 		httpError(w, r, err, http.StatusUnauthorized)
@@ -194,7 +194,7 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//err = db.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
-	err = cache.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
+	err = cache.UpdateActiveSession(r.Context(), uuid, r.URL.Query().Get("clientSessionId"))
 	if err != nil {
 		httpError(w, r, fmt.Errorf("handlesession : failed to update active session: %s", err), http.StatusBadRequest)
 		return
@@ -202,7 +202,7 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 
 	switch r.PathValue("action") {
 	case "get":
-		save, err := savedata.GetSession(uuid, slot)
+		save, err := savedata.GetSession(r.Context(), uuid, slot)
 		if errors.Is(err, sql.ErrNoRows) {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -222,7 +222,7 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		existingSave, err := savedata.GetSession(uuid, slot)
+		existingSave, err := savedata.GetSession(r.Context(), uuid, slot)
 		if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			httpError(w, r, fmt.Errorf("failed to retrieve session save data: %s", err), http.StatusInternalServerError)
 			return
@@ -233,7 +233,7 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		err = savedata.UpdateSession(uuid, slot, session)
+		err = savedata.UpdateSession(r.Context(), uuid, slot, session)
 		if err != nil {
 			httpError(w, r, fmt.Errorf("failed to put session data: %s", err), http.StatusInternalServerError)
 			return
@@ -254,7 +254,7 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		resp, err := savedata.Clear(uuid, slot, seed, session)
+		resp, err := savedata.Clear(r.Context(), uuid, slot, seed, session)
 		if err != nil {
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
@@ -262,7 +262,7 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 
 		writeJSON(w, r, resp)
 	case "newclear":
-		resp, err := savedata.NewClear(uuid, slot)
+		resp, err := savedata.NewClear(r.Context(), uuid, slot)
 		if err != nil {
 			httpError(w, r, fmt.Errorf("failed to read new clear: %s", err), http.StatusInternalServerError)
 			return
@@ -270,7 +270,7 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 
 		writeJSON(w, r, resp)
 	case "delete":
-		err := savedata.DeleteSession(uuid, slot)
+		err := savedata.DeleteSession(r.Context(), uuid, slot)
 		if err != nil {
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
@@ -313,7 +313,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 	var active bool
 	// cache로 변경
 	// active, err = db.IsActiveSession(uuid, data.ClientSessionId)
-	active, err = cache.IsActiveSession(uuid, data.ClientSessionId)
+	active, err = cache.IsActiveSession(r.Context(), uuid, data.ClientSessionId)
 
 	if err != nil {
 		httpError(w, r, fmt.Errorf("failed to check active session: %s", err), http.StatusBadRequest)
@@ -326,7 +326,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//storedTrainerId, storedSecretId, err := db.FetchTrainerIds(uuid)
-	storedTrainerId, storedSecretId, err := cache.FetchTrainerIds(uuid)
+	storedTrainerId, storedSecretId, err := cache.FetchTrainerIds(r.Context(), uuid)
 	if err != nil {
 		logger.Error("%s", err)
 		if errors.Is(err, redis.Nil) {
@@ -342,7 +342,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		//err = db.UpdateTrainerIds(data.System.TrainerId, data.System.SecretId, uuid)
-		err = cache.UpdateTrainerIds(data.System.TrainerId, data.System.SecretId, uuid)
+		err = cache.UpdateTrainerIds(r.Context(), data.System.TrainerId, data.System.SecretId, uuid)
 		//if err != nil {
 		if err != nil {
 			if errors.Is(err, redis.Nil) {
@@ -354,7 +354,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 
 	// cache로 변경
 	//existingPlaytime, err := db.RetrievePlaytime(uuid)
-	existingPlaytime, err := cache.RetrievePlaytime(uuid)
+	existingPlaytime, err := cache.RetrievePlaytime(r.Context(), uuid)
 	if err != nil && errors.Is(err, redis.Nil) {
 		httpError(w, r, fmt.Errorf("failed to retrieve playtime: %s", err), http.StatusInternalServerError)
 		return
@@ -377,7 +377,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 
 	logger.Info("handleUpdateAll %s %d", uuid, data.SessionSlotId)
 
-	existingSave, err := savedata.GetSession(uuid, data.SessionSlotId)
+	existingSave, err := savedata.GetSession(r.Context(), uuid, data.SessionSlotId)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		httpError(w, r, fmt.Errorf("failed to retrieve session save data: %s", err), http.StatusInternalServerError)
 		return
@@ -389,14 +389,14 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//logger.Info("Update %s %d %v", uuid, data.SessionSlotId, data.Session)
-	err = savedata.Update(uuid, data.SessionSlotId, data.Session)
+	err = savedata.Update(r.Context(), uuid, data.SessionSlotId, data.Session)
 	if err != nil {
 		logger.Error("%v", err)
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
-	err = savedata.Update(uuid, 0, data.System)
+	err = savedata.Update(r.Context(), uuid, 0, data.System)
 	if err != nil {
 		logger.Error("%v", err)
 		httpError(w, r, err, http.StatusInternalServerError)
@@ -425,7 +425,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//active, err = db.IsActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
-	active, err = cache.IsActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
+	active, err = cache.IsActiveSession(r.Context(), uuid, r.URL.Query().Get("clientSessionId"))
 	if err != nil {
 		httpError(w, r, fmt.Errorf("failed to check active session: %s", err), http.StatusBadRequest)
 		return
@@ -435,14 +435,14 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 	case "get":
 		if !active {
 			//err = db.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
-			err = cache.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
+			err = cache.UpdateActiveSession(r.Context(), uuid, r.URL.Query().Get("clientSessionId"))
 			if err != nil {
 				httpError(w, r, fmt.Errorf("handleSystem_get : failed to update active session: %s", err), http.StatusBadRequest)
 				return
 			}
 		}
 
-		save, err := savedata.GetSystem(uuid)
+		save, err := savedata.GetSystem(r.Context(), uuid)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				http.Error(w, err.Error(), http.StatusNotFound)
@@ -652,7 +652,7 @@ func handleProviderCallback(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		sessionToken, err := account.GenerateTokenForUsername(userName)
+		sessionToken, err := account.GenerateTokenForUsername(r.Context(), userName)
 		if err != nil {
 			http.Redirect(w, r, account.GameURL, http.StatusSeeOther)
 			return

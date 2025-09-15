@@ -56,7 +56,7 @@ func Set(ctx context.Context, key string, value interface{}, ttl time.Duration) 
 	err := Rdb.Set(ctx, key, value, ttl).Err()
 
 	// write-back worker에서 json만 처리하고 있어서 일단 주석 처리했음.
-	//MarkAsDirty(key) // Mark the key as dirty for write-back
+	//MarkAsDirty(ctx, key) // Mark the key as dirty for write-back
 
 	return err
 }
@@ -66,7 +66,7 @@ func SetJSON(ctx context.Context, key string, path string, jsonData interface{})
 	logger.Info("Set JSON")
 	err := Rdb.JSONSet(ctx, key, path, jsonData).Err()
 
-	MarkAsDirty(key) // Mark the key as dirty for write-back
+	MarkAsDirty(ctx, key) // Mark the key as dirty for write-back
 
 	return err
 }

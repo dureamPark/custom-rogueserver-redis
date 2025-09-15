@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -14,7 +15,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func InitAccountStatsInRedis(uuid []byte) error {
+func InitAccountStatsInRedis(ctx context.Context, uuid []byte) error {
 	// Redis 키 생성
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 
@@ -37,15 +38,8 @@ func InitAccountStatsInRedis(uuid []byte) error {
 		GoldenVouchers:        0,
 	}
 
-	// Redis 저장용 데이터를 JSON으로 마샬링
-	// jsonData, err := json.Marshal(redisData)
-	// if err != nil {
-	// 	logger.Error("통계 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
-	// 	return err
-	// }
-
 	// Redis에 JSON 데이터 저장
-	err := SetJSON(Ctx, redisKey, "$.accountStats", redisData)
+	err := SetJSON(ctx, redisKey, "$.accountStats", redisData)
 
 	if err != nil {
 		logger.Error("Redis에 통계 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
@@ -57,7 +51,7 @@ func InitAccountStatsInRedis(uuid []byte) error {
 }
 
 // DB에서 가져온 AccountDBRow를 Redis 캐시에 저장하는 함수
-func CacheAccountInRedis(dbRow defs.AccountDBRow) error {
+func CacheAccountInRedis(ctx context.Context, dbRow defs.AccountDBRow) error {
 
 	// Redis 키 생성: UUID (binary)를 16진수 문자열로 변환하고 접두사 추가
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(dbRow.UUID)
@@ -93,16 +87,8 @@ func CacheAccountInRedis(dbRow defs.AccountDBRow) error {
 		redisData.GoogleID = &dbRow.GoogleID.String
 	}
 
-	// JSON으로 마샬링
-	// jsonData, err := json.Marshal(redisData)
-	// if err != nil {
-	// 	logger.Error("Redis 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
-	// 	return err
-	// }
-
-	//fmt.Printf("CacheAccountInRedis : %s", redisData)
 	// Redis에 저장
-	err := SetJSON(Ctx, redisKey, "$.account", redisData)
+	err := SetJSON(ctx, redisKey, "$.account", redisData)
 	if err != nil {
 		logger.Error("Redis에 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
 		return err
@@ -114,7 +100,7 @@ func CacheAccountInRedis(dbRow defs.AccountDBRow) error {
 
 // CacheAccountStatsInRedis 함수는 AccountStatsData를 Redis에 캐시합니다.
 // dbStats는 DB에서 읽어온 AccountStatsData 구조체입니다.
-func CacheAccountStatsInRedis(uuid []byte, dbStats defs.AccountStatsData) error {
+func CacheAccountStatsInRedis(ctx context.Context, uuid []byte, dbStats defs.AccountStatsData) error {
 
 	// Redis 키 생성
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
@@ -138,15 +124,8 @@ func CacheAccountStatsInRedis(uuid []byte, dbStats defs.AccountStatsData) error 
 		GoldenVouchers:        dbStats.GoldenVouchers,
 	}
 
-	// Redis 저장용 데이터를 JSON으로 마샬링
-	// jsonData, err := json.Marshal(redisData)
-	// if err != nil {
-	// 	logger.Error("통계 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
-	// 	return err
-	// }
-
 	// Redis에 JSON 데이터 저장
-	err := SetJSON(Ctx, redisKey, "$.accountStats", redisData)
+	err := SetJSON(ctx, redisKey, "$.accountStats", redisData)
 
 	if err != nil {
 		logger.Error("Redis에 통계 데이터 캐싱 오류 (키: %s): %s", redisKey, err)
@@ -158,26 +137,26 @@ func CacheAccountStatsInRedis(uuid []byte, dbStats defs.AccountStatsData) error 
 }
 
 // session 활성화
-func UpdateActiveSession(uuid []byte, sessionId string) error {
+func UpdateActiveSession(ctx context.Context, uuid []byte, sessionId string) error {
 
 	logger.Info("UpdateActiveSession uuid : %s, sessionId : %s", base64.StdEncoding.EncodeToString(uuid), sessionId)
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 	if sessionId == "" {
 		return fmt.Errorf("sessionId is empty")
 	}
-	return SetJSON(Ctx, redisKey, "$.activeClientSession", fmt.Sprintf("\"%s\"", sessionId))
+	return SetJSON(ctx, redisKey, "$.activeClientSession", fmt.Sprintf("%s", sessionId))
 }
 
 // 현재 session이 활성화되어 있는지 확인, 비활성화 시 새롭게 활성화
-func IsActiveSession(uuid []byte, sessionId string) (bool, error) {
-	//var id string
+func IsActiveSession(ctx context.Context, uuid []byte, sessionId string) (bool, error) {
+	//var id
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
-	id, err := Rdb.JSONGet(Ctx, redisKey, ".activeClientSession").Result()
+	id, err := Rdb.JSONGet(ctx, redisKey, ".activeClientSession").Result()
 
 	if err != nil {
 		logger.Error("fail to Set Active Session in redis")
 		// 초기화를 빈 문자열로 ""로 해서 확인하기
-		err = UpdateActiveSession(uuid, sessionId)
+		err = UpdateActiveSession(ctx, uuid, sessionId)
 		if err != nil {
 			logger.Error("fail to Set Active Session in redis")
 			return false, err
@@ -185,7 +164,7 @@ func IsActiveSession(uuid []byte, sessionId string) (bool, error) {
 		return true, nil
 	}
 
-	id = strings.Trim(id, "\"") // 쌍따옴표 제거
+	id = strings.Trim(id, "") // 쌍따옴표 제거
 	// if(!(id == "" || id == sessionId)){
 	// 	logger.Error("id : %s, session id : %s", id, sessionId)
 
@@ -194,30 +173,30 @@ func IsActiveSession(uuid []byte, sessionId string) (bool, error) {
 }
 
 // StoreSessionToken stores a token-uuid pair in Redis with TTL.
-func StoreSessionToken(uuid []byte, token []byte) error {
+func StoreSessionToken(ctx context.Context, uuid []byte, token []byte) error {
 	key := "token:" + base64.StdEncoding.EncodeToString(token)
-	return Set(Ctx, key, uuid, sessionTokenTTL)
+	return Set(ctx, key, uuid, sessionTokenTTL)
 }
 
 // FetchSessionToken retrieves the uuid for a given token from Redis.
-func FetchSessionToken(token []byte) ([]byte, error) {
+func FetchSessionToken(ctx context.Context, token []byte) ([]byte, error) {
 	key := "token:" + base64.StdEncoding.EncodeToString(token)
-	return Rdb.Get(Ctx, key).Bytes()
+	return Rdb.Get(ctx, key).Bytes()
 }
 
 // RemoveSessionFromToken removes the token-uuid mapping from Redis.
-func RemoveSessionFromToken(token []byte) error {
+func RemoveSessionFromToken(ctx context.Context, token []byte) error {
 	key := "token:" + base64.StdEncoding.EncodeToString(token)
-	return Rdb.Del(Ctx, key).Err()
+	return Rdb.Del(ctx, key).Err()
 }
 
-func FetchTrainerIds(uuid []byte) (int, int, error) {
+func FetchTrainerIds(ctx context.Context, uuid []byte) (int, int, error) {
 	logger.Info("FetchTrainerIds")
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 
 	// JSON.MGET을 사용하여 여러 경로의 값을 한 번에 가져올 수 있음
 	// 결과는 []interface{} 형태의 슬라이스로 오며, 각 요소는 해당 경로의 값 또는 nil
-	result, err := Rdb.JSONGet(Ctx, redisKey, "$.account.trainerId", "$.account.secretId").Result()
+	result, err := Rdb.JSONGet(ctx, redisKey, "$.account.trainerId", "$.account.secretId").Result()
 
 	if err == redis.Nil {
 		return 0, 0, fmt.Errorf("캐시에서 UUID '%s'에 해당하는 계정을 찾을 수 없음: %w", uuid, err)
@@ -243,7 +222,7 @@ func FetchTrainerIds(uuid []byte) (int, int, error) {
 }
 
 // 트레이너 아이디 업데이트
-func UpdateTrainerIds(trainerId, secretId int, uuid []byte) error {
+func UpdateTrainerIds(ctx context.Context, trainerId, secretId int, uuid []byte) error {
 
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 
@@ -254,13 +233,13 @@ func UpdateTrainerIds(trainerId, secretId int, uuid []byte) error {
 	// JSON.SET key path value
 	// path는 "$.trainerId"
 	// value는 int 타입이므로 Redis가 JSON 숫자로 저장합니다.
-	pipe.JSONSet(Ctx, redisKey, "$.account.trainerId", trainerId)
+	pipe.JSONSet(ctx, redisKey, "$.account.trainerId", trainerId)
 
 	// 3. secretId 업데이트
-	pipe.JSONSet(Ctx, redisKey, "$.account.secretId", secretId)
+	pipe.JSONSet(ctx, redisKey, "$.account.secretId", secretId)
 
 	// 4. 파이프라인 실행
-	cmders, err := pipe.Exec(Ctx)
+	cmders, err := pipe.Exec(ctx)
 	if err != nil {
 		logger.Error("Redis 파이프라인 실행 오류 (키: %s): %s", redisKey, err)
 		return err
@@ -285,7 +264,7 @@ func UpdateTrainerIds(trainerId, secretId int, uuid []byte) error {
 	return nil
 }
 
-func UpdateAccountLastActivity(uuid []byte) error {
+func UpdateAccountLastActivity(ctx context.Context, uuid []byte) error {
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 
 	// 2. 현재 UTC 시간을 ISO 8601 형식 문자열로 준비
@@ -301,7 +280,7 @@ func UpdateAccountLastActivity(uuid []byte) error {
 	// JSON.SET key path value
 	// path는 "$.lastActivity"
 	// value는 준비된 시간 문자열 (또는 숫자 타임스탬프)
-	err := SetJSON(Ctx, redisKey, "$.account.lastActivity", currentTimeStr)
+	err := SetJSON(ctx, redisKey, "$.account.lastActivity", currentTimeStr)
 	if err != nil {
 		logger.Error("Redis JSON.SET lastActivity 오류 (키: %s): %s", redisKey, err)
 		return err
@@ -315,7 +294,7 @@ func UpdateAccountLastActivity(uuid []byte) error {
 }
 
 // UpdateAccountStatsInRedis 함수는 Redis에 저장된 계정 통계를 업데이트합니다.
-func UpdateAccountStats(uuid []byte, stats defs.GameStats, voucherCounts map[string]int) error {
+func UpdateAccountStats(ctx context.Context, uuid []byte, stats defs.GameStats, voucherCounts map[string]int) error {
 
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 
@@ -349,7 +328,7 @@ func UpdateAccountStats(uuid []byte, stats defs.GameStats, voucherCounts map[str
 
 		// JSONPath 생성 (예: "$.playTime")
 		jsonPath := "$.accountStats." + key
-		pipe.JSONSet(Ctx, redisKey, jsonPath, intValue)
+		pipe.JSONSet(ctx, redisKey, jsonPath, intValue)
 		updateCount++
 		// log.Printf("Debug: Pipelining JSON.SET %s %s %d", redisKey, jsonPath, intValue)
 	}
@@ -368,7 +347,7 @@ func UpdateAccountStats(uuid []byte, stats defs.GameStats, voucherCounts map[str
 			continue
 		}
 		jsonPath := "$.accountStats." + columnName
-		pipe.JSONSet(Ctx, redisKey, jsonPath, count) // count는 이미 int
+		pipe.JSONSet(ctx, redisKey, jsonPath, count) // count는 이미 int
 		updateCount++
 		// log.Printf("Debug: Pipelining JSON.SET %s %s %d", redisKey, jsonPath, count)
 	}
@@ -379,7 +358,7 @@ func UpdateAccountStats(uuid []byte, stats defs.GameStats, voucherCounts map[str
 		return nil // 아무것도 안하고 성공
 	}
 
-	cmders, err := pipe.Exec(Ctx)
+	cmders, err := pipe.Exec(ctx)
 	if err != nil {
 		logger.Error("Redis 파이프라인 실행 오류 (키: %s): %s", redisKey, err)
 		return err

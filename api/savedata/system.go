@@ -18,6 +18,7 @@
 package savedata
 
 import (
+	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -30,13 +31,13 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func GetSystem(uuid []byte) (defs.SystemSaveData, error) {
+func GetSystem(context context.Context, uuid []byte) (defs.SystemSaveData, error) {
 	var system defs.SystemSaveData
 	var err error
 
 	encodedUUID := base64.StdEncoding.EncodeToString(uuid)
 
-	system, err = cache.ReadSystemSaveData(uuid)
+	system, err = cache.ReadSystemSaveData(context, uuid)
 
 	if errors.Is(err, redis.Nil) {
 		// 캐시에 저장된 세션 정보가 없으면

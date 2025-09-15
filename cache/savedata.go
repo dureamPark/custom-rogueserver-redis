@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -13,7 +14,7 @@ import (
 )
 
 // ReadSessionSaveData 함수는 Redis에서 특정 UUID와 슬롯에 해당하는 세션 저장 데이터를 읽어옵니다.
-func ReadSessionSaveData(uuid []byte, slot int) (defs.SessionSaveData, error) { // defs.SessionSaveData로 변경해야 함
+func ReadSessionSaveData(ctx context.Context, uuid []byte, slot int) (defs.SessionSaveData, error) { // defs.SessionSaveData로 변경해야 함
 	var saveData defs.SessionSaveData // defs.SessionSaveData
 
 	encodedUUID := base64.StdEncoding.EncodeToString(uuid)
@@ -21,7 +22,7 @@ func ReadSessionSaveData(uuid []byte, slot int) (defs.SessionSaveData, error) { 
 
 	jsonPath := fmt.Sprintf(`$.sessionSaveData["%s"]`, strconv.Itoa(slot))
 	// Redis에서 JSON 데이터 가져오기
-	jsonData, err := Rdb.JSONGet(Ctx, redisKey, jsonPath).Result()
+	jsonData, err := Rdb.JSONGet(ctx, redisKey, jsonPath).Result()
 	if err == redis.Nil {
 		// 키가 존재하지 않는 경우, 빈 SessionSaveData와 함께 특정 에러 반환
 		// 호출하는 쪽에서 이 에러를 식별하여 "새 게임" 또는 "슬롯 비어있음" 등으로 처리 가능
@@ -53,22 +54,15 @@ func ReadSessionSaveData(uuid []byte, slot int) (defs.SessionSaveData, error) { 
 
 // StoreSessionSaveData 함수는 주어진 SessionSaveData를 Redis에 저장합니다.
 // 데이터는 JSON 형태로 저장되며, 만료 시간은 설정하지 않습니다 (필요시 추가 가능).
-func StoreSessionSaveData(uuid []byte, data defs.SessionSaveData, slot int) error { // defs.SessionSaveData
+func StoreSessionSaveData(ctx context.Context, uuid []byte, data defs.SessionSaveData, slot int) error { // defs.SessionSaveData
 
 	encodedUUID := base64.StdEncoding.EncodeToString(uuid)
 	redisKey := "session:" + encodedUUID
 
 	jsonPath := fmt.Sprintf(`$.sessionSaveData["%s"]`, strconv.Itoa(slot))
 
-	// SessionSaveData 구조체를 JSON으로 마샬링
-	// jsonData, err := json.Marshal(data)
-	// if err != nil {
-	// 	log.Printf("세션 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
-	// 	return err
-	// }
-
 	// Redis에 JSON 데이터 저장
-	err := SetJSON(Ctx, redisKey, jsonPath, data)
+	err := SetJSON(ctx, redisKey, jsonPath, data)
 	if err != nil {
 		logger.Error("Redis에 세션 데이터 저장 오류 (키: %s): %s", redisKey, err)
 		return err
@@ -79,7 +73,7 @@ func StoreSessionSaveData(uuid []byte, data defs.SessionSaveData, slot int) erro
 }
 
 // DeleteSessionSaveData 함수는 Redis에서 특정 UUID와 슬롯에 해당하는 세션 저장 데이터를 삭제합니다.
-func DeleteSessionSaveData(uuid []byte, slot int) error {
+func DeleteSessionSaveData(ctx context.Context, uuid []byte, slot int) error {
 
 	encodedUUID := base64.StdEncoding.EncodeToString(uuid)
 	redisKey := "session:" + encodedUUID
@@ -87,7 +81,7 @@ func DeleteSessionSaveData(uuid []byte, slot int) error {
 	jsonPath := fmt.Sprintf(`$.sessionSaveData["%s"]`, strconv.Itoa(slot))
 
 	// Redis에서 해당 키 삭제
-	result, err := Rdb.JSONDel(Ctx, redisKey, jsonPath).Result()
+	result, err := Rdb.JSONDel(ctx, redisKey, jsonPath).Result()
 	if err != nil {
 		return fmt.Errorf("Redis에서 세션 데이터 삭제 오류 (키: %s): %s", redisKey, err)
 	}
@@ -105,7 +99,7 @@ func DeleteSessionSaveData(uuid []byte, slot int) error {
 	return nil
 }
 
-func ReadSystemSaveData(uuid []byte) (defs.SystemSaveData, error) {
+func ReadSystemSaveData(ctx context.Context, uuid []byte) (defs.SystemSaveData, error) {
 	var systemData defs.SystemSaveData
 
 	encodedUUID := base64.StdEncoding.EncodeToString(uuid)
@@ -114,7 +108,7 @@ func ReadSystemSaveData(uuid []byte) (defs.SystemSaveData, error) {
 	jsonPath := fmt.Sprintf(`$.systemSaveData`)
 
 	// Redis에서 JSON 데이터 가져오기
-	jsonData, err := Rdb.JSONGet(Ctx, redisKey, jsonPath).Result()
+	jsonData, err := Rdb.JSONGet(ctx, redisKey, jsonPath).Result()
 	if err == redis.Nil {
 		// 키가 존재하지 않는 경우, 빈 SessionSaveData와 함께 특정 에러 반환
 		// 호출하는 쪽에서 이 에러를 식별하여 "새 게임" 또는 "슬롯 비어있음" 등으로 처리 가능
@@ -145,20 +139,13 @@ func ReadSystemSaveData(uuid []byte) (defs.SystemSaveData, error) {
 	return systemData, nil
 }
 
-// StoreSessionSaveData 함수는 주어진 SessionSaveData를 Redis에 저장합니다.
-// 데이터는 JSON 형태로 저장되며, 만료 시간은 설정하지 않습니다 (필요시 추가 가능).
-func StoreSystemSaveData(uuid []byte, data defs.SystemSaveData) error { // defs.SessionSaveData
+// StoreSystemSaveData 함수는 주어진 SystemSaveData를 Redis에 저장합니다.
+func StoreSystemSaveData(ctx context.Context, uuid []byte, data defs.SystemSaveData) error { // defs.SessionSaveData
 
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 
-	// // SessionSaveData 구조체를 JSON으로 마샬링
-	// jsonData, err := json.Marshal(data)
-	// if err != nil {
-	// 	return fmt.Errorf("세션 데이터 JSON 마샬링 오류 (키: %s): %s", redisKey, err)
-	// }
-
 	// Redis에 JSON 데이터 저장
-	err := SetJSON(Ctx, redisKey, "$.systemSaveData", data)
+	err := SetJSON(ctx, redisKey, "$.systemSaveData", data)
 	if err != nil {
 		logger.Error("Redis에 세션 데이터 저장 오류 (키: %s): %s", redisKey, err)
 		return err
@@ -170,11 +157,11 @@ func StoreSystemSaveData(uuid []byte, data defs.SystemSaveData) error { // defs.
 
 // FetchPlayTimeFromAccountStats 함수는 RedisJSON을 사용하여 캐시된 계정 통계에서 playTime만 가져옵니다.
 // uuidBytes는 계정의 []byte UUID입니다.
-func RetrievePlaytime(uuid []byte) (int, error) {
+func RetrievePlaytime(ctx context.Context, uuid []byte) (int, error) {
 
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 
-	rawResult, err := Rdb.JSONGet(Ctx, redisKey, ".accountStats.playTime").Result()
+	rawResult, err := Rdb.JSONGet(ctx, redisKey, ".accountStats.playTime").Result()
 	if err != nil {
 		logger.Error("Redis JSON.GET playTime 오류 (키: %s): %s", redisKey, err)
 		return 0, err

@@ -18,6 +18,7 @@
 package savedata
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/pagefaultgames/rogueserver/db"
@@ -25,7 +26,7 @@ import (
 )
 
 // /savedata/newclear - return whether a session is a new clear for its seed
-func NewClear(uuid []byte, slot int) (bool, error) {
+func NewClear(context context.Context, uuid []byte, slot int) (bool, error) {
 	if slot < 0 || slot >= defs.SessionSlotCount {
 		return false, fmt.Errorf("slot id %d out of range", slot)
 	}

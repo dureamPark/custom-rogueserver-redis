@@ -18,6 +18,7 @@
 package savedata
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -33,10 +34,10 @@ type ClearResponse struct {
 }
 
 // /savedata/clear - mark session save data as cleared and delete
-func Clear(uuid []byte, slot int, seed string, save defs.SessionSaveData) (ClearResponse, error) {
+func Clear(context context.Context, uuid []byte, slot int, seed string, save defs.SessionSaveData) (ClearResponse, error) {
 	var response ClearResponse
 
-	err := cache.UpdateAccountLastActivity(uuid)
+	err := cache.UpdateAccountLastActivity(context, uuid)
 
 	if err != nil {
 		log.Print("failed to update account last activity")
@@ -72,7 +73,7 @@ func Clear(uuid []byte, slot int, seed string, save defs.SessionSaveData) (Clear
 	}
 
 	// clear 시 캐시에서 데이터 지우기
-	cache.DeleteSessionSaveData(uuid, slot)
+	cache.DeleteSessionSaveData(context, uuid, slot)
 	//err = db.DeleteSessionSaveData(uuid, slot)
 	if err != nil {
 		logger.Error("failed to delete session save data: %s", err)
