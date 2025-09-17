@@ -28,6 +28,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/redis/go-redis/v9"
 
@@ -52,19 +54,19 @@ func handleAccountInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	username, err := AccountRepo.FetchUsernameFromUUID(r.Context(), uuid)
+	username, err := repository.Repos.Account.FetchUsernameFromUUID(r.Context(), uuid)
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
 	}
-	discordId, err := AccountRepo.FetchDiscordIdByUsername(r.Context(), username)
+	discordId, err := repository.Repos.Account.FetchDiscordIdByUsername(r.Context(), username)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
 		}
 	}
-	googleId, err := AccountRepo.FetchGoogleIdByUsername(r.Context(), username)
+	googleId, err := repository.Repos.Account.FetchGoogleIdByUsername(r.Context(), username)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			httpError(w, r, err, http.StatusInternalServerError)
@@ -194,7 +196,7 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//err = db.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
-	err = cache.UpdateActiveSession(r.Context(), uuid, r.URL.Query().Get("clientSessionId"))
+	err = repository.Repos.Account.UpdateActiveSession(r.Context(), uuid, r.URL.Query().Get("clientSessionId"))
 	if err != nil {
 		httpError(w, r, fmt.Errorf("handlesession : failed to update active session: %s", err), http.StatusBadRequest)
 		return
@@ -248,7 +250,7 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		seed, err := DailyRepo.GetDailyRunSeed(r.Context())
+		seed, err := db.GetDailyRunSeed()
 		if err != nil {
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
@@ -313,7 +315,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 	var active bool
 	// cache로 변경
 	// active, err = db.IsActiveSession(uuid, data.ClientSessionId)
-	active, err = cache.IsActiveSession(r.Context(), uuid, data.ClientSessionId)
+	active, err = repository.Repos.Account.IsActiveSession(r.Context(), uuid, data.ClientSessionId)
 
 	if err != nil {
 		httpError(w, r, fmt.Errorf("failed to check active session: %s", err), http.StatusBadRequest)
@@ -342,7 +344,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		//err = db.UpdateTrainerIds(data.System.TrainerId, data.System.SecretId, uuid)
-		err = cache.UpdateTrainerIds(r.Context(), data.System.TrainerId, data.System.SecretId, uuid)
+		err = repository.Repos.Account.UpdateTrainerIds(r.Context(), data.System.TrainerId, data.System.SecretId, uuid)
 		//if err != nil {
 		if err != nil {
 			if errors.Is(err, redis.Nil) {
@@ -425,7 +427,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//active, err = db.IsActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
-	active, err = cache.IsActiveSession(r.Context(), uuid, r.URL.Query().Get("clientSessionId"))
+	active, err = repository.Repos.Account.IsActiveSession(r.Context(), uuid, r.URL.Query().Get("clientSessionId"))
 	if err != nil {
 		httpError(w, r, fmt.Errorf("failed to check active session: %s", err), http.StatusBadRequest)
 		return
@@ -435,7 +437,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 	case "get":
 		if !active {
 			//err = db.UpdateActiveSession(uuid, r.URL.Query().Get("clientSessionId"))
-			err = cache.UpdateActiveSession(r.Context(), uuid, r.URL.Query().Get("clientSessionId"))
+			err = repository.Repos.Account.UpdateActiveSession(r.Context(), uuid, r.URL.Query().Get("clientSessionId"))
 			if err != nil {
 				httpError(w, r, fmt.Errorf("handleSystem_get : failed to update active session: %s", err), http.StatusBadRequest)
 				return
@@ -467,7 +469,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		existingPlaytime, err := SavedataRepo.RetrievePlaytime(r.Context(), uuid)
+		existingPlaytime, err := db.RetrievePlaytime(uuid)
 		if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			httpError(w, r, fmt.Errorf("failed to retrieve playtime: %s", err), http.StatusInternalServerError)
 			return
@@ -484,7 +486,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		err = savedata.UpdateSystem(uuid, system)
+		err = savedata.UpdateSystem(r.Context(), uuid, system)
 		if err != nil {
 			httpError(w, r, fmt.Errorf("failed to put system data: %s", err), http.StatusInternalServerError)
 			return
@@ -498,14 +500,14 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 
 		// not valid, send server state
 		if !active {
-			err = AccountRepo.UpdateActiveSession(r.Context(), uuid, r.URL.Query().Get("clientSessionId"))
+			err = repository.Repos.Account.UpdateActiveSession(r.Context(), uuid, r.URL.Query().Get("clientSessionId"))
 			if err != nil {
 				httpError(w, r, fmt.Errorf("handleSystem_verify : failed to update active session: %s", err), http.StatusBadRequest)
 				return
 			}
 
 			var storedSaveData defs.SystemSaveData
-			storedSaveData, err = SavedataRepo.ReadSystemSaveData(r.Context(), uuid)
+			storedSaveData, err = db.ReadSystemSaveData(uuid)
 			if err != nil {
 				httpError(w, r, fmt.Errorf("failed to read session save data: %s", err), http.StatusInternalServerError)
 				return
@@ -531,7 +533,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 
 // daily
 func handleDailySeed(w http.ResponseWriter, r *http.Request) {
-	seed, err := DailyRepo.GetDailyRunSeed(r.Context())
+	seed, err := db.GetDailyRunSeed()
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
@@ -621,7 +623,7 @@ func handleProviderCallback(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		userName, err := AccountRepo.FetchUsernameBySessionToken(r.Context(), stateByte)
+		userName, err := repository.Repos.Account.FetchUsernameBySessionToken(r.Context(), stateByte)
 		if err != nil {
 			http.Redirect(w, r, account.GameURL, http.StatusSeeOther)
 			return
@@ -629,9 +631,9 @@ func handleProviderCallback(w http.ResponseWriter, r *http.Request) {
 
 		switch provider {
 		case "discord":
-			err = AccountRepo.AddDiscordIdByUsername(r.Context(), externalAuthId, userName)
+			err = repository.Repos.Account.AddDiscordIdByUsername(r.Context(), externalAuthId, userName)
 		case "google":
-			err = AccountRepo.AddGoogleIdByUsername(r.Context(), externalAuthId, userName)
+			err = repository.Repos.Account.AddGoogleIdByUsername(r.Context(), externalAuthId, userName)
 		}
 
 		if err != nil {
@@ -643,9 +645,9 @@ func handleProviderCallback(w http.ResponseWriter, r *http.Request) {
 		var userName string
 		switch provider {
 		case "discord":
-			userName, err = AccountRepo.FetchUsernameByDiscordId(r.Context(), externalAuthId)
+			userName, err = repository.Repos.Account.FetchUsernameByDiscordId(r.Context(), externalAuthId)
 		case "google":
-			userName, err = AccountRepo.FetchUsernameByGoogleId(r.Context(), externalAuthId)
+			userName, err = repository.Repos.Account.FetchUsernameByGoogleId(r.Context(), externalAuthId)
 		}
 		if err != nil {
 			http.Redirect(w, r, account.GameURL, http.StatusSeeOther)
@@ -681,9 +683,9 @@ func handleProviderLogout(w http.ResponseWriter, r *http.Request) {
 
 	switch r.PathValue("provider") {
 	case "discord":
-		err = AccountRepo.RemoveDiscordIdByUUID(r.Context(), uuid)
+		err = repository.Repos.Account.RemoveDiscordIdByUUID(r.Context(), uuid)
 	case "google":
-		err = AccountRepo.RemoveGoogleIdByUUID(r.Context(), uuid)
+		err = repository.Repos.Account.RemoveGoogleIdByUUID(r.Context(), uuid)
 	default:
 		http.Error(w, "invalid provider", http.StatusBadRequest)
 		return
@@ -708,7 +710,7 @@ func handleAdminDiscordLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userDiscordId, err := AccountRepo.FetchDiscordIdByUUID(r.Context(), uuid)
+	userDiscordId, err := repository.Repos.Account.FetchDiscordIdByUUID(r.Context(), uuid)
 	if err != nil {
 		httpError(w, r, err, http.StatusUnauthorized)
 		return
@@ -725,19 +727,19 @@ func handleAdminDiscordLink(w http.ResponseWriter, r *http.Request) {
 
 	// this does a quick call to make sure the username exists on the server before allowing the rest of the code to run
 	// this calls error value 404 (StatusNotFound) if there's no data; this means the username does not exist in the server
-	_, err = AccountRepo.CheckUsernameExists(r.Context(), username)
+	_, err = repository.Repos.Account.CheckUsernameExists(r.Context(), username)
 	if err != nil {
 		httpError(w, r, fmt.Errorf("username does not exist on the server"), http.StatusNotFound)
 		return
 	}
 
-	userUuid, err := AccountRepo.FetchUUIDFromUsername(r.Context(), username)
+	userUuid, err := repository.Repos.Account.FetchUUIDFromUsername(r.Context(), username)
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
-	err = AccountRepo.AddDiscordIdByUUID(r.Context(), discordId, userUuid)
+	err = repository.Repos.Account.AddDiscordIdByUUID(r.Context(), discordId, userUuid)
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
@@ -761,7 +763,7 @@ func handleAdminDiscordUnlink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userDiscordId, err := AccountRepo.FetchDiscordIdByUUID(r.Context(), uuid)
+	userDiscordId, err := repository.Repos.Account.FetchDiscordIdByUUID(r.Context(), uuid)
 	if err != nil {
 		httpError(w, r, err, http.StatusUnauthorized)
 		return
@@ -781,26 +783,26 @@ func handleAdminDiscordUnlink(w http.ResponseWriter, r *http.Request) {
 		logger.Info("Username given, removing discordId")
 		// this does a quick call to make sure the username exists on the server before allowing the rest of the code to run
 		// this calls error value 404 (StatusNotFound) if there's no data; this means the username does not exist in the server
-		_, err = AccountRepo.CheckUsernameExists(r.Context(), username)
+		_, err = repository.Repos.Account.CheckUsernameExists(r.Context(), username)
 		if err != nil {
 			httpError(w, r, fmt.Errorf("username does not exist on the server"), http.StatusNotFound)
 			return
 		}
 
-		userUuid, err := AccountRepo.FetchUUIDFromUsername(r.Context(), username)
+		userUuid, err := repository.Repos.Account.FetchUUIDFromUsername(r.Context(), username)
 		if err != nil {
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
 		}
 
-		err = AccountRepo.RemoveDiscordIdByUUID(r.Context(), userUuid)
+		err = repository.Repos.Account.RemoveDiscordIdByUUID(r.Context(), userUuid)
 		if err != nil {
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
 		}
 	case discordId != "":
 		logger.Info("DiscordID given, removing discordId")
-		err = AccountRepo.RemoveDiscordIdByDiscordId(r.Context(), discordId)
+		err = repository.Repos.Account.RemoveDiscordIdByDiscordId(r.Context(), discordId)
 		if err != nil {
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
@@ -825,7 +827,7 @@ func handleAdminGoogleLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userDiscordId, err := AccountRepo.FetchDiscordIdByUUID(r.Context(), uuid)
+	userDiscordId, err := repository.Repos.Account.FetchDiscordIdByUUID(r.Context(), uuid)
 	if err != nil {
 		httpError(w, r, err, http.StatusUnauthorized)
 		return
@@ -842,19 +844,19 @@ func handleAdminGoogleLink(w http.ResponseWriter, r *http.Request) {
 
 	// this does a quick call to make sure the username exists on the server before allowing the rest of the code to run
 	// this calls error value 404 (StatusNotFound) if there's no data; this means the username does not exist in the server
-	_, err = AccountRepo.CheckUsernameExists(r.Context(), username)
+	_, err = repository.Repos.Account.CheckUsernameExists(r.Context(), username)
 	if err != nil {
 		httpError(w, r, fmt.Errorf("username does not exist on the server"), http.StatusNotFound)
 		return
 	}
 
-	userUuid, err := AccountRepo.FetchUUIDFromUsername(r.Context(), username)
+	userUuid, err := repository.Repos.Account.FetchUUIDFromUsername(r.Context(), username)
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
-	err = AccountRepo.AddGoogleIdByUUID(r.Context(), googleId, userUuid)
+	err = repository.Repos.Account.AddGoogleIdByUUID(r.Context(), googleId, userUuid)
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
@@ -878,7 +880,7 @@ func handleAdminGoogleUnlink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userDiscordId, err := AccountRepo.FetchDiscordIdByUUID(r.Context(), uuid)
+	userDiscordId, err := repository.Repos.Account.FetchDiscordIdByUUID(r.Context(), uuid)
 	if err != nil {
 		httpError(w, r, err, http.StatusUnauthorized)
 		return
@@ -898,26 +900,26 @@ func handleAdminGoogleUnlink(w http.ResponseWriter, r *http.Request) {
 		logger.Info("Username given, removing googleId")
 		// this does a quick call to make sure the username exists on the server before allowing the rest of the code to run
 		// this calls error value 404 (StatusNotFound) if there's no data; this means the username does not exist in the server
-		_, err = AccountRepo.CheckUsernameExists(r.Context(), username)
+		_, err = repository.Repos.Account.CheckUsernameExists(r.Context(), username)
 		if err != nil {
 			httpError(w, r, fmt.Errorf("username does not exist on the server"), http.StatusNotFound)
 			return
 		}
 
-		userUuid, err := AccountRepo.FetchUUIDFromUsername(r.Context(), username)
+		userUuid, err := repository.Repos.Account.FetchUUIDFromUsername(r.Context(), username)
 		if err != nil {
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
 		}
 
-		err = AccountRepo.RemoveGoogleIdByUUID(r.Context(), userUuid)
+		err = repository.Repos.Account.RemoveGoogleIdByUUID(r.Context(), userUuid)
 		if err != nil {
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
 		}
 	case googleId != "":
 		logger.Info("DiscordID given, removing googleId")
-		err = AccountRepo.RemoveGoogleIdByDiscordId(r.Context(), googleId)
+		err = repository.Repos.Account.RemoveGoogleIdByDiscordId(r.Context(), googleId)
 		if err != nil {
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
@@ -942,7 +944,7 @@ func handleAdminSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userDiscordId, err := AccountRepo.FetchDiscordIdByUUID(r.Context(), uuid)
+	userDiscordId, err := repository.Repos.Account.FetchDiscordIdByUUID(r.Context(), uuid)
 	if err != nil {
 		httpError(w, r, err, http.StatusUnauthorized)
 		return
@@ -958,14 +960,14 @@ func handleAdminSearch(w http.ResponseWriter, r *http.Request) {
 
 	// this does a quick call to make sure the username exists on the server before allowing the rest of the code to run
 	// this calls error value 404 (StatusNotFound) if there's no data; this means the username does not exist in the server
-	_, err = AccountRepo.CheckUsernameExists(r.Context(), username)
+	_, err = repository.Repos.Account.CheckUsernameExists(r.Context(), username)
 	if err != nil {
 		httpError(w, r, fmt.Errorf("username does not exist on the server"), http.StatusNotFound)
 		return
 	}
 
 	// this does a single call that does a query for multiple columns from our database and makes an object out of it, which is returned to us
-	adminSearchResult, err := AccountRepo.FetchAdminDetailsByUsername(r.Context(), username)
+	adminSearchResult, err := repository.Repos.Account.FetchAdminDetailsByUsername(r.Context(), username)
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 		return

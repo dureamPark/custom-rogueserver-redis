@@ -27,6 +27,7 @@ import (
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/redis/go-redis/v9"
 )
@@ -59,12 +60,12 @@ func GetSystem(context context.Context, uuid []byte) (defs.SystemSaveData, error
 	return system, nil
 }
 
-func UpdateSystem(uuid []byte, data defs.SystemSaveData) error {
+func UpdateSystem(ctx context.Context, uuid []byte, data defs.SystemSaveData) error {
 	if data.TrainerId == 0 && data.SecretId == 0 {
 		return fmt.Errorf("invalid system data")
 	}
 
-	err := db.UpdateAccountStats(uuid, data.GameStats, data.VoucherCounts)
+	err := repository.Repos.Account.UpdateAccountStats(ctx, uuid, data.GameStats, data.VoucherCounts)
 	if err != nil {
 		return fmt.Errorf("failed to update account stats: %s", err)
 	}

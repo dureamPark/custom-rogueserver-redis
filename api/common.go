@@ -28,7 +28,6 @@ import (
 	"github.com/pagefaultgames/rogueserver/api/account"
 	"github.com/pagefaultgames/rogueserver/api/daily"
 	"github.com/pagefaultgames/rogueserver/cache"
-	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/redis/go-redis/v9"
 	//"github.com/pagefaultgames/rogueserver/db"
@@ -39,20 +38,8 @@ const (
 	sessionTTL        = 7 * 24 * time.Hour
 )
 
-// 전역 레포지토리 변수 선언
-var (
-	AccountRepo  repository.AccountRepository
-	DailyRepo    repository.DailyRepository
-	GameRepo     repository.GameRepository
-	SavedataRepo repository.SavedataRepository
-)
-
 // InitWithRepositories: 레포지토리 주입 및 API 핸들러 등록
-func InitWithRepositories(mux *http.ServeMux, repos repository.Repositories) error {
-	AccountRepo = repos.Account
-	DailyRepo = repos.Daily
-	GameRepo = repos.Game
-	SavedataRepo = repos.Savedata
+func InitWithRepositories(mux *http.ServeMux) error {
 
 	err := scheduleStatRefresh()
 	if err != nil {

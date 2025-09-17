@@ -25,6 +25,7 @@ import (
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 )
 
@@ -56,7 +57,7 @@ func Clear(context context.Context, uuid []byte, slot int, seed string, save def
 		}
 
 		if save.Score >= 20000 {
-			db.SetAccountBanned(uuid, true)
+			repository.Repos.Account.SetAccountBanned(context, uuid, true)
 		}
 
 		err = db.AddOrUpdateAccountDailyRun(uuid, save.Score, waveCompleted)

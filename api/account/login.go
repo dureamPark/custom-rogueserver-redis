@@ -26,10 +26,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/pagefaultgames/rogueserver/cache"
-	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
-	"github.com/redis/go-redis/v9"
 )
 
 type LoginResponse GenericAuthResponse
@@ -49,7 +47,7 @@ func Login(ctx context.Context, username, password string) (LoginResponse, error
 	}
 
 	// 비밀번호 인증을 위해 필요한 데이터 해시키, 솔트를 데이터베이스에서 가져오기
-	key, err := db.FetchAccountKeySaltFromUsername(username)
+	key, err := repository.Repos.Account.FetchAccountKeySaltFromUsername(ctx, username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return response, fmt.Errorf("account doesn't exist")
@@ -84,62 +82,10 @@ func GenerateTokenForUsername(ctx context.Context, username string) (string, err
 		return "", fmt.Errorf("failed to generate token: %s", err)
 	}
 
-	// db에서 uuid 가져오기
-	uuid, err := db.FetchUUIDFromUsername(username)
+	err = repository.Repos.Account.AddAccountSession(ctx, username, token)
 	if err != nil {
-		return "", fmt.Errorf("failed to get uuid")
+		return "", fmt.Errorf("failed to add account session")
 	}
-
-	// uuid와토큰으로 Cache 추가
-	// token / uuid
-	err = cache.StoreSessionToken(ctx, uuid, token)
-	if err != nil {
-		return "", fmt.Errorf("failed to store token : %s", err)
-	}
-
-	// 유저가 로그인한 것이기 때문에 Cache에 Userdata가 있는지 확인
-	err = cache.IsValidCacheData(ctx, uuid)
-
-	// 데이터가 없는 경우 넘어가기
-	if err != nil {
-		if !errors.Is(err, redis.Nil) {
-			// 데이터가 있으면 return
-			return "", fmt.Errorf("")
-		}
-	}
-
-	// cache에 해당 uuid를 가진 데이터가 없는 경우
-	// db에서 로그인 유저 정보 가져와서 cache에 저장
-	// uuid / userData
-	accountData, err := db.GetAccount(uuid)
-
-	if err != nil {
-		// 없는 경우에는 회원이 아닌 거임.
-		return "", fmt.Errorf("%s", err)
-	} else {
-		// 정보가 있는 경우에만 account 정보 cache로 가져오기
-		cache.CacheAccountInRedis(ctx, accountData)
-	}
-
-	// db에서 로그인 유저 통계 정보 가져와서 cache에 저장
-	accountStatsData, err := db.GetAccountStats(uuid)
-	logger.Info("Login account StatsData : %s", accountStatsData)
-
-	if err != nil && errors.Is(err, sql.ErrNoRows) {
-		logger.Error("GetAccountStatsFromDB 에서 에러발생: %s", err)
-		// 없는 경우는 회원가입 후 처음 로그인 상황 초기화해줘야 됨.
-		//cache.InitAccountStatsInRedis(uuid)
-		return base64.StdEncoding.EncodeToString(token), nil
-	} else {
-		// accountStats 정보가 db에 있는 경우에만 cache로 가져오기
-		cache.CacheAccountStatsInRedis(ctx, uuid, accountStatsData)
-	}
-
-	// 유저 아이디와 토큰값으로 세션 정보 저장 -> DB에 굳이 할 필요가 없어짐
-	// err = db.AddAccountSession(username, token)
-	// if err != nil {
-	// 	return "", fmt.Errorf("failed to add account session")
-	// }
 
 	return base64.StdEncoding.EncodeToString(token), nil
 }

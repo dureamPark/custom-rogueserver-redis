@@ -22,7 +22,7 @@ import (
 	"crypto/rand"
 	"fmt"
 
-	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/pagefaultgames/rogueserver/repository"
 )
 
 func ChangePW(ctx context.Context, uuid []byte, password string) error {
@@ -36,7 +36,7 @@ func ChangePW(ctx context.Context, uuid []byte, password string) error {
 		return fmt.Errorf("failed to generate salt: %s", err)
 	}
 
-	err = db.UpdateAccountPassword(uuid, []byte(password), salt)
+	err = repository.Repos.Account.UpdateAccountPassword(ctx, uuid, []byte(password), salt)
 	if err != nil {
 		return fmt.Errorf("failed to add account record: %s", err)
 	}

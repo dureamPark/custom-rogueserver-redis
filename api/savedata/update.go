@@ -24,6 +24,7 @@ import (
 
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/repository"
 )
 
 // /savedata/update - update save data
@@ -39,7 +40,7 @@ func Update(context context.Context, uuid []byte, slot int, save any) error {
 			return fmt.Errorf("invalid system data")
 		}
 
-		err = cache.UpdateAccountStats(context, uuid, save.GameStats, save.VoucherCounts)
+		err = repository.Repos.Account.UpdateAccountStats(context, uuid, save.GameStats, save.VoucherCounts)
 		//err = db.UpdateAccountStats(uuid, save.GameStats, save.VoucherCounts)
 		if err != nil {
 			return fmt.Errorf("failed to update account stats: %s", err)

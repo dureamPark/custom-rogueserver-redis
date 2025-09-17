@@ -14,6 +14,7 @@ func IsValidCacheData(ctx context.Context, uuid []byte) error {
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 	exists, err := Rdb.Exists(ctx, redisKey).Result()
 
+	// 데이터가 없다면?
 	if exists == 0 {
 		// UserCacheData의 초기 상태 정의
 		initialData := defs.UserCacheData{

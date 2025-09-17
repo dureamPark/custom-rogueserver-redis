@@ -22,7 +22,7 @@ import (
 	"crypto/rand"
 	"fmt"
 
-	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 )
 
@@ -54,7 +54,7 @@ func Register(ctx context.Context, username, password string) error {
 
 	logger.Info("make salt")
 
-	err = db.AddAccountRecord(uuid, username, []byte(password), salt)
+	err = repository.Repos.Account.AddAccountRecord(ctx, uuid, username, []byte(password), salt)
 	if err != nil {
 		logger.Error("addaccountrecord error")
 		return fmt.Errorf("failed to add account record: %s", err)

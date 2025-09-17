@@ -13,6 +13,17 @@ type Repositories struct {
 	Savedata SavedataRepository
 }
 
+var (
+	Repos Repositories
+)
+
+func NewMakeRepositories(account AccountRepository, daily DailyRepository, game GameRepository, savedata SavedataRepository) {
+	Repos.Account = account
+	Repos.Daily = daily
+	Repos.Game = game
+	Repos.Savedata = savedata
+}
+
 type AccountRepository interface {
 	GetAccount(ctx context.Context, uuid []byte) (defs.AccountDBRow, error)
 	GetAccountStats(ctx context.Context, uuid []byte) (defs.AccountStatsData, error)
