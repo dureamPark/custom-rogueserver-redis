@@ -42,7 +42,7 @@ type savedataDBRepository struct {
 }
 
 // NewSaveDataDBRepository는 데이터베이스와 통신하는 새로운 saveData repository를 생성합니다.
-func NewSaveDataDBRepository(db *sql.DB, account repository.AccountRepository) repository.SavedataRepository {
+func NewSavedataDBRepository(db *sql.DB, account repository.AccountRepository) repository.SavedataRepository {
 	return &savedataDBRepository{db: db, accountRepo: account}
 }
 

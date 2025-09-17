@@ -28,7 +28,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/redis/go-redis/v9"
@@ -79,7 +78,7 @@ func handleAccountInfo(w http.ResponseWriter, r *http.Request) {
 		hasAdminRole, _ = account.IsUserDiscordAdmin(discordId, account.DiscordGuildID)
 	}
 
-	response, err := account.Info(username, discordId, googleId, uuid, hasAdminRole)
+	response, err := account.Info(r.Context(), username, discordId, googleId, uuid, hasAdminRole)
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
@@ -250,7 +249,7 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		seed, err := db.GetDailyRunSeed()
+		seed, err := repository.Repos.Daily.GetDailyRunSeed(r.Context())
 		if err != nil {
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
@@ -356,7 +355,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 
 	// cache로 변경
 	//existingPlaytime, err := db.RetrievePlaytime(uuid)
-	existingPlaytime, err := cache.RetrievePlaytime(r.Context(), uuid)
+	existingPlaytime, err := repository.Repos.Savedata.RetrievePlaytime(r.Context(), uuid)
 	if err != nil && errors.Is(err, redis.Nil) {
 		httpError(w, r, fmt.Errorf("failed to retrieve playtime: %s", err), http.StatusInternalServerError)
 		return
@@ -469,7 +468,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		existingPlaytime, err := db.RetrievePlaytime(uuid)
+		existingPlaytime, err := repository.Repos.Savedata.RetrievePlaytime(r.Context(), uuid)
 		if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			httpError(w, r, fmt.Errorf("failed to retrieve playtime: %s", err), http.StatusInternalServerError)
 			return
@@ -507,7 +506,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 			}
 
 			var storedSaveData defs.SystemSaveData
-			storedSaveData, err = db.ReadSystemSaveData(uuid)
+			storedSaveData, err = repository.Repos.Savedata.ReadSystemSaveData(r.Context(), uuid)
 			if err != nil {
 				httpError(w, r, fmt.Errorf("failed to read session save data: %s", err), http.StatusInternalServerError)
 				return
@@ -518,7 +517,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 
 		writeJSON(w, r, response)
 	case "delete":
-		err := savedata.DeleteSystem(uuid)
+		err := savedata.DeleteSystem(r.Context(), uuid)
 		if err != nil {
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
@@ -533,7 +532,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 
 // daily
 func handleDailySeed(w http.ResponseWriter, r *http.Request) {
-	seed, err := db.GetDailyRunSeed()
+	seed, err := repository.Repos.Daily.GetDailyRunSeed(r.Context())
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
@@ -566,7 +565,7 @@ func handleDailyRankings(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	rankings, err := daily.Rankings(category, page)
+	rankings, err := daily.Rankings(r.Context(), category, page)
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
@@ -586,7 +585,7 @@ func handleDailyRankingPageCount(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	count, err := daily.RankingPageCount(category)
+	count, err := daily.RankingPageCount(r.Context(), category)
 	if err != nil {
 		httpError(w, r, err, http.StatusInternalServerError)
 	}

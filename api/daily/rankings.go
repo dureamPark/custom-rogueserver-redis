@@ -18,13 +18,15 @@
 package daily
 
 import (
-	"github.com/pagefaultgames/rogueserver/db"
+	"context"
+
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/repository"
 )
 
 // /daily/rankings - fetch daily rankings
-func Rankings(category, page int) ([]defs.DailyRanking, error) {
-	rankings, err := db.FetchRankings(category, page)
+func Rankings(ctx context.Context, category, page int) ([]defs.DailyRanking, error) {
+	rankings, err := repository.Repos.Daily.FetchRankings(ctx, category, page)
 	if err != nil {
 		return rankings, err
 	}

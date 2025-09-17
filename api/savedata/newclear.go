@@ -21,22 +21,22 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/repository"
 )
 
 // /savedata/newclear - return whether a session is a new clear for its seed
-func NewClear(context context.Context, uuid []byte, slot int) (bool, error) {
+func NewClear(ctx context.Context, uuid []byte, slot int) (bool, error) {
 	if slot < 0 || slot >= defs.SessionSlotCount {
 		return false, fmt.Errorf("slot id %d out of range", slot)
 	}
 
-	session, err := db.ReadSessionSaveData(uuid, slot)
+	session, err := repository.Repos.Savedata.ReadSessionSaveData(ctx, uuid, slot)
 	if err != nil {
 		return false, err
 	}
 
-	completed, err := db.ReadSeedCompleted(uuid, session.Seed)
+	completed, err := repository.Repos.Savedata.ReadSeedCompleted(ctx, uuid, session.Seed)
 	if err != nil {
 		return false, fmt.Errorf("failed to read seed completed: %s", err)
 	}

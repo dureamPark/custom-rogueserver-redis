@@ -19,45 +19,19 @@ package savedata
 
 import (
 	"context"
-	"encoding/base64"
-	"errors"
 
-	"github.com/pagefaultgames/rogueserver/cache"
-	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
-	"github.com/pagefaultgames/rogueserver/util/logger"
-	"github.com/redis/go-redis/v9"
+	"github.com/pagefaultgames/rogueserver/repository"
 )
 
 func GetSession(context context.Context, uuid []byte, slot int) (defs.SessionSaveData, error) {
-
-	encodedUUID := base64.StdEncoding.EncodeToString(uuid)
-
-	session, err := cache.ReadSessionSaveData(context, uuid, slot)
-
-	if errors.Is(err, redis.Nil) {
-		// 캐시에 저장된 세션 정보가 없으면
-		logger.Info("세션 정보가 캐시에 없습니다.(key : %s, slot : %d) : %s", encodedUUID, slot, err)
-		session, err = db.ReadSessionSaveData(uuid, slot)
-		logger.Info("세션 정보를 DB에서 찾습니다.")
-
-		if err == nil {
-			// DB에서 세션 값을 가져왔을 때만
-			UpdateSession(context, uuid, slot, session)
-		}
-	}
-
-	if err != nil {
-		logger.Error("Fail to Get Session (key : %s) : %s | session : %s", encodedUUID, err, session)
-		return session, err
-	}
-
-	return session, nil
+	session, err := repository.Repos.Savedata.ReadSessionSaveData(context, uuid, slot)
+	return session, err
 }
 
 func UpdateSession(context context.Context, uuid []byte, slot int, data defs.SessionSaveData) error {
 	//err := db.StoreSessionSaveData(uuid, data, slot)
-	err := cache.StoreSessionSaveData(context, uuid, data, slot)
+	err := repository.Repos.Savedata.StoreSessionSaveData(context, uuid, data, slot)
 	if err != nil {
 		return err
 	}
@@ -67,7 +41,7 @@ func UpdateSession(context context.Context, uuid []byte, slot int, data defs.Ses
 
 func DeleteSession(context context.Context, uuid []byte, slot int) error {
 	//err := db.DeleteSessionSaveData(uuid, slot)
-	err := cache.DeleteSessionSaveData(context, uuid, slot)
+	err := repository.Repos.Savedata.DeleteSessionSaveData(context, uuid, slot)
 	if err != nil {
 		return err
 	}

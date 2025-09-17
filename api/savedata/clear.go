@@ -23,7 +23,6 @@ import (
 	"log"
 
 	"github.com/pagefaultgames/rogueserver/cache"
-	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
 	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
@@ -35,10 +34,10 @@ type ClearResponse struct {
 }
 
 // /savedata/clear - mark session save data as cleared and delete
-func Clear(context context.Context, uuid []byte, slot int, seed string, save defs.SessionSaveData) (ClearResponse, error) {
+func Clear(ctx context.Context, uuid []byte, slot int, seed string, save defs.SessionSaveData) (ClearResponse, error) {
 	var response ClearResponse
 
-	err := cache.UpdateAccountLastActivity(context, uuid)
+	err := cache.UpdateAccountLastActivity(ctx, uuid)
 
 	if err != nil {
 		log.Print("failed to update account last activity")
@@ -57,25 +56,23 @@ func Clear(context context.Context, uuid []byte, slot int, seed string, save def
 		}
 
 		if save.Score >= 20000 {
-			repository.Repos.Account.SetAccountBanned(context, uuid, true)
+			repository.Repos.Account.SetAccountBanned(ctx, uuid, true)
 		}
 
-		err = db.AddOrUpdateAccountDailyRun(uuid, save.Score, waveCompleted)
+		err = repository.Repos.Daily.AddOrUpdateAccountDailyRun(ctx, uuid, save.Score, waveCompleted)
 		if err != nil {
 			logger.Error("failed to add or update daily run record: %s", err)
 		}
 	}
 
 	if sessionCompleted {
-		response.Success, err = db.TryAddSeedCompletion(uuid, save.Seed, int(save.GameMode))
+		response.Success, err = repository.Repos.Savedata.TryAddSeedCompletion(ctx, uuid, save.Seed, int(save.GameMode))
 		if err != nil {
 			logger.Error("failed to mark seed as completed: %s", err)
 		}
 	}
 
-	// clear 시 캐시에서 데이터 지우기
-	cache.DeleteSessionSaveData(context, uuid, slot)
-	//err = db.DeleteSessionSaveData(uuid, slot)
+	err = repository.Repos.Savedata.DeleteSessionSaveData(ctx, uuid, slot)
 	if err != nil {
 		logger.Error("failed to delete session save data: %s", err)
 	}

@@ -18,6 +18,7 @@
 package daily
 
 import (
+	"context"
 	"crypto/md5"
 	"crypto/rand"
 	"encoding/base64"
@@ -27,7 +28,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/robfig/cron/v3"
 )
@@ -62,7 +63,7 @@ func Init() error {
 		secret = newSecret
 	}
 
-	seed, err := db.TryAddDailyRun(Seed())
+	seed, err := repository.Repos.Daily.TryAddDailyRun(context.Background(), Seed())
 	if err != nil {
 		log.Print(err)
 	}
@@ -72,7 +73,7 @@ func Init() error {
 	_, err = scheduler.AddFunc("@daily", func() {
 		time.Sleep(time.Second)
 
-		seed, err = db.TryAddDailyRun(Seed())
+		seed, err = repository.Repos.Daily.TryAddDailyRun(context.Background(), Seed())
 		if err != nil {
 			logger.Error("error while recording new daily: %s", err)
 		} else {

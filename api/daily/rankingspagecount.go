@@ -18,12 +18,14 @@
 package daily
 
 import (
-	"github.com/pagefaultgames/rogueserver/db"
+	"context"
+
+	"github.com/pagefaultgames/rogueserver/repository"
 )
 
 // /daily/rankingpagecount - fetch daily ranking page count
-func RankingPageCount(category int) (int, error) {
-	pageCount, err := db.FetchRankingPageCount(category)
+func RankingPageCount(ctx context.Context, category int) (int, error) {
+	pageCount, err := repository.Repos.Daily.FetchRankingPageCount(ctx, category)
 	if err != nil {
 		return pageCount, err
 	}

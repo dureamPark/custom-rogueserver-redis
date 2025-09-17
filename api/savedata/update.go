@@ -46,14 +46,14 @@ func Update(context context.Context, uuid []byte, slot int, save any) error {
 			return fmt.Errorf("failed to update account stats: %s", err)
 		}
 		//return db.StoreSystemSaveData(uuid, save)
-		return cache.StoreSystemSaveData(context, uuid, save)
+		return repository.Repos.Savedata.StoreSystemSaveData(context, uuid, save)
 
 	case defs.SessionSaveData: // Session
 		if slot < 0 || slot >= defs.SessionSlotCount {
 			return fmt.Errorf("slot id %d out of range", slot)
 		}
 		//return db.StoreSessionSaveData(uuid, save, slot)
-		return cache.StoreSessionSaveData(context, uuid, save, slot)
+		return repository.Repos.Savedata.StoreSessionSaveData(context, uuid, save, slot)
 
 	default:
 		return fmt.Errorf("invalid data type")

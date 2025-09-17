@@ -103,11 +103,16 @@ func main() {
 
 	// 레포지토리 생성
 	accountDBRepo := dbrepository.NewAccountDBRepository(db.GetHandle())
-	accountCacheRepo := repository.NewAccountCacheRepository(cache.Rdb, accountDBRepo)
-	dailyRepo := repository.NewDailyRepository(db.GetHandle())
-	gameRepo := repository.NewGameRepository(db.GetHandle())
-	savedataRepo := repository.NewSavedataRepository(db.GetHandle())
-	repository.NewMakeRepositories(accountCacheRepo, dailyRepo, gameRepo, savedataRepo)
+	dailyDBRepo := dbrepository.NewDailyDBRepository(db.GetHandle())
+	gameDBRepo := dbrepository.NewGameDBRepository(db.GetHandle())
+	savedataDBRepo := dbrepository.NewSavedataDBRepository(db.GetHandle(), accountDBRepo)
+
+	accountRepo := repository.NewAccountCacheRepository(cache.Rdb, accountDBRepo)
+	dailyRepo := repository.NewDailyRepository(cache.Rdb, dailyDBRepo)
+	gameRepo := repository.NewGameRepository(cache.Rdb, gameDBRepo)
+	savedataRepo := repository.NewSavedataRepository(cache.Rdb, savedataDBRepo)
+
+	repository.NewMakeRepositories(accountRepo, dailyRepo, gameRepo, savedataRepo)
 
 	// create listener
 	logger.Info("create listener")

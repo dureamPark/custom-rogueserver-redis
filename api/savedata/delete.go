@@ -18,15 +18,17 @@
 package savedata
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/repository"
 )
 
 // /savedata/delete - delete save data
-func Delete(uuid []byte, datatype, slot int) error {
+func Delete(ctx context.Context, uuid []byte, datatype, slot int) error {
 	err := db.UpdateAccountLastActivity(uuid)
 	if err != nil {
 		log.Print("failed to update account last activity")
@@ -39,7 +41,7 @@ func Delete(uuid []byte, datatype, slot int) error {
 			break
 		}
 
-		err = db.DeleteSessionSaveData(uuid, slot)
+		err = repository.Repos.Savedata.DeleteSessionSaveData(ctx, uuid, slot)
 	default:
 		err = fmt.Errorf("invalid data type")
 	}

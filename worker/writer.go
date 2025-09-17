@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 
 	"github.com/redis/go-redis/v9"
@@ -154,14 +154,14 @@ func (w *WriteBackWorker) flushDirtyData(ctx context.Context) {
 
 	// 4. 모든 데이터가 준비되면 한 번의 DB 호출로 업데이트
 	if len(systemDataList) > 0 {
-		err = db.StoreSystemSaveDataBulk(ctx, uuidList, systemDataList)
+		err = repository.Repos.Savedata.StoreSystemSaveDataBulk(ctx, uuidList, systemDataList)
 		if err != nil {
 			logger.Error("WriteBack - Bulk StoreSystemSaveData Error : %s", err)
 		}
 	}
 
 	if len(sessionDataMapList) > 0 {
-		err = db.StoreSessionSaveDataBulk(ctx, uuidList, sessionDataMapList, 0)
+		err = repository.Repos.Savedata.StoreSessionSaveDataBulk(ctx, uuidList, sessionDataMapList, 0)
 		if err != nil {
 			logger.Error("WriteBack - Bulk StoreSessionSaveDataBulk Error : %s", err)
 		}

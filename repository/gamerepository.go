@@ -2,31 +2,31 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 
-	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/redis/go-redis/v9"
 )
 
 // gameRepository 구조체 선언 (DB 핸들 포함)
 type gameRepository struct {
-	db *sql.DB
+	cache *redis.Client
+	next  GameRepository
 }
 
 // 생성자 함수: DB 핸들 주입
-func NewGameRepository(db *sql.DB) *gameRepository {
-	return &gameRepository{db: db}
+func NewGameRepository(redisClient *redis.Client, nextRepo GameRepository) *gameRepository {
+	return &gameRepository{cache: redisClient, next: nextRepo}
 }
 
 // 아래부터 인터페이스 구현 (context는 받지만 db 함수에는 넘기지 않음)
 
 func (r *gameRepository) FetchPlayerCount(ctx context.Context) (int, error) {
-	return db.FetchPlayerCount()
+	return r.next.FetchPlayerCount(ctx)
 }
 
 func (r *gameRepository) FetchBattleCount(ctx context.Context) (int, error) {
-	return db.FetchBattleCount()
+	return r.next.FetchBattleCount(ctx)
 }
 
 func (r *gameRepository) FetchClassicSessionCount(ctx context.Context) (int, error) {
-	return db.FetchClassicSessionCount()
+	return r.next.FetchClassicSessionCount(ctx)
 }

@@ -18,9 +18,10 @@
 package api
 
 import (
+	"context"
 	"time"
 
-	"github.com/pagefaultgames/rogueserver/db"
+	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/robfig/cron/v3"
 )
@@ -49,17 +50,17 @@ func scheduleStatRefresh() error {
 
 func updateStats() error {
 	var err error
-	playerCount, err = db.FetchPlayerCount()
+	playerCount, err = repository.Repos.Game.FetchPlayerCount(context.Background())
 	if err != nil {
 		return err
 	}
 
-	battleCount, err = db.FetchBattleCount()
+	battleCount, err = repository.Repos.Game.FetchBattleCount(context.Background())
 	if err != nil {
 		return err
 	}
 
-	classicSessionCount, err = db.FetchClassicSessionCount()
+	classicSessionCount, err = repository.Repos.Game.FetchClassicSessionCount(context.Background())
 	if err != nil {
 		return err
 	}

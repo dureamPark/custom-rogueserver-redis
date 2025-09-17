@@ -18,7 +18,9 @@
 package account
 
 import (
-	"github.com/pagefaultgames/rogueserver/db"
+	"context"
+
+	"github.com/pagefaultgames/rogueserver/repository"
 )
 
 type InfoResponse struct {
@@ -30,8 +32,8 @@ type InfoResponse struct {
 }
 
 // /account/info - get account info
-func Info(username string, discordId string, googleId string, uuid []byte, hasAdminRole bool) (InfoResponse, error) {
-	slot, _ := db.GetLatestSessionSaveDataSlot(uuid)
+func Info(ctx context.Context, username string, discordId string, googleId string, uuid []byte, hasAdminRole bool) (InfoResponse, error) {
+	slot, _ := repository.Repos.Savedata.GetLatestSessionSaveDataSlot(ctx, uuid)
 	response := InfoResponse{
 		Username:        username,
 		LastSessionSlot: slot,

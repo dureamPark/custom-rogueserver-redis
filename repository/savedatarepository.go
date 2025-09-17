@@ -2,76 +2,105 @@ package repository
 
 import (
 	"context"
-	"database/sql"
+	"errors"
+	"os"
 
+	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/redis/go-redis/v9"
 )
 
 // savedataRepository 구조체 선언 (DB 핸들 포함)
 type savedataRepository struct {
-	db *sql.DB
+	cache *redis.Client
+	next  SavedataRepository
 }
 
 // 생성자 함수: DB 핸들 주입
-func NewSavedataRepository(db *sql.DB) *savedataRepository {
-	return &savedataRepository{db: db}
+func NewSavedataRepository(redisClient *redis.Client, nextRepo SavedataRepository) SavedataRepository {
+	return &savedataRepository{cache: redisClient, next: nextRepo}
 }
 
 // 아래부터 인터페이스 구현 (context는 받지만 db 함수에는 넘기지 않음)
 
 func (r *savedataRepository) TryAddSeedCompletion(ctx context.Context, uuid []byte, seed string, mode int) (bool, error) {
-	return db.TryAddSeedCompletion(uuid, seed, mode)
+	return r.next.TryAddSeedCompletion(ctx, uuid, seed, mode)
 }
 
 func (r *savedataRepository) ReadSeedCompleted(ctx context.Context, uuid []byte, seed string) (bool, error) {
-	return db.ReadSeedCompleted(uuid, seed)
+	return r.next.ReadSeedCompleted(ctx, uuid, seed)
 }
 
 func (r *savedataRepository) ReadSystemSaveData(ctx context.Context, uuid []byte) (defs.SystemSaveData, error) {
-	return db.ReadSystemSaveData(uuid)
+
+	system, err := cache.ReadSystemSaveData(cache.Ctx, uuid)
+
+	if errors.Is(err, redis.Nil) {
+		if os.Getenv("S3_SYSTEM_BUCKET_NAME") != "" { // use S3
+			system, err = r.GetSystemSaveFromS3(ctx, uuid)
+		} else { // use database
+			system, err = r.next.ReadSystemSaveData(ctx, uuid)
+		}
+
+		if err != nil {
+			return system, err
+		}
+	}
+
+	return system, err
 }
 
 func (r *savedataRepository) StoreSystemSaveData(ctx context.Context, uuid []byte, data defs.SystemSaveData) error {
-	return db.StoreSystemSaveData(uuid, data)
+	return cache.StoreSystemSaveData(ctx, uuid, data)
 }
 
 func (r *savedataRepository) StoreSystemSaveDataS3(ctx context.Context, uuid []byte, data defs.SystemSaveData) error {
-	return db.StoreSystemSaveDataS3(uuid, data)
+	return r.next.StoreSystemSaveDataS3(ctx, uuid, data)
 }
 
 func (r *savedataRepository) DeleteSystemSaveData(ctx context.Context, uuid []byte) error {
-	return db.DeleteSystemSaveData(uuid)
+	return r.next.DeleteSystemSaveData(ctx, uuid)
 }
 
 func (r *savedataRepository) ReadSessionSaveData(ctx context.Context, uuid []byte, slot int) (defs.SessionSaveData, error) {
-	return db.ReadSessionSaveData(uuid, slot)
+
+	session, err := cache.ReadSessionSaveData(ctx, uuid, slot)
+
+	if errors.Is(err, redis.Nil) {
+		session, err = db.ReadSessionSaveData(uuid, slot)
+	}
+
+	return session, err
 }
 
 func (r *savedataRepository) GetLatestSessionSaveDataSlot(ctx context.Context, uuid []byte) (int, error) {
-	return db.GetLatestSessionSaveDataSlot(uuid)
+	return r.next.GetLatestSessionSaveDataSlot(ctx, uuid)
 }
 
 func (r *savedataRepository) StoreSessionSaveData(ctx context.Context, uuid []byte, data defs.SessionSaveData, slot int) error {
-	return db.StoreSessionSaveData(uuid, data, slot)
+	return cache.StoreSessionSaveData(ctx, uuid, data, slot)
+	//return db.StoreSessionSaveData(uuid, data, slot)
 }
 
 func (r *savedataRepository) DeleteSessionSaveData(ctx context.Context, uuid []byte, slot int) error {
-	return db.DeleteSessionSaveData(uuid, slot)
+	cache.DeleteSessionSaveData(ctx, uuid, slot)
+	return r.next.DeleteSessionSaveData(ctx, uuid, slot)
 }
 
 func (r *savedataRepository) StoreSessionSaveDataBulk(ctx context.Context, uuids [][]byte, sessionsDataMapList []defs.SessionSaveData, slot int) error {
-	return db.StoreSessionSaveDataBulk(ctx, uuids, sessionsDataMapList, slot)
+	return r.next.StoreSessionSaveDataBulk(ctx, uuids, sessionsDataMapList, slot)
 }
 
 func (r *savedataRepository) StoreSystemSaveDataBulk(ctx context.Context, uuids [][]byte, systemsDataList []defs.SystemSaveData) error {
-	return db.StoreSystemSaveDataBulk(ctx, uuids, systemsDataList)
+	return r.next.StoreSystemSaveDataBulk(ctx, uuids, systemsDataList)
 }
 
 func (r *savedataRepository) RetrievePlaytime(ctx context.Context, uuid []byte) (int, error) {
-	return db.RetrievePlaytime(uuid)
+	return cache.RetrievePlaytime(ctx, uuid)
+	// return db.RetrievePlaytime(uuid)
 }
 
 func (r *savedataRepository) GetSystemSaveFromS3(ctx context.Context, uuid []byte) (defs.SystemSaveData, error) {
-	return db.GetSystemSaveFromS3(uuid)
+	return r.next.GetSystemSaveFromS3(ctx, uuid)
 }
