@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"slices"
-	"strings"
 	"time"
 
 	"github.com/pagefaultgames/rogueserver/util/logger"
@@ -136,6 +135,22 @@ func CacheAccountStatsInRedis(ctx context.Context, uuid []byte, dbStats defs.Acc
 	return nil
 }
 
+func FetchUsernameBySessionToken(ctx context.Context, token []byte) (string, error) {
+	key := "token:" + string(token)
+	// uuid 찾기
+	uuid, err := Rdb.Get(ctx, key).Result()
+
+	if err != nil {
+		return "", err
+	}
+
+	// username 찾기
+	sessionkey := "session:" + uuid
+	username, err := Rdb.JSONGet(ctx, sessionkey, "$.account.username").Result()
+
+	return username, err
+}
+
 // session 활성화
 func UpdateActiveSession(ctx context.Context, uuid []byte, sessionId string) error {
 
@@ -144,7 +159,8 @@ func UpdateActiveSession(ctx context.Context, uuid []byte, sessionId string) err
 	if sessionId == "" {
 		return fmt.Errorf("sessionId is empty")
 	}
-	return SetJSON(ctx, redisKey, "$.activeClientSession", fmt.Sprintf("%s", sessionId))
+	// expected value at line 1 column 1  문자열 형식이 안맞아서 ""를 붙여주기
+	return SetJSON(ctx, redisKey, "$.activeClientSession", fmt.Sprintf("\"%s\"", sessionId))
 }
 
 // 현재 session이 활성화되어 있는지 확인, 비활성화 시 새롭게 활성화
@@ -158,18 +174,32 @@ func IsActiveSession(ctx context.Context, uuid []byte, sessionId string) (bool, 
 		// 초기화를 빈 문자열로 ""로 해서 확인하기
 		err = UpdateActiveSession(ctx, uuid, sessionId)
 		if err != nil {
-			logger.Error("fail to Set Active Session in redis")
+			logger.Error("fail to Set Active Session in redis : %s, session id : %s, get id : %s", err, sessionId, id)
 			return false, err
 		}
 		return true, nil
 	}
 
-	id = strings.Trim(id, "") // 쌍따옴표 제거
-	// if(!(id == "" || id == sessionId)){
-	// 	logger.Error("id : %s, session id : %s", id, sessionId)
+	var cur string
+	if err := json.Unmarshal([]byte(id), &cur); err != nil {
 
-	// }
-	return id == "" || id == sessionId, nil
+		// 비어있는 경우 = 첫 로그인인 경우는 패쓰
+		if id != "" {
+			return false, fmt.Errorf("unmarshal error (%s): %w", id, err)
+		}
+	}
+
+	// .activeClientSession로 가져오면 문자열의 경우 ""도 같이 가져옴
+	// id = strings.Trim(id, "") // 쌍따옴표 제거
+	// id = strings.Trim(id, "") // 두 번..?
+	// // if(!(id == "" || id == sessionId)){
+	// // 	logger.Error("id : %s, session id : %s", id, sessionId)
+
+	// // }
+
+	logger.Info("session id : %s, get id : %s", sessionId, cur)
+
+	return cur == "" || cur == sessionId, nil
 }
 
 // StoreSessionToken stores a token-uuid pair in Redis with TTL.
@@ -233,6 +263,11 @@ func UpdateTrainerIds(ctx context.Context, trainerId, secretId int, uuid []byte)
 	// JSON.SET key path value
 	// path는 "$.trainerId"
 	// value는 int 타입이므로 Redis가 JSON 숫자로 저장합니다.
+
+	// 객체가 없을 때는 생성해서 넣어주기
+	pipe.Do(ctx, "JSON.SET", redisKey, "$", "{}", "NX")
+	pipe.Do(ctx, "JSON.SET", redisKey, "$.account", "{}", "NX")
+
 	pipe.JSONSet(ctx, redisKey, "$.account.trainerId", trainerId)
 
 	// 3. secretId 업데이트
@@ -240,26 +275,18 @@ func UpdateTrainerIds(ctx context.Context, trainerId, secretId int, uuid []byte)
 
 	// 4. 파이프라인 실행
 	cmders, err := pipe.Exec(ctx)
-	if err != nil {
-		logger.Error("Redis 파이프라인 실행 오류 (키: %s): %s", redisKey, err)
-		return err
-	}
+	// if err != nil {
+	// 	logger.Error("Redis 파이프라인 실행 오류 (키: %s): %s", redisKey, err)
+	// 	return err
+	// }
 
 	// 각 명령어의 성공 여부 확인 (선택적이지만 권장)
 	for i, cmd := range cmders {
-		if cmd.Err() != nil {
-			fieldName := "trainerId"
-			if i == 1 {
-				fieldName = "secretId"
-			}
-			// 파이프라인 내의 특정 명령 실패 시 롤백 전략이 필요할 수 있으나,
-			// 여기서는 일단 에러를 반환합니다.
-			logger.Error("Redis 파이프라인 내 '%s' 업데이트 실패 (키: %s): %s", fieldName, redisKey, cmd.Err())
+		if cmd.Err() != nil && cmd.Err() != redis.Nil {
+			logger.Error("명령 %d 실패: %v", i, cmd.Err())
 			return err
 		}
-		// log.Printf("Debug: Command %d result: %v", i, cmd.String())
 	}
-
 	logger.Info("키 %s의 trainerId가 %d로, secretId가 %d로 업데이트되었습니다.", redisKey, trainerId, secretId)
 	return nil
 }
@@ -280,6 +307,7 @@ func UpdateAccountLastActivity(ctx context.Context, uuid []byte) error {
 	// JSON.SET key path value
 	// path는 "$.lastActivity"
 	// value는 준비된 시간 문자열 (또는 숫자 타임스탬프)
+	Rdb.Do(ctx, "JSON.SET", redisKey, "$.account", "{}", "NX")
 	err := SetJSON(ctx, redisKey, "$.account.lastActivity", currentTimeStr)
 	if err != nil {
 		logger.Error("Redis JSON.SET lastActivity 오류 (키: %s): %s", redisKey, err)
@@ -312,6 +340,8 @@ func UpdateAccountStats(ctx context.Context, uuid []byte, stats defs.GameStats, 
 		return fmt.Errorf("expected map[string]interface{}, got %T", stats)
 	}
 
+	pipe.Do(ctx, "JSON.SET", redisKey, "$", "{}", "NX")
+	pipe.Do(ctx, "JSON.SET", redisKey, "$.accountStats", "{}", "NX")
 	for key, val := range m {
 		if !slices.Contains(validStatColumns, key) {
 			//logger.Warn("경고: GameStats에 유효하지 않은 키 '%s'가 포함되어 무시합니다.", key)
@@ -328,6 +358,7 @@ func UpdateAccountStats(ctx context.Context, uuid []byte, stats defs.GameStats, 
 
 		// JSONPath 생성 (예: "$.playTime")
 		jsonPath := "$.accountStats." + key
+		pipe.Do(ctx, "JSON.SET", redisKey, jsonPath, "{}", "NX")
 		pipe.JSONSet(ctx, redisKey, jsonPath, intValue)
 		updateCount++
 		// log.Printf("Debug: Pipelining JSON.SET %s %s %d", redisKey, jsonPath, intValue)
@@ -340,6 +371,7 @@ func UpdateAccountStats(ctx context.Context, uuid []byte, stats defs.GameStats, 
 		"2": "premiumVouchers",
 		"3": "goldenVouchers",
 	}
+
 	for key, count := range voucherCounts {
 		columnName, ok := voucherColumnMap[key]
 		if !ok {
@@ -347,6 +379,7 @@ func UpdateAccountStats(ctx context.Context, uuid []byte, stats defs.GameStats, 
 			continue
 		}
 		jsonPath := "$.accountStats." + columnName
+		pipe.Do(ctx, "JSON.SET", redisKey, jsonPath, "{}", "NX")
 		pipe.JSONSet(ctx, redisKey, jsonPath, count) // count는 이미 int
 		updateCount++
 		// log.Printf("Debug: Pipelining JSON.SET %s %s %d", redisKey, jsonPath, count)

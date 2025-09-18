@@ -41,6 +41,7 @@ func (r *savedataRepository) ReadSystemSaveData(ctx context.Context, uuid []byte
 			system, err = r.GetSystemSaveFromS3(ctx, uuid)
 		} else { // use database
 			system, err = r.next.ReadSystemSaveData(ctx, uuid)
+			cache.StoreSystemSaveData(ctx, uuid, system)
 		}
 
 		if err != nil {
@@ -97,8 +98,11 @@ func (r *savedataRepository) StoreSystemSaveDataBulk(ctx context.Context, uuids 
 }
 
 func (r *savedataRepository) RetrievePlaytime(ctx context.Context, uuid []byte) (int, error) {
-	return cache.RetrievePlaytime(ctx, uuid)
-	// return db.RetrievePlaytime(uuid)
+	time, err := cache.RetrievePlaytime(ctx, uuid)
+	if err != nil {
+		time, err = db.RetrievePlaytime(uuid)
+	}
+	return time, err
 }
 
 func (r *savedataRepository) GetSystemSaveFromS3(ctx context.Context, uuid []byte) (defs.SystemSaveData, error) {

@@ -397,12 +397,12 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = savedata.Update(r.Context(), uuid, 0, data.System)
-	if err != nil {
-		logger.Error("%v", err)
-		httpError(w, r, err, http.StatusInternalServerError)
-		return
-	}
+	// err = savedata.Update(r.Context(), uuid, 0, data.System)
+	// if err != nil {
+	// 	logger.Error("%v", err)
+	// 	httpError(w, r, err, http.StatusInternalServerError)
+	// 	return
+	// }
 
 	w.WriteHeader(http.StatusOK)
 }

@@ -67,21 +67,19 @@ func (r *accountCacheRepository) UpdateAccountPassword(ctx context.Context, uuid
 // --- 대부분의 읽기 작업은 캐시를 먼저 시도하고, 실패 시 DB로 넘어갑니다. ---
 
 func (r *accountCacheRepository) FetchUsernameBySessionToken(ctx context.Context, token []byte) (string, error) {
-	key := "token:" + base64.StdEncoding.EncodeToString(token)
-	uuid, err := r.cache.Get(ctx, key).Bytes()
 
-	// 토큰은 Cache에서만 관리, cache에 없으면 err가 반환.
+	username, err := cache.FetchUsernameBySessionToken(ctx, token)
+
+	// cacehe에서 찾기 오류
 	if err != nil {
-		return "", err // Cache miss
-	}
+		// db에서 찾기
+		username, err = r.next.FetchUsernameBySessionToken(ctx, token)
 
-	// 캐시에 uuid가 있으면, account 정보에서 username을 찾음
-	account, err := r.GetAccount(ctx, uuid)
-	username := account.Username
-
-	// 없으면 db에서 찾기
-	if err != nil {
-		username, err = r.FetchUsernameFromUUID(ctx, uuid)
+		// cache에 넣기
+		var uuid []byte
+		uuid, err = r.next.FetchUUIDFromToken(ctx, token)
+		key := "session:" + base64.StdEncoding.EncodeToString(uuid)
+		cache.SetJSON(ctx, key, "$.account.username", username)
 	}
 
 	return username, nil
@@ -226,6 +224,7 @@ func (r *accountCacheRepository) FetchTrainerIds(ctx context.Context, uuid []byt
 	trainerId, secretId, err = cache.FetchTrainerIds(ctx, uuid)
 	if err != nil {
 		trainerId, secretId, err = r.next.FetchTrainerIds(ctx, uuid)
+		// 다시 캐시에 저장하기
 	}
 	return trainerId, secretId, err
 }

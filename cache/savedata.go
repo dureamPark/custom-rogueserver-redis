@@ -62,6 +62,7 @@ func StoreSessionSaveData(ctx context.Context, uuid []byte, data defs.SessionSav
 	jsonPath := fmt.Sprintf(`$.sessionSaveData["%s"]`, strconv.Itoa(slot))
 
 	// Redis에 JSON 데이터 저장
+	Rdb.Do(ctx, "JSON.SET", redisKey, "$.sessionSaveData", "{}", "NX")
 	err := SetJSON(ctx, redisKey, jsonPath, data)
 	if err != nil {
 		logger.Error("Redis에 세션 데이터 저장 오류 (키: %s): %s", redisKey, err)
@@ -145,7 +146,7 @@ func StoreSystemSaveData(ctx context.Context, uuid []byte, data defs.SystemSaveD
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 
 	// Redis에 JSON 데이터 저장
-	err := SetJSON(ctx, redisKey, "$.systemSaveData", data)
+	err := SetJSON(ctx, redisKey, ".systemSaveData", data)
 	if err != nil {
 		logger.Error("Redis에 세션 데이터 저장 오류 (키: %s): %s", redisKey, err)
 		return err
@@ -162,7 +163,7 @@ func RetrievePlaytime(ctx context.Context, uuid []byte) (int, error) {
 	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
 
 	rawResult, err := Rdb.JSONGet(ctx, redisKey, ".accountStats.playTime").Result()
-	if err != nil {
+	if err == redis.Nil || err != nil {
 		logger.Error("Redis JSON.GET playTime 오류 (키: %s): %s", redisKey, err)
 		return 0, err
 	}

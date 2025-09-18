@@ -64,7 +64,22 @@ func Set(ctx context.Context, key string, value interface{}, ttl time.Duration) 
 // stores key-value json data function
 func SetJSON(ctx context.Context, key string, path string, jsonData interface{}) error {
 	logger.Info("Set JSON")
-	err := Rdb.JSONSet(ctx, key, path, jsonData).Err()
+
+	// 키 존재 여부 확인
+	exists, err := Rdb.Exists(ctx, key).Result()
+	if err != nil {
+		return err
+	}
+
+	// 키가 없고 루트가 아닌 경로라면 → 루트 먼저 생성
+	if exists == 0 && (path != "$" && path != ".") {
+		// 루트에 빈 객체 생성
+		if err := Rdb.JSONSet(ctx, key, "$", "{}").Err(); err != nil {
+			return err
+		}
+	}
+
+	err = Rdb.JSONSet(ctx, key, path, jsonData).Err()
 
 	MarkAsDirty(ctx, key) // Mark the key as dirty for write-back
 
