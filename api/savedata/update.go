@@ -22,14 +22,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/defs"
 	"github.com/pagefaultgames/rogueserver/repository"
 )
 
 // /savedata/update - update save data
 func Update(context context.Context, uuid []byte, slot int, save any) error {
-	err := cache.UpdateAccountLastActivity(context, uuid)
+	err := repository.Repos.Account.UpdateAccountLastActivity(context, uuid)
 	if err != nil {
 		log.Print("failed to update account last activity")
 	}

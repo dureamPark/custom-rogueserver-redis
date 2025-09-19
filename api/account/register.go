@@ -47,10 +47,10 @@ func Register(ctx context.Context, username, password string) error {
 	logger.Info("make uuid")
 
 	salt := make([]byte, ArgonSaltSize)
-	_, err = rand.Read(salt)
-	if err != nil {
-		return fmt.Errorf("failed to generate salt: %s", err)
-	}
+	// _, err = rand.Read(salt)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to generate salt: %s", err)
+	// }
 
 	logger.Info("make salt")
 

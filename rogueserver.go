@@ -107,12 +107,15 @@ func main() {
 	gameDBRepo := dbrepository.NewGameDBRepository(db.GetHandle())
 	savedataDBRepo := dbrepository.NewSavedataDBRepository(db.GetHandle(), accountDBRepo)
 
-	accountRepo := repository.NewAccountCacheRepository(cache.Rdb, accountDBRepo)
-	dailyRepo := repository.NewDailyRepository(cache.Rdb, dailyDBRepo)
-	gameRepo := repository.NewGameRepository(cache.Rdb, gameDBRepo)
-	savedataRepo := repository.NewSavedataRepository(cache.Rdb, savedataDBRepo)
+	// cache 사용 모드
+	// accountRepo := repository.NewAccountCacheRepository(cache.Rdb, accountDBRepo)
+	// dailyRepo := repository.NewDailyRepository(cache.Rdb, dailyDBRepo)
+	// gameRepo := repository.NewGameRepository(cache.Rdb, gameDBRepo)
+	// savedataRepo := repository.NewSavedataRepository(cache.Rdb, savedataDBRepo)
+	// repository.NewMakeRepositories(accountRepo, dailyRepo, gameRepo, savedataRepo)
 
-	repository.NewMakeRepositories(accountRepo, dailyRepo, gameRepo, savedataRepo)
+	// db만 사용
+	repository.NewMakeRepositories(accountDBRepo, dailyDBRepo, gameDBRepo, savedataDBRepo)
 
 	// create listener
 	logger.Info("create listener")

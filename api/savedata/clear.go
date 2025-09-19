@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/defs"
 	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
@@ -37,7 +36,7 @@ type ClearResponse struct {
 func Clear(ctx context.Context, uuid []byte, slot int, seed string, save defs.SessionSaveData) (ClearResponse, error) {
 	var response ClearResponse
 
-	err := cache.UpdateAccountLastActivity(ctx, uuid)
+	err := repository.Repos.Account.UpdateAccountLastActivity(ctx, uuid)
 
 	if err != nil {
 		log.Print("failed to update account last activity")

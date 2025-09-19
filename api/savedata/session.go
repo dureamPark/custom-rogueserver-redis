@@ -19,6 +19,8 @@ package savedata
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/pagefaultgames/rogueserver/defs"
 	"github.com/pagefaultgames/rogueserver/repository"
@@ -26,7 +28,15 @@ import (
 
 func GetSession(context context.Context, uuid []byte, slot int) (defs.SessionSaveData, error) {
 	session, err := repository.Repos.Savedata.ReadSessionSaveData(context, uuid, slot)
-	return session, err
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			err = ErrSaveNotExist
+		}
+
+		return session, err
+	}
+
+	return session, nil
 }
 
 func UpdateSession(context context.Context, uuid []byte, slot int, data defs.SessionSaveData) error {

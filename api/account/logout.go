@@ -23,13 +23,13 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/pagefaultgames/rogueserver/cache"
+	"github.com/pagefaultgames/rogueserver/repository"
 )
 
 // /account/logout - log out of account
 func Logout(context context.Context, token []byte) error {
 	// err := db.RemoveSessionFromToken(token)
-	err := cache.RemoveSessionFromToken(context, token)
+	err := repository.Repos.Account.RemoveSessionFromToken(context, token)
 	// TODO. 남아있는 데이터를 로그아웃할 때, 전부 DB에 저장할건지, Cache 정책에 따라 저장할 것인지
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

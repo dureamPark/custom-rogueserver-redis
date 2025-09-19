@@ -35,7 +35,6 @@ import (
 	"github.com/pagefaultgames/rogueserver/api/account"
 	"github.com/pagefaultgames/rogueserver/api/daily"
 	"github.com/pagefaultgames/rogueserver/api/savedata"
-	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/defs"
 )
 
@@ -224,9 +223,11 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 		}
 
 		existingSave, err := savedata.GetSession(r.Context(), uuid, slot)
-		if err != nil && !errors.Is(err, sql.ErrNoRows) {
-			httpError(w, r, fmt.Errorf("failed to retrieve session save data: %s", err), http.StatusInternalServerError)
-			return
+		if err != nil {
+			if !errors.Is(err, savedata.ErrSaveNotExist) {
+				httpError(w, r, fmt.Errorf("failed to retrieve session save data: %s", err), http.StatusInternalServerError)
+				return
+			}
 		} else {
 			if existingSave.Seed == session.Seed && existingSave.WaveIndex > session.WaveIndex {
 				httpError(w, r, fmt.Errorf("session out of date: existing wave index is greater"), http.StatusBadRequest)
@@ -327,7 +328,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//storedTrainerId, storedSecretId, err := db.FetchTrainerIds(uuid)
-	storedTrainerId, storedSecretId, err := cache.FetchTrainerIds(r.Context(), uuid)
+	storedTrainerId, storedSecretId, err := repository.Repos.Account.FetchTrainerIds(r.Context(), uuid)
 	if err != nil {
 		logger.Error("%s", err)
 		if errors.Is(err, redis.Nil) {
@@ -379,9 +380,11 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 	logger.Info("handleUpdateAll %s %d", uuid, data.SessionSlotId)
 
 	existingSave, err := savedata.GetSession(r.Context(), uuid, data.SessionSlotId)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		httpError(w, r, fmt.Errorf("failed to retrieve session save data: %s", err), http.StatusInternalServerError)
-		return
+	if err != nil {
+		if !errors.Is(err, savedata.ErrSaveNotExist) {
+			httpError(w, r, fmt.Errorf("failed to retrieve session save data: %s", err), http.StatusInternalServerError)
+			return
+		}
 	} else {
 		if existingSave.Seed == data.Session.Seed && existingSave.WaveIndex > data.Session.WaveIndex {
 			httpError(w, r, fmt.Errorf("session out of date: existing wave index is greater"), http.StatusBadRequest)

@@ -342,7 +342,11 @@ func (r *accountDBRepository) SetAccountBanned(ctx context.Context, uuid []byte,
 func (r *accountDBRepository) FetchAccountKeySaltFromUsername(ctx context.Context, username string) ([]byte, error) {
 	var key, salt []byte
 	err := r.db.QueryRowContext(ctx, "SELECT hash, salt FROM accounts WHERE username = ?", username).Scan(&key, &salt)
-	return key, err
+	if err != nil {
+		return nil, err
+	}
+
+	return key, nil
 }
 
 func (r *accountDBRepository) FetchTrainerIds(ctx context.Context, uuid []byte) (trainerId, secretId int, err error) {

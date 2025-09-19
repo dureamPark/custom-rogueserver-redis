@@ -19,12 +19,15 @@ package savedata
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
 	"github.com/pagefaultgames/rogueserver/defs"
 	"github.com/pagefaultgames/rogueserver/repository"
 )
+
+var ErrSaveNotExist = errors.New("save does not exist")
 
 func GetSystem(context context.Context, uuid []byte) (defs.SystemSaveData, error) {
 

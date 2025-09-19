@@ -155,9 +155,9 @@ func (r *savedataDBRepository) ReadSessionSaveData(ctx context.Context, uuid []b
 	var data []byte
 	err := r.db.QueryRowContext(ctx, "SELECT data FROM sessionSaveData WHERE uuid = ? AND slot = ?", uuid, slot).Scan(&data)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return session, nil // 저장 데이터가 없으면 빈 구조체와 nil 에러 반환
-		}
+		// if err == sql.ErrNoRows {
+		// 	return session, err // 저장 데이터가 없으면 빈 구조체와 nil 에러 반환, redis에서 빈 구조체를 사용하도록 만들기 위해
+		// }
 		return session, err
 	}
 

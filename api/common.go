@@ -27,7 +27,7 @@ import (
 
 	"github.com/pagefaultgames/rogueserver/api/account"
 	"github.com/pagefaultgames/rogueserver/api/daily"
-	"github.com/pagefaultgames/rogueserver/cache"
+	"github.com/pagefaultgames/rogueserver/repository"
 	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/redis/go-redis/v9"
 	//"github.com/pagefaultgames/rogueserver/db"
@@ -125,7 +125,7 @@ func tokenAndUuidFromRequest(r *http.Request) ([]byte, []byte, error) {
 
 	// 2) Redis 캐시 조회 (token→uuid)
 	logger.Info("token : %s\n", base64.StdEncoding.EncodeToString(token))
-	uuid, err := cache.FetchSessionToken(r.Context(), token)
+	uuid, err := repository.Repos.Account.FetchUUIDFromToken(r.Context(), token)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
 			logger.Error("token : %s\n", base64.StdEncoding.EncodeToString(token))
