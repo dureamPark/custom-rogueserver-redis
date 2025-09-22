@@ -17,11 +17,22 @@ var (
 	Repos Repositories
 )
 
+var (
+	ReposDB Repositories
+)
+
 func NewMakeRepositories(account AccountRepository, daily DailyRepository, game GameRepository, savedata SavedataRepository) {
 	Repos.Account = account
 	Repos.Daily = daily
 	Repos.Game = game
 	Repos.Savedata = savedata
+}
+
+func NewMakeRepositoriesDB(account AccountRepository, daily DailyRepository, game GameRepository, savedata SavedataRepository) {
+	ReposDB.Account = account
+	ReposDB.Daily = daily
+	ReposDB.Game = game
+	ReposDB.Savedata = savedata
 }
 
 type AccountRepository interface {

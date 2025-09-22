@@ -108,7 +108,7 @@ func main() {
 	savedataDBRepo := dbrepository.NewSavedataDBRepository(db.GetHandle(), accountDBRepo)
 
 	// db만 사용
-	//repository.NewMakeRepositories(accountDBRepo, dailyDBRepo, gameDBRepo, savedataDBRepo)
+	repository.NewMakeRepositoriesDB(accountDBRepo, dailyDBRepo, gameDBRepo, savedataDBRepo)
 
 	// cache 사용 모드
 	accountRepo := repository.NewAccountCacheRepository(cache.Rdb, accountDBRepo)

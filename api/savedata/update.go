@@ -28,7 +28,7 @@ import (
 )
 
 // /savedata/update - update save data
-func Update(context context.Context, uuid []byte, slot int, save any) error {
+func Update(context context.Context, uuid []byte, slot int, save any, level string) error {
 	logger.Info("Update %s %d", uuid, slot)
 	err := repository.Repos.Account.UpdateAccountLastActivity(context, uuid)
 	if err != nil {
@@ -47,8 +47,13 @@ func Update(context context.Context, uuid []byte, slot int, save any) error {
 		if err != nil {
 			return fmt.Errorf("failed to update account stats: %s", err)
 		}
-		//return db.StoreSystemSaveData(uuid, save)
-		return repository.Repos.Savedata.StoreSystemSaveData(context, uuid, save)
+		if level == "Cache" {
+			return repository.Repos.Savedata.StoreSystemSaveData(context, uuid, save)
+		} else {
+			return repository.ReposDB.Savedata.StoreSystemSaveData(context, uuid, save)
+		}
+
+		//return repository.Repos.Savedata.StoreSystemSaveData(context, uuid, save)
 
 	case defs.SessionSaveData: // Session
 		logger.Info("Update SessionSaveData %s %d", uuid, slot)
@@ -56,7 +61,14 @@ func Update(context context.Context, uuid []byte, slot int, save any) error {
 			return fmt.Errorf("slot id %d out of range", slot)
 		}
 		//return db.StoreSessionSaveData(uuid, save, slot)
-		return repository.Repos.Savedata.StoreSessionSaveData(context, uuid, save, slot)
+
+		if level == "Cache" {
+			return repository.Repos.Savedata.StoreSessionSaveData(context, uuid, save, slot)
+		} else {
+			return repository.ReposDB.Savedata.StoreSessionSaveData(context, uuid, save, slot)
+		}
+
+		//return repository.Repos.Savedata.StoreSessionSaveData(context, uuid, save, slot)
 
 	default:
 		return fmt.Errorf("invalid data type")

@@ -29,14 +29,21 @@ import (
 
 var ErrSaveNotExist = errors.New("save does not exist")
 
-func GetSystem(context context.Context, uuid []byte) (defs.SystemSaveData, error) {
+func GetSystem(context context.Context, uuid []byte, level string) (defs.SystemSaveData, error) {
 
-	system, err := repository.Repos.Savedata.ReadSystemSaveData(context, uuid)
+	var system defs.SystemSaveData
+	var err error
+	if level == "Cache" {
+		system, err = repository.Repos.Savedata.ReadSystemSaveData(context, uuid)
+	} else {
+		system, err = repository.ReposDB.Savedata.ReadSystemSaveData(context, uuid)
+	}
+	//system, err := repository.Repos.Savedata.ReadSystemSaveData(context, uuid)
 
 	return system, err
 }
 
-func UpdateSystem(ctx context.Context, uuid []byte, data defs.SystemSaveData) error {
+func UpdateSystem(ctx context.Context, uuid []byte, data defs.SystemSaveData, level string) error {
 	if data.TrainerId == 0 && data.SecretId == 0 {
 		return fmt.Errorf("invalid system data")
 	}
@@ -49,7 +56,11 @@ func UpdateSystem(ctx context.Context, uuid []byte, data defs.SystemSaveData) er
 	if os.Getenv("S3_SYSTEM_BUCKET_NAME") != "" { // use S3
 		err = repository.Repos.Savedata.StoreSystemSaveDataS3(ctx, uuid, data)
 	} else {
-		err = repository.Repos.Savedata.StoreSystemSaveData(ctx, uuid, data)
+		if level == "Cache" {
+			err = repository.Repos.Savedata.StoreSystemSaveData(ctx, uuid, data)
+		} else {
+			err = repository.ReposDB.Savedata.StoreSystemSaveData(ctx, uuid, data)
+		}
 	}
 	if err != nil {
 		return err

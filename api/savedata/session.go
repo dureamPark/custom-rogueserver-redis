@@ -24,12 +24,21 @@ import (
 
 	"github.com/pagefaultgames/rogueserver/defs"
 	"github.com/pagefaultgames/rogueserver/repository"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 )
 
-func GetSession(context context.Context, uuid []byte, slot int) (defs.SessionSaveData, error) {
-	session, err := repository.Repos.Savedata.ReadSessionSaveData(context, uuid, slot)
+func GetSession(context context.Context, uuid []byte, slot int, level string) (defs.SessionSaveData, error) {
+	var session defs.SessionSaveData
+	var err error
+	if level == "Cache" {
+		session, err = repository.Repos.Savedata.ReadSessionSaveData(context, uuid, slot)
+	} else {
+		session, err = repository.ReposDB.Savedata.ReadSessionSaveData(context, uuid, slot)
+	}
+	//session, err = repository.Repos.Savedata.ReadSessionSaveData(context, uuid, slot);
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			logger.Error("Level : %s", level)
 			err = ErrSaveNotExist
 		}
 
@@ -39,9 +48,16 @@ func GetSession(context context.Context, uuid []byte, slot int) (defs.SessionSav
 	return session, nil
 }
 
-func UpdateSession(context context.Context, uuid []byte, slot int, data defs.SessionSaveData) error {
+func UpdateSession(context context.Context, uuid []byte, slot int, data defs.SessionSaveData, level string) error {
 	//err := db.StoreSessionSaveData(uuid, data, slot)
-	err := repository.Repos.Savedata.StoreSessionSaveData(context, uuid, data, slot)
+	var err error
+	if level == "Cache" {
+		err = repository.Repos.Savedata.StoreSessionSaveData(context, uuid, data, slot)
+	} else {
+		err = repository.ReposDB.Savedata.StoreSessionSaveData(context, uuid, data, slot)
+	}
+
+	//err := repository.Repos.Savedata.StoreSessionSaveData(context, uuid, data, slot)
 	if err != nil {
 		return err
 	}

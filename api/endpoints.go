@@ -202,13 +202,15 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 
 	switch r.PathValue("action") {
 	case "get":
-		save, err := savedata.GetSession(r.Context(), uuid, slot)
+		save, err := savedata.GetSession(r.Context(), uuid, slot, r.URL.Query().Get("Level"))
 		if errors.Is(err, sql.ErrNoRows) {
+			logger.Error("%s", err)
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
 
 		if err != nil {
+			logger.Error("%s", err)
 			httpError(w, r, err, http.StatusInternalServerError)
 			return
 		}
@@ -222,7 +224,7 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		existingSave, err := savedata.GetSession(r.Context(), uuid, slot)
+		existingSave, err := savedata.GetSession(r.Context(), uuid, slot, r.URL.Query().Get("Level"))
 		if err != nil {
 			if !errors.Is(err, savedata.ErrSaveNotExist) {
 				httpError(w, r, fmt.Errorf("failed to retrieve session save data: %s", err), http.StatusInternalServerError)
@@ -235,7 +237,7 @@ func handleSession(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		err = savedata.UpdateSession(r.Context(), uuid, slot, session)
+		err = savedata.UpdateSession(r.Context(), uuid, slot, session, r.URL.Query().Get("Level"))
 		if err != nil {
 			httpError(w, r, fmt.Errorf("failed to put session data: %s", err), http.StatusInternalServerError)
 			return
@@ -379,7 +381,7 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 
 	logger.Info("handleUpdateAll %s %d", uuid, data.SessionSlotId)
 
-	existingSave, err := savedata.GetSession(r.Context(), uuid, data.SessionSlotId)
+	existingSave, err := savedata.GetSession(r.Context(), uuid, data.SessionSlotId, r.URL.Query().Get("Level"))
 	if err != nil {
 		if !errors.Is(err, savedata.ErrSaveNotExist) {
 			httpError(w, r, fmt.Errorf("failed to retrieve session save data: %s", err), http.StatusInternalServerError)
@@ -392,14 +394,14 @@ func handleUpdateAll(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = savedata.Update(r.Context(), uuid, data.SessionSlotId, data.Session)
+	err = savedata.Update(r.Context(), uuid, data.SessionSlotId, data.Session, r.URL.Query().Get("Level"))
 	if err != nil {
 		logger.Error("%v", err)
 		httpError(w, r, err, http.StatusInternalServerError)
 		return
 	}
 
-	err = savedata.Update(r.Context(), uuid, 0, data.System)
+	err = savedata.Update(r.Context(), uuid, 0, data.System, r.URL.Query().Get("Level"))
 	if err != nil {
 		logger.Error("%v", err)
 		httpError(w, r, err, http.StatusInternalServerError)
@@ -445,7 +447,7 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		save, err := savedata.GetSystem(r.Context(), uuid)
+		save, err := savedata.GetSystem(r.Context(), uuid, r.URL.Query().Get("Level"))
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				http.Error(w, err.Error(), http.StatusNotFound)
@@ -487,7 +489,8 @@ func handleSystem(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		err = savedata.UpdateSystem(r.Context(), uuid, system)
+		//err = savedata.UpdateSystem(r.Context(), uuid, system)
+		err = savedata.UpdateSystem(r.Context(), uuid, system, r.URL.Query().Get("Level"))
 		if err != nil {
 			httpError(w, r, fmt.Errorf("failed to put system data: %s", err), http.StatusInternalServerError)
 			return

@@ -24,7 +24,7 @@ var (
 	logLevelNames = []string{"INFO", "WARN", "ERROR", "DEBUG"}
 	mu            sync.Mutex
 	logger        *log.Logger
-	currentLevel  LogLevel = WARN // Default log level
+	currentLevel  LogLevel = ERROR // Default log level
 )
 
 func init() {
