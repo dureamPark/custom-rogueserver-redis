@@ -208,10 +208,18 @@ func StoreSessionToken(ctx context.Context, uuid []byte, token []byte) error {
 	return Set(ctx, key, uuid, sessionTokenTTL)
 }
 
-// FetchSessionToken retrieves the uuid for a given token from Redis.
-func FetchSessionToken(ctx context.Context, token []byte) ([]byte, error) {
+// FetchUUIDFromToken retrieves the uuid for a given token from Redis.
+func FetchUUIDFromToken(ctx context.Context, token []byte) ([]byte, error) {
 	key := "token:" + base64.StdEncoding.EncodeToString(token)
 	return Rdb.Get(ctx, key).Bytes()
+}
+
+func FetchUsernameFromUUID(ctx context.Context, uuid []byte) (string, error) {
+
+	key := "session:" + base64.StdEncoding.EncodeToString(uuid)
+	username, err := Rdb.Get(ctx, key).Result()
+
+	return username, err
 }
 
 // RemoveSessionFromToken removes the token-uuid mapping from Redis.
@@ -361,7 +369,7 @@ func UpdateAccountStats(ctx context.Context, uuid []byte, stats defs.GameStats, 
 		pipe.Do(ctx, "JSON.SET", redisKey, jsonPath, "{}", "NX")
 		pipe.JSONSet(ctx, redisKey, jsonPath, intValue)
 		updateCount++
-		// log.Printf("Debug: Pipelining JSON.SET %s %s %d", redisKey, jsonPath, intValue)
+		logger.Info("Debug: Pipelining JSON.SET %s %s %d", redisKey, jsonPath, intValue)
 	}
 
 	// 3. `voucherCounts` 처리
@@ -382,7 +390,7 @@ func UpdateAccountStats(ctx context.Context, uuid []byte, stats defs.GameStats, 
 		pipe.Do(ctx, "JSON.SET", redisKey, jsonPath, "{}", "NX")
 		pipe.JSONSet(ctx, redisKey, jsonPath, count) // count는 이미 int
 		updateCount++
-		// log.Printf("Debug: Pipelining JSON.SET %s %s %d", redisKey, jsonPath, count)
+		logger.Info("Debug: Pipelining JSON.SET %s %s %d", redisKey, jsonPath, count)
 	}
 
 	// 4. 파이프라인 실행 (실제로 업데이트할 내용이 있을 때만)
@@ -392,15 +400,15 @@ func UpdateAccountStats(ctx context.Context, uuid []byte, stats defs.GameStats, 
 	}
 
 	cmders, err := pipe.Exec(ctx)
-	if err != nil {
-		logger.Error("Redis 파이프라인 실행 오류 (키: %s): %s", redisKey, err)
-		return err
-	}
+	// if err != nil {
+	// 	logger.Error("Redis 파이프라인 실행 오류 (키: %s): %s", redisKey, err)
+	// 	return err
+	// }
 
 	// 각 명령어의 성공 여부 확인 (선택적)
 	for i, cmd := range cmders {
-		if cmd.Err() != nil {
-			logger.Error("Redis 파이프라인 내 %d번째 업데이트 실패 (키: %s): %s", i+1, redisKey, cmd.Err())
+		if cmd.Err() != nil && cmd.Err() != redis.Nil {
+			logger.Error("Redis 파이프라인 내 %d번째 업데이트 실패 (cmd: %s): %s", i+1, cmd, cmd.Err())
 			// 어떤 필드 업데이트가 실패했는지 특정하기 어려울 수 있음 (파이프라인 순서 기반 추정)
 			return err
 		}

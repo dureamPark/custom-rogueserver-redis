@@ -8,6 +8,7 @@ import (
 	"github.com/pagefaultgames/rogueserver/cache"
 	"github.com/pagefaultgames/rogueserver/db"
 	"github.com/pagefaultgames/rogueserver/defs"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -61,6 +62,11 @@ func (r *savedataRepository) StoreSystemSaveDataS3(ctx context.Context, uuid []b
 }
 
 func (r *savedataRepository) DeleteSystemSaveData(ctx context.Context, uuid []byte) error {
+
+	err := cache.DeleteSystemSaveData(ctx, uuid)
+	if err != nil {
+		logger.Error("캐시에서 시스템 저장 데이터 삭제 오류: %s", err)
+	}
 	return r.next.DeleteSystemSaveData(ctx, uuid)
 }
 
@@ -68,7 +74,8 @@ func (r *savedataRepository) ReadSessionSaveData(ctx context.Context, uuid []byt
 
 	session, err := cache.ReadSessionSaveData(ctx, uuid, slot)
 
-	if errors.Is(err, redis.Nil) {
+	// err를 ErrSaveNotExist로 따로 선언해서 redis.Nil로 검사하면 안됨.
+	if err != nil {
 		session, err = db.ReadSessionSaveData(uuid, slot)
 	}
 
@@ -85,11 +92,18 @@ func (r *savedataRepository) StoreSessionSaveData(ctx context.Context, uuid []by
 }
 
 func (r *savedataRepository) DeleteSessionSaveData(ctx context.Context, uuid []byte, slot int) error {
-	cache.DeleteSessionSaveData(ctx, uuid, slot)
-	return r.next.DeleteSessionSaveData(ctx, uuid, slot)
+
+	err := cache.DeleteSessionSaveData(ctx, uuid, slot)
+	if err != nil {
+		logger.Error("캐시에서 세션 저장 데이터 삭제 오류: %s", err)
+	}
+	err = r.next.DeleteSessionSaveData(ctx, uuid, slot)
+
+	return err
 }
 
 func (r *savedataRepository) StoreSessionSaveDataBulk(ctx context.Context, uuids [][]byte, sessionsDataMapList []defs.SessionSaveData, slot int) error {
+	// bulk 처리니까 Cache는 안하고 db에서만 하기
 	return r.next.StoreSessionSaveDataBulk(ctx, uuids, sessionsDataMapList, slot)
 }
 

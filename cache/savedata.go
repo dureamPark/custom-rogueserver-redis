@@ -156,6 +156,14 @@ func StoreSystemSaveData(ctx context.Context, uuid []byte, data defs.SystemSaveD
 	return nil
 }
 
+func DeleteSystemSaveData(ctx context.Context, uuid []byte) error {
+
+	redisKey := "session:" + base64.StdEncoding.EncodeToString(uuid)
+	err := Rdb.JSONDel(ctx, redisKey, ".systemSaveData").Err()
+
+	return err
+}
+
 // FetchPlayTimeFromAccountStats 함수는 RedisJSON을 사용하여 캐시된 계정 통계에서 playTime만 가져옵니다.
 // uuidBytes는 계정의 []byte UUID입니다.
 func RetrievePlaytime(ctx context.Context, uuid []byte) (int, error) {

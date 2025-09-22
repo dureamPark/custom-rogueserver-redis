@@ -77,6 +77,18 @@ func SetJSON(ctx context.Context, key string, path string, jsonData interface{})
 		if err := Rdb.JSONSet(ctx, key, "$", "{}").Err(); err != nil {
 			return err
 		}
+
+		// 나머지 객체도 생성
+		pathRunes := []rune(path)
+		for i := 0; i < len(pathRunes); i++ {
+			if pathRunes[i] == '.' {
+				subPath := string(pathRunes[:i])
+				if err := Rdb.JSONSet(ctx, key, subPath, "{}").Err(); err != nil {
+					return err
+				}
+			}
+		}
+
 	}
 
 	err = Rdb.JSONSet(ctx, key, path, jsonData).Err()

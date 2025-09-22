@@ -225,6 +225,7 @@ func (r *accountCacheRepository) FetchTrainerIds(ctx context.Context, uuid []byt
 	if err != nil {
 		trainerId, secretId, err = r.next.FetchTrainerIds(ctx, uuid)
 		// 다시 캐시에 저장하기
+		cache.UpdateTrainerIds(ctx, trainerId, secretId, uuid)
 	}
 	return trainerId, secretId, err
 }
@@ -247,7 +248,11 @@ func (r *accountCacheRepository) UpdateActiveSession(ctx context.Context, uuid [
 // Token은 무조건 Cache에서 사용 중
 func (r *accountCacheRepository) FetchUUIDFromToken(ctx context.Context, token []byte) ([]byte, error) {
 	// 따로 건들이지는 않음.
-	return r.next.FetchUUIDFromToken(ctx, token)
+	uuid, err := cache.FetchUUIDFromToken(ctx, token)
+	// if err != nil {
+	// 	uuid, err = r.next.FetchUUIDFromToken(ctx, token)
+	// }
+	return uuid, err
 }
 
 func (r *accountCacheRepository) RemoveSessionFromToken(ctx context.Context, token []byte) error {
@@ -256,12 +261,20 @@ func (r *accountCacheRepository) RemoveSessionFromToken(ctx context.Context, tok
 }
 
 func (r *accountCacheRepository) FetchUsernameFromUUID(ctx context.Context, uuid []byte) (string, error) {
-	// cache에서 안가져옴?
-	return r.next.FetchUsernameFromUUID(ctx, uuid)
+	username, err := cache.FetchUsernameFromUUID(ctx, uuid)
+
+	if err != nil {
+		username, err = r.next.FetchUsernameFromUUID(ctx, uuid)
+		// cache에 넣기
+		key := "session:" + base64.StdEncoding.EncodeToString(uuid)
+		cache.SetJSON(ctx, key, "$.account.username", username)
+	}
+
+	return username, err
 }
 
 func (r *accountCacheRepository) FetchUUIDFromUsername(ctx context.Context, username string) ([]byte, error) {
-	// cache에서 안가져옴?
+	// 이거는 무조건 db에서 찾아옴.
 	return r.next.FetchUUIDFromUsername(ctx, username)
 }
 

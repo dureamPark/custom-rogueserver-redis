@@ -24,10 +24,12 @@ import (
 
 	"github.com/pagefaultgames/rogueserver/defs"
 	"github.com/pagefaultgames/rogueserver/repository"
+	"github.com/pagefaultgames/rogueserver/util/logger"
 )
 
 // /savedata/update - update save data
 func Update(context context.Context, uuid []byte, slot int, save any) error {
+	logger.Info("Update %s %d", uuid, slot)
 	err := repository.Repos.Account.UpdateAccountLastActivity(context, uuid)
 	if err != nil {
 		log.Print("failed to update account last activity")
@@ -35,6 +37,7 @@ func Update(context context.Context, uuid []byte, slot int, save any) error {
 
 	switch save := save.(type) {
 	case defs.SystemSaveData: // System
+		logger.Info("Update SystemSaveData %s", uuid)
 		if save.TrainerId == 0 && save.SecretId == 0 {
 			return fmt.Errorf("invalid system data")
 		}
@@ -48,6 +51,7 @@ func Update(context context.Context, uuid []byte, slot int, save any) error {
 		return repository.Repos.Savedata.StoreSystemSaveData(context, uuid, save)
 
 	case defs.SessionSaveData: // Session
+		logger.Info("Update SessionSaveData %s %d", uuid, slot)
 		if slot < 0 || slot >= defs.SessionSlotCount {
 			return fmt.Errorf("slot id %d out of range", slot)
 		}
